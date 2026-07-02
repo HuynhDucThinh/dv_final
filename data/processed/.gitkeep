@@ -1,0 +1,11 @@
+# Dữ liệu đã xử lý — PROCESSED DATA
+# ============================================================
+# Thư mục này chứa dữ liệu sau khi đã qua:
+#   - Làm sạch (Clean)
+#   - Chuẩn hóa (Normalize / Standardize)
+#   - Feature Engineering
+#   - Merge / Join từ nhiều nguồn
+#
+# Quy tắc đặt tên:
+#   <tên_bộ_dữ_liệu>_processed_<YYYY-MM-DD>.<định dạng>
+#   Ví dụ: sales_data_processed_2026-01-01.csv

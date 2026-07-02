@@ -1,0 +1,11 @@
+# Dữ liệu thô — RAW DATA
+# ============================================================
+# Thư mục này chứa dữ liệu gốc, KHÔNG chỉnh sửa trực tiếp.
+# Mọi bản gốc cần được bảo toàn nguyên vẹn.
+#
+# Quy tắc đặt tên:
+#   <tên_nguồn>_<YYYY-MM-DD>.<định dạng>
+#   Ví dụ: sales_data_2026-01-01.csv
+#
+# Định dạng phổ biến:
+#   - .csv, .xlsx, .json, .parquet, .db, .sql

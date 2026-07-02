@@ -1,0 +1,4 @@
+# Thư mục lưu biểu đồ, hình ảnh export từ notebooks
+# Định dạng: PNG, SVG, PDF
+# Quy tắc đặt tên: <notebook_số>_<mô_tả>.png
+# Ví dụ: 01_distribution.png, 01_correlation.png
