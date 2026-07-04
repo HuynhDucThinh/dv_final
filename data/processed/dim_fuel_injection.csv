@@ -1,0 +1,803 @@
+﻿id_hệ_thống_nạp,Hệ thống nạp nhiên liệu
+1,.
+2,...
+3,0000
+4,07
+5,1
+6,"1,5l"
+7,1.0
+8,1.0 Turbo
+9,1.0 Turbo tăng áp
+10,1.0AT
+11,1.0L
+12,1.1
+13,1.2
+14,1.25L
+15,1.2L
+16,1.3
+17,1.3L
+18,1.4
+19,1.4L
+20,1.4l
+21,1.5
+22,1.5 AT
+23,1.5 L
+24,1.5 hút khí tự nhiên
+25,1.5 turbo
+26,1.5G
+27,1.5L
+28,1.5tubor
+29,1.6
+30,1.6 L
+31,1.6 Turbo
+32,1.6 tubor
+33,1.6L
+34,1.8
+35,1.8 AT
+36,1.8G
+37,1.8L
+38,10
+39,100
+40,100l
+41,10lit
+42,11
+43,11lit
+44,12
+45,13
+46,2 at
+47,2.0
+48,2.0 Bi-Turbo
+49,2.0 L
+50,2.0 Tubor
+51,2.0 Turbo
+52,2.0 tubor
+53,2.0L
+54,2.0Tfsi
+55,2.0Tubor
+56,2.0l
+57,2.2
+58,2.2L
+59,2.2d
+60,2.2l
+61,2.3
+62,2.3L
+63,2.3L Turbo
+64,2.4
+65,2.4 GL
+66,2.4 L
+67,2.4 MIVEC
+68,2.4G
+69,2.4L
+70,2.4LE
+71,2.5
+72,2.5 L
+73,2.5L
+74,2.5l
+75,2.7
+76,2.7 DuraVVTi
+77,2.7L
+78,2.9
+79,3
+80,3.0
+81,3.0 L
+82,3.0 tubor
+83,3.0L
+84,3.2 turbo
+85,3.3
+86,3.3 LE
+87,3.5
+88,3.5L
+89,3.5L V6
+90,3.5L V6 Twin-Turbo
+91,3.6
+92,3.6 V8
+93,3.6 tubor
+94,3.7 V6
+95,37
+96,4
+97,4 máy
+98,4.0
+99,4.6
+100,4.7L
+101,40
+102,42
+103,4B12 DOHC MIVEC
+104,4M40 diesel
+105,4xilanh
+106,5
+107,"5,2"
+108,"5,5"
+109,5.0
+110,5.7
+111,5.7L
+112,5/100km
+113,50
+114,53
+115,55
+116,55l
+117,5l
+118,5l/100km
+119,5lit
+120,6
+121,6.5
+122,6.5 L
+123,6.75
+124,60
+125,65
+126,6L/100km
+127,7
+128,7 lit
+129,70
+130,8
+131,"8,2"
+132,"8,8"
+133,800
+134,80L
+135,85
+136,9
+137,92
+138,93
+139,95
+140,9l
+141,A
+142,A95
+143,AMG
+144,AT
+145,Aaa
+146,Abc
+147,Adf
+148,Ativ
+149,B
+150,BMW ActiveHybrid
+151,BXC
+152,Bec
+153,Bec phun
+154,Bec trupo
+155,Bep
+156,Betphun
+157,Bi Turble
+158,Bi turbo
+159,Bi-Turbo
+160,Bi-tubo
+161,Bi-turbo
+162,Bi_Turbo
+163,Biturbo
+164,Bom bec
+165,Bom-tubo-
+166,Bxc
+167,Béc Dầu Điện
+168,Béc Phun
+169,Béc cơ
+170,Béc phun
+171,Bét phun
+172,Bét phung xăng điện tủ
+173,Bình
+174,Bình xăng
+175,Bình xăng con
+176,Bơm
+177,Bơm cao áp
+178,Bơm xăng
+179,Bơm điện
+180,Bộ chế
+181,Bộ chế hoà khí
+182,Bộ khí điều hoà
+183,CDI
+184,CDi
+185,CGI
+186,CHK
+187,CRDI
+188,CRDi
+189,CRDi 16V
+190,CRDi Turbo
+191,CVT
+192,CVVT
+193,Chế hòa khí
+194,Chế
+195,Chế hoà khí
+196,Chế hòa khí
+197,Civic G
+198,Comanrail
+199,Common Rail
+200,Common rail
+201,Commonrail
+202,Comorai
+203,Crdi
+204,Cvt
+205,Có
+206,Căng
+207,Cơ
+208,Cơm
+209,D
+210,D-4S
+211,DI-D
+212,DI.D
+213,DID
+214,DISSEL
+215,DO
+216,DOHC
+217,DOHC 16V
+218,Dau
+219,Denzen
+220,Di
+221,Die sel
+222,Dien
+223,Dien tu
+224,Diesel
+225,Diesel R 2.2L e-VGT
+226,Diezel
+227,Diezen
+228,Diezenp
+229,Disel
+230,Diêsel
+231,Diện tử
+232,Dohc
+233,Dreamearth
+234,Dt
+235,Dua VTI
+236,Dua vvti
+237,Dual
+238,Dual - VVTi
+239,Dual VTT i
+240,Dual VTTi
+241,Dual VVTI
+242,Dual vvt-i
+243,Dual vvti
+244,Duall VTTi
+245,Dura VVTi
+246,Dâu
+247,Dùng Xăng xạc pin
+248,Dầu
+249,Dầu 2.0
+250,Dầu 2.2
+251,Dầu 3.2L
+252,Dầu Diesel 2.2
+253,Dầu diesel
+254,ECI - Multi
+255,ECOBOOST
+256,EFI
+257,EFI Turbo
+258,EFI phun điện tử
+259,EFi
+260,EPI
+261,EQ Boost
+262,EVGT
+263,EVGt
+264,Eco
+265,Eco 1.6L
+266,Eco siêu tiết kiệm nhiên liệu
+267,Eco tech
+268,Eco tiết kiệm nhiên liệu
+269,EcoBoost
+270,Ecoblue
+271,Ecoboost
+272,Ecoboot
+273,Ecobost
+274,Effi
+275,Efi
+276,F
+277,F1
+278,FI
+279,Fe
+280,Fev
+281,Fi
+282,Fi phun xăng điện tử
+283,Fj
+284,Fo
+285,Ful xăng điện tử
+286,Full
+287,Full dầu điện tử
+288,Full xăng
+289,Full xăng điện tử
+290,Full điện tử
+291,Fun NL điện tử
+292,Fun dâu
+293,Fun dầu điện tử
+294,Fun xăn điện tử
+295,Fun xăng
+296,Fun xăng điện tử
+297,Fun xăng điện tử
+298,Fun điện tử
+299,G
+300,GA CƠ-TURBO TĂNG ÁP
+301,GDI
+302,GDI 1.6 Tubo
+303,GDi
+304,Gdi
+305,Giá cực tốt
+306,Gió tự nhiên
+307,Good
+308,H
+309,Heo béo
+310,Heo dầu
+311,Heo dầu cơ
+312,Hoà khí/ phun xăng điện tử
+313,Hoả khí
+314,Hut khí tự nhiên
+315,Hybrit
+316,Hút Khí Tự Nhiên
+317,Hút khi tự nhiên
+318,Hút khí
+319,Hút khí tự nhiên
+320,Hút nén nổ xả
+321,Hút tự nhiên
+322,Hút. Khí tự nhiên
+323,I
+324,I-vtec
+325,I4 2.0
+326,I4 2.0l
+327,Ip
+328,K
+329,K 1.0
+330,KAPPA 1.2
+331,KAPPA 1.4
+332,Kapa
+333,Kappa
+334,Kappa 1.2 MPI
+335,Kappa 1.4 MPI
+336,Khi nap tu nhien
+337,Khí
+338,Khí nạp tự nhiên
+339,Khí tư nhiên
+340,Khí tự nhiên
+341,Không rõ
+342,Kim Phun
+343,Kim Phun Xăng
+344,Kim Phun Điện Tử
+345,Kim cơ
+346,Kim ful
+347,Kim ful điện tử
+348,Kim full
+349,Kim full điện tử
+350,Kim fun
+351,Kim phun
+352,Kim phun xăng
+353,Kim phun xăng điện
+354,Kim phun xăng điện tử
+355,Kim phun đien tử
+356,Kim phun điênh tưt
+357,Kim phun điện tư
+358,Kim phun điện tử
+359,Kim phun điện tử kết hợp với Turbo tăng áp
+360,Kim phun điện tử đa điểm
+361,Km
+362,Km phun điện tủ
+363,Ko bt
+364,Kìm full điện tử
+365,L
+366,Lit
+367,M
+368,MFI
+369,MIVEC
+370,MPI
+371,Mercedes-Benz
+372,Mild Hybrid
+373,Mivec
+374,Mpi
+375,Máy cơ
+376,Máy dầu
+377,Máy xăng
+378,Nap
+379,New
+380,Nu
+381,Nu 1.6 Turbo
+382,Nạp
+383,Nạp xả
+384,Nạp điện
+385,Ohun
+386,PDĐT
+387,PGM-Fi
+388,PHUN DẦU
+389,PHUN DẦU ĐIỆN TỬ
+390,PHUN NHIEN LIỆU
+391,PHUN NHIÊN LIỆU TRỰC TIẾP
+392,PHUN XĂNG
+393,PHUN XĂNG TĂNG ÁP
+394,PHUN XĂNG ĐIỆN TỬ
+395,PXĐT
+396,Phanh
+397,Phin xăng
+398,Phu
+399,Phu săng điện tử
+400,Phum xăng
+401,Phun
+402,Phun Dầu Turbo
+403,Phun Dầu Turbo đơn
+404,Phun Dầu Điện Tử
+405,Phun Dầu điện tử
+406,Phun Nguyên Liệu Trực Tiếp
+407,Phun Trưc Tiếp
+408,Phun Trưc TiếpTrưc
+409,Phun Trục Tiếp
+410,Phun Trực Tiếp
+411,Phun Xang Dien Tu
+412,Phun Xang dien tu
+413,Phun Xămg Điện Tử
+414,Phun Xăng
+415,Phun Xăng Trực Tiếp
+416,Phun Xăng Điện Tử
+417,Phun Xăng Điện Tử
+418,Phun Xăng Điện tử
+419,Phun Xăng đa điểm
+420,Phun Xăng điện tử
+421,Phun cao ap
+422,Phun căng
+423,Phun dau
+424,Phun dau dien tu
+425,Phun dau điện tu
+426,Phun dien tu
+427,Phun diện tử
+428,Phun dt
+429,Phun dầu
+430,Phun dầu Turbo kép
+431,Phun dầu trực tiếp
+432,Phun dầu turbo
+433,Phun dầu turbo kép
+434,Phun dầu turbo đơn
+435,Phun dầu điện từ
+436,Phun dầu điện tử
+437,Phun dầu điện tử .
+438,Phun dầu điện tử Common Rail
+439,Phun dầu điện tử Euro 4-TURBO TĂNG ÁP
+440,Phun dầu điện tử commonrail
+441,"Phun dầu điện tử, Turbo tăng áp biến thiên"
+442,"Phun dầu điện tử, turbo tăng áp"
+443,"Phun dầu điện tử, tăng áp, biến thiên"
+444,Phun dầu điện tử.
+445,Phun kim điện tử
+446,Phun nhiên liệu
+447,Phun nhiên liệu kép
+448,Phun nhiên liệu trực tiếp
+449,Phun nhiên liệu trực tiếp sử dụng đường ống dẫn ch
+450,Phun nhiên liệu trực tuếp
+451,Phun nhiên liệu điện tử
+452,Phun nhiên liệu điện tử EFI
+453,Phun nhiên liệui điện tử
+454,Phun săng điện tử
+455,Phun sương nhiên liệu
+456,Phun trực tiếp
+457,Phun trực tiếp với Turbo tăng áp
+458,Phun trực tiếp đa điểm
+459,Phun trực tiệp
+460,Phun tự nhiên
+461,Phun xang
+462,Phun xang dien tu
+463,Phun xang điện tử
+464,Phun xĂng trực tiếp
+465,Phun xăng
+466,Phun xăng DT
+467,Phun xăng diễn tu
+468,Phun xăng fi
+469,Phun xăng gián tiếp
+470,Phun xăng hoà khí
+471,Phun xăng trực tiếp
+472,Phun xăng trực
+473,Phun xăng trực tiếp
+474,Phun xăng trực tiếp có turbo tăng áp
+475,Phun xăng trực tiếp.
+476,Phun xăng tăng áp
+477,Phun xăng tăng áp Ecoboost
+478,Phun xăng tự động
+479,Phun xăng tự động. Kim phun đt.
+480,Phun xăng Điện Tử
+481,Phun xăng đa điểm
+482,Phun xăng đa điểm MPI
+483,Phun xăng đa điểm MPi
+484,Phun xăng đa điển điện tử
+485,Phun xăng điên tư
+486,Phun xăng điên tử
+487,Phun xăng điện tử
+488,Phun xăng điện
+489,Phun xăng điện tủ
+490,Phun xăng điện từ
+491,Phun xăng điện tử
+492,Phun xăng điện tử - hút gió tự nhiên
+493,Phun xăng điện tử FI
+494,Phun xăng điện tử kết hợp điện
+495,Phun xăng điện tử thông minh
+496,Phun xăng điện tử trực tiếp
+497,Phun xăng điện tử tubo
+498,Phun xăng điện tử đa điểm
+499,Phun xăng điện tự
+500,Phun xăng đt
+501,Phun Điện Tử
+502,Phun Điện tu
+503,Phun đa điểm
+504,Phun đien tu tubo
+505,Phun đien tử
+506,Phun điện tử
+507,Phun điện tu
+508,Phun điện tử
+509,Phun điện tử EFI
+510,Phun đầu
+511,Phung xang dien tu
+512,Phung xăng điện tử
+513,Phụ xăng trực tiếp
+514,Pin
+515,Pun xăng điện tử
+516,Ron 95
+517,SKYACTIV
+518,SMARTREAM
+519,Sang
+520,Sau
+521,Single Turbo Diesel 2.0L i4 TDCi
+522,Siêu nạp
+523,Sky active
+524,SkyActiv
+525,SkyActiv G
+526,SkyActiv-G 2.0L
+527,Skyactiv
+528,Skyactiv G
+529,Skyactive
+530,Skyactive - G
+531,Skyactive G
+532,Skyactive-X
+533,SmartStream
+534,SmartStream 2.0
+535,Smartream G1.5
+536,Smartream G2.0
+537,Smartstream
+538,Smartstream 1.5D Turbo
+539,Smartstream 1.6T
+540,Smartstream 2.2D
+541,Smartstream G2.0
+542,Smartstream G2.2
+543,Smartstream G2.5
+544,Smarttream
+545,Ssi
+546,Supercharged
+547,Supercharged & Turbocharged
+548,Suv
+549,Săng
+550,Sạc
+551,Sạc điện
+552,Số tự động
+553,T
+554,TCD4l
+555,TCDI
+556,TD
+557,TDCI
+558,TDCI 2.2
+559,TDCi
+560,TDIC
+561,TFI 2.0
+562,TFSI
+563,TFi
+564,TSI
+565,TURBO
+566,TURBO TĂNG ÁP
+567,Tay
+568,Td
+569,Tdci
+570,Thông minh
+571,Thường
+572,Thế Hệ Mới
+573,Ti
+574,Tiwn Power Tubo
+575,TiwwinPower Turbo
+576,Tiết kiệm nhiên liệu tối đa
+577,Truyền động trực tiếp
+578,Trạm sạc
+579,Trực Tiếp
+580,Trực tiếp
+581,Tu bô
+582,Tu bô kép
+583,Tu dong
+584,Tu đong
+585,Tubo
+586,Tubo fi diesel
+587,Tubo kép
+588,Tubo phun xăng điện tử
+589,Tubo tăng ap
+590,Tubo tăng áp
+591,Tubo điện
+592,Tubo điện tử
+593,Tubor
+594,Tubor biến thiên
+595,Tubor tăng áp
+596,Turbo
+597,Turbo 2.0
+598,Turbo 2.4
+599,Turbo Diesel
+600,Turbo Direct Injection
+601,Turbo Injection
+602,Turbo Tăng áp
+603,Turbo kép
+604,Turbo phun cap áp
+605,Turbo tăng áp
+606,Turbo tăng áp Ecoboost
+607,Turbo tăng áp Tiết Kiệm Nhiên Liệu
+608,Turbo tăng áp kép
+609,Turbo tăng áp kết hợp với phun xăng trực tiếp
+610,Turbo tăng áp mạnh mẽ tiết kiệm nhiên liệu
+611,Turbo tăng áp rất tiết kiệm nhiên liệu
+612,"Turbo tăng áp, phun nhiên liệu trực tiếp"
+613,Turbo vtec
+614,Turbor
+615,Twin Power Tubo
+616,Twin Turbo
+617,TwinPowerTurbo
+618,Tăng ap
+619,Tăng áp
+620,Tăng áp khí nạp(turbo)
+621,Tăng áp kéo
+622,Tăng áp kép
+623,Tăng áp kép (Bi turbo)
+624,Tăng áp điện
+625,Tốt
+626,Tự dong
+627,Tự nhiên
+628,Tự động
+629,V- vtek
+630,V-Tect
+631,V-tec
+632,V12 6.5L
+633,V6 3.0
+634,V6 3.5
+635,V6 3.5L
+636,V6 DUAL VVT-1
+637,V8
+638,V8 3.9L
+639,V8 4.0L
+640,V8 4.7
+641,V8 4.8L
+642,VTI
+643,VTV-I
+644,VTV-i
+645,VTVI
+646,VVT
+647,VVT i
+648,VVT-i
+649,VVT-i I4
+650,VVTI
+651,VVTI - II
+652,VVTi
+653,Van
+654,Vtec
+655,Vti
+656,Vtti
+657,Vvi
+658,Vvti
+659,Vvvi
+660,WF
+661,WW
+662,X
+663,XAng
+664,Xang
+665,Xangw
+666,Xanhw
+667,Xe xăng
+668,Xilanh
+669,Xupap
+670,Xyz
+671,XĂNG
+672,XĂng
+673,Xăng
+674,Xăng + Điện
+675,Xăng 1.2L
+676,Xăng 2.0
+677,Xăng 2.0L
+678,Xăng 2.4 L
+679,Xăng 3.0
+680,Xăng 3.0 L
+681,Xăng 3.0L
+682,Xăng 3.3L
+683,Xăng 3.5
+684,Xăng 3.5L
+685,Xăng 4.0
+686,Xăng 4.0 L
+687,Xăng 4.7L
+688,Xăng 5.2 L
+689,Xăng 6.0 L
+690,Xăng 95
+691,Xăng điện
+692,Xăng điện tử
+693,Xằng
+694,bi turbo 2.0L
+695,bình
+696,bơm
+697,bơm cao áp phun nhiên liệu
+698,chế hoà khí
+699,crdi
+700,cơ
+701,dien tu
+702,diesel
+703,diezen
+704,dầu
+705,e-VGT
+706,eVGT
+707,ffi
+708,fhun điện tử
+709,fi
+710,full xăng điện tử
+711,full điện tử
+712,ga cơ
+713,giá tốt
+714,gián tiếp
+715,hybit
+716,hydbit
+717,hút khí tự nhiên
+718,hệ thống đánh lửa trực tiếp DIS có điều khiển thời
+719,i-Vtec
+720,i-vtec
+721,khí
+722,kim phun
+723,kim phun trực tiếp
+724,kim phun xăng điện tử
+725,kim phun điện tử
+726,kim phun đôi
+727,mercedes
+728,mpi
+729,pgm
+730,phun
+731,phun dau dien tu
+732,phun dầu
+733,phun dầu điện tử
+734,phun dầu điện tử common rail
+735,phun nhiên liệu điện tử
+736,phun trực tiếp
+737,phun xang
+738,phun xang dien tu
+739,phun xang truc tiep
+740,phun xăng
+741,phun xăng dầu
+742,phun xăng trực tiếp
+743,phun xăng trực tiếp
+744,phun xăng tăng áp
+745,phun xăng đa điểm
+746,phun xăng điên tử
+747,phun xăng điênj tử
+748,phun xăng điện tử
+749,phun xăng điẹn tử
+750,phun xăng điện tử
+751,phun xăng điện tử 1.6l
+752,phun xăng điện tử đa điểm
+753,phun xănng
+754,phun điện tử
+755,phundientu
+756,phung xăng điện tử
+757,tiếp
+758,truc tiep
+759,trưc tiếp
+760,trạm sạc
+761,trực tiếp
+762,tubo
+763,tubo Dầu
+764,turbo
+765,turbo kép
+766,tăng áp
+767,tăng áp điện tử
+768,tự nhiên
+769,tự động
+770,vur
+771,vvt-iw
+772,xang
+773,xăng
+774,xăng trực tiếp
+775,Đ
+776,ĐIỆN TỬ
+777,Đien tử
+778,Điezen
+779,Điên tư
+780,Điên tử
+781,Điện tử
+782,Điện
+783,Điện Tử
+784,Điện cao ap
+785,Điện cao áp
+786,Điện trực tiếp
+787,Điện tu
+788,Điện tủ
+789,Điện tử
+790,Đt
+791,Đâu
+792,Động cơ
+793,Động cơ Bi-Turbo Diesel 2.0L i4 TDCi
+794,Động cơ Diêzn
+795,Động cơ Eco boost độc quyền
+796,Động cơ xăng
+797,điẹp
+798,điện
+799,điện tư
+800,điện từ
+801,điện tử
+802,đổ

@@ -34,9 +34,7 @@ data/raw/*.csv
 data/raw/*.xlsx
 data/raw/*.parquet
 data/raw/*.json
-data/processed/*.csv
-data/processed/*.xlsx
-data/processed/*.parquet
+
 
 # ============================================================
 # Model files (có thể nặng)

@@ -1,0 +1,613 @@
+﻿id_phân_khúc,id_hãng,Grade
+1,1,CL
+2,1,MDX
+3,1,ZDX
+4,2,Rapide
+5,3,A1
+6,3,A3
+7,3,A4
+8,3,A5
+9,3,A6
+10,3,A7
+11,3,A8
+12,3,E-tron GT
+13,3,Q2
+14,3,Q3
+15,3,Q5
+16,3,Q6
+17,3,Q7
+18,3,Q8
+19,3,S8
+20,3,TT
+21,4,1 Series
+22,4,2 Series
+23,4,3 Series
+24,4,4 Series
+25,4,5 Series
+26,4,6 Series
+27,4,7 Series
+28,4,M4
+29,4,M5
+30,4,X1
+31,4,X2
+32,4,X3
+33,4,X4
+34,4,X5
+35,4,X6
+36,4,X7
+37,4,Z4
+38,4,i8
+39,5,F0
+40,6,Beijing X7
+41,6,F6
+42,6,Q7
+43,7,Bentayga
+44,7,Continental
+45,7,Flying Spur
+46,7,Mulsanne
+47,8,Xiaoma
+48,9,3 Series
+49,9,4 Series
+50,9,5 Series
+51,9,7 Series
+52,9,M3
+53,9,M4
+54,9,X3
+55,9,X5
+56,9,X6
+57,9,X7
+58,9,Z4
+59,10,V7
+60,11,LaCrosse
+61,12,Atto
+62,12,Han
+63,12,M6
+64,12,M9
+65,12,Seal
+66,12,Sealion
+67,13,Escalade
+68,13,SRX
+69,13,STS
+70,13,Seville
+71,14,CX20
+72,15,Khác
+73,15,QQ3
+74,16,Aveo
+75,16,Camaro
+76,16,Captiva
+77,16,Colorado
+78,16,Cruze
+79,16,Express
+80,16,Lacetti
+81,16,Orlando
+82,16,Spark
+83,16,Trailblazer
+84,16,Trax
+85,16,Vivant
+86,17,300C
+87,18,DS3
+88,19,Espero
+89,19,Gentra
+90,19,GentraX
+91,19,Khác
+92,19,Labo
+93,19,Lacetti
+94,19,Lanos
+95,19,Leganza
+96,19,Magnus
+97,19,Matiz
+98,19,Novus
+99,19,Nubira
+100,19,Super Saloon
+101,19,Winstorm
+102,20,Citivan
+103,20,Feroza
+104,20,Hijet
+105,20,Terios
+106,21,Caravan
+107,22,DB X30
+108,22,DB1021
+109,22,Khác
+110,22,SRM X30
+111,22,Srm
+112,23,Box
+113,23,Khác
+114,23,Mage
+115,24,488
+116,24,California
+117,24,F8
+118,24,Khác
+119,24,Roma
+120,24,SF90 Stradale
+121,25,500
+122,25,Albea
+123,25,Doblo
+124,25,Siena
+125,26,EcoSport
+126,26,Escape
+127,26,Everest
+128,26,Explorer
+129,26,F150
+130,26,F350
+131,26,Fiesta
+132,26,Focus
+133,26,Laser
+134,26,Mondeo
+135,26,Mustang
+136,26,Ranger
+137,26,Territory
+138,26,Tourneo
+139,26,Transit
+140,27,Yukon
+141,28,M6
+142,29,3308
+143,29,Gazele
+144,29,Khác
+145,30,Coolray
+146,30,Emgrand
+147,30,Ex5
+148,30,Khác
+149,30,Monjaro
+150,31,7X
+151,32,H6
+152,32,Jolion
+153,33,300 Series
+154,33,500 Series
+155,33,Khác
+156,34,Accord
+157,34,Br V
+158,34,Brio
+159,34,CRV
+160,34,City
+161,34,Civic
+162,34,Crv
+163,34,HRV
+164,34,Hrv
+165,34,Jazz
+166,34,Odyssey
+167,35,E-HS9
+168,35,H9
+169,36,H2
+170,37,Accent
+171,37,Avante
+172,37,Click
+173,37,County
+174,37,Creta
+175,37,Custin
+176,37,Elantra
+177,37,Eon
+178,37,Equus
+179,37,Galloper
+180,37,Genesis
+181,37,Getz
+182,37,Grace
+183,37,Grand Starex
+184,37,Grandeur
+185,37,H 1
+186,37,H 100
+187,37,HD
+188,37,I10
+189,37,Khác
+190,37,Kona
+191,37,Libero
+192,37,Mighty
+193,37,Mobistar
+194,37,Palisade
+195,37,Porter
+196,37,SantaFe
+197,37,Santafe
+198,37,Solati
+199,37,Sonata
+200,37,Starex
+201,37,Stargazer
+202,37,Terracan
+203,37,Trajet
+204,37,Tucson
+205,37,Universe
+206,37,Universe Xpress Luxury
+207,37,Veloster
+208,37,Venue
+209,37,Veracruz
+210,37,Verna
+211,37,Xcent
+212,37,eMighty
+213,37,i10
+214,37,i20
+215,37,i30
+216,38,EX
+217,38,FX
+218,38,G35
+219,38,G37
+220,38,QX
+221,39,Dmax
+222,39,FVR
+223,39,Frr
+224,39,Hi lander
+225,39,Khác
+226,39,MU-X
+227,39,Mu
+228,39,NLR
+229,39,NMR
+230,39,NPR
+231,39,NQR
+232,39,QKR
+233,39,Qkr
+234,39,Trooper
+235,40,Daily
+236,40,Khác
+237,41,J7
+238,42,F-Pace
+239,42,XE
+240,42,XF
+241,42,XJ series
+242,43,Gladiator
+243,43,Grand cherokee
+244,43,Khác
+245,43,Wrangler
+246,44,Bongo
+247,44,Carens
+248,44,Carnival
+249,44,Cerato
+250,44,Forte
+251,44,Frontier
+252,44,K2700
+253,44,K3
+254,44,K3000S
+255,44,K5
+256,44,Khác
+257,44,Morning
+258,44,Optima
+259,44,Picanto
+260,44,Pride
+261,44,Ray
+262,44,Rio
+263,44,Rondo
+264,44,Sedona
+265,44,Seltos
+266,44,Soluto
+267,44,Sonet
+268,44,Sorento
+269,44,Soul
+270,44,Spectra
+271,44,Sportage
+272,45,Aventador
+273,45,Huracan
+274,45,Urus
+275,46,Defender
+276,46,Discovery
+277,46,Discovery Sport
+278,46,Freelander
+279,46,Range Rover
+280,46,Range Rover Evoque
+281,46,Range Rover Sport
+282,46,Range Rover Velar
+283,47,Defender
+284,47,Range Rover
+285,47,Range Rover Evoque
+286,47,Range Rover Sport
+287,47,Range Rover Velar
+288,48,ES
+289,48,Es
+290,48,GS
+291,48,GX
+292,48,Gx
+293,48,IS
+294,48,LC
+295,48,LM
+296,48,LS
+297,48,LX
+298,48,Lm
+299,48,Ls
+300,48,Lx
+301,48,NX
+302,48,RC
+303,48,RX
+304,48,Rx
+305,49,320
+306,49,520
+307,50,Navigator
+308,51,M7
+309,51,U7
+310,52,06
+311,53,5
+312,53,HS
+313,53,ZS
+314,54,Ghibli
+315,54,GranCabrio
+316,54,GranTurismo
+317,54,Grancabrio
+318,54,Grecale
+319,54,Levante
+320,54,MC20
+321,54,Quattroporte
+322,55,2
+323,55,3
+324,55,323
+325,55,5
+326,55,6
+327,55,626
+328,55,BT50
+329,55,CX 30
+330,55,CX5
+331,55,CX7
+332,55,CX8
+333,55,CX9
+334,55,Cx
+335,55,Cx3
+336,55,Cx5
+337,55,Cx8
+338,55,Premacy
+339,55,Tribute
+340,55,cx3
+341,56,650s
+342,56,720S
+343,56,765LT
+344,57,Premio
+345,58,A class
+346,58,AMG GT
+347,58,C Class
+348,58,C class
+349,58,CLA class
+350,58,CLK class
+351,58,CLS class
+352,58,E Class
+353,58,E class
+354,58,EQS
+355,58,Eqb
+356,58,Eqe
+357,58,Eqs
+358,58,G Class
+359,58,G class
+360,58,GL
+361,58,GLA class
+362,58,GLB
+363,58,GLC
+364,58,GLE Class
+365,58,GLK Class
+366,58,GLS
+367,58,Glb
+368,58,Glc
+369,58,Gle Class
+370,58,Gls
+371,58,Khác
+372,58,MB
+373,58,ML Class
+374,58,Maybach
+375,58,R class
+376,58,S Class
+377,58,S class
+378,58,SL class
+379,58,SLK class
+380,58,Sl Class
+381,58,Sprinter
+382,58,V Class
+383,58,V class
+384,58,Vito
+385,59,5
+386,59,G50
+387,59,Hs
+388,59,Rx5
+389,59,Zs
+390,60,Cooper
+391,60,Countryman
+392,60,One
+393,61,Attrage
+394,61,Canter
+395,61,Colt
+396,61,Destinator
+397,61,Grandis
+398,61,Grunder
+399,61,Jolie
+400,61,Khác
+401,61,L300
+402,61,Lancer
+403,61,Mirage
+404,61,Montero
+405,61,Outlander
+406,61,Outlander Sport
+407,61,Pajero
+408,61,Pajero Sport
+409,61,Triton
+410,61,XFC
+411,61,Xforce
+412,61,Xpander
+413,61,Zinger
+414,62,Almera
+415,62,Bluebird
+416,62,Cedric
+417,62,Cefiro
+418,62,Grand livina
+419,62,Juke
+420,62,Kicks
+421,62,Livina
+422,62,Maxima
+423,62,Micra
+424,62,Murano
+425,62,Navara
+426,62,Patrol
+427,62,Pixo
+428,62,Primera
+429,62,Pulsar
+430,62,Qashqai
+431,62,Quest
+432,62,Rogue
+433,62,Sentra
+434,62,Sunny
+435,62,Teana
+436,62,Terra
+437,62,Terrano
+438,62,Tiida
+439,62,X trail
+440,63,107
+441,63,2008
+442,63,208
+443,63,3008
+444,63,405
+445,63,408
+446,63,5008
+447,63,508
+448,63,605
+449,63,RCZ
+450,63,Traveller
+451,64,Solstice
+452,65,718
+453,65,911
+454,65,Boxster
+455,65,Cayenne
+456,65,Macan
+457,65,Panamera
+458,65,Taycan
+459,66,Wira
+460,67,1500
+461,68,1500
+462,69,Duster
+463,69,Khác
+464,69,Koleos
+465,69,Latitude
+466,69,Megane
+467,69,Sandero
+468,70,Cullinan
+469,70,Ghost
+470,70,Phantom
+471,70,Silver
+472,70,Wraith
+473,71,V5
+474,72,SM3
+475,72,SM5
+476,73,Xd
+477,74,Karoq
+478,74,Kodiaq
+479,74,Kushaq
+480,74,Slavia
+481,75,Forfour
+482,75,Fortwo
+483,76,Korando
+484,76,Musso
+485,76,Rexton
+486,76,Stavic
+487,76,Tivoli
+488,77,BRZ
+489,77,Brz
+490,77,Crosstrek
+491,77,Forester
+492,77,Outback
+493,77,WRX
+494,77,Wrx
+495,78,APV
+496,78,Alto
+497,78,Baleno
+498,78,Carry
+499,78,Celerio
+500,78,Ciaz
+501,78,Ertiga
+502,78,Fronx
+503,78,Grand vitara
+504,78,Jimny
+505,78,Super Carry Truck
+506,78,Super Carry Van
+507,78,Swift
+508,78,Vitara
+509,78,Wagon R+
+510,78,XL7
+511,78,Xl7
+512,79,300
+513,79,500
+514,80,X
+515,81,Auman
+516,81,Aumark
+517,81,Forland
+518,81,Foton
+519,81,Frontier
+520,81,Khác
+521,81,Mobihome
+522,81,Ollin
+523,81,Towner
+524,82,Mcar
+525,83,4 Runner
+526,83,86
+527,83,Alphard
+528,83,Avalon
+529,83,Avanza
+530,83,Aygo
+531,83,Camry
+532,83,Celica
+533,83,Corolla
+534,83,Corolla Cross
+535,83,Corolla altis
+536,83,Corona
+537,83,Cressida
+538,83,Crown
+539,83,Fortuner
+540,83,Hiace
+541,83,Highlander
+542,83,Hilux
+543,83,Innova
+544,83,Khác
+545,83,Land Cruiser
+546,83,Prado
+547,83,Previa
+548,83,Prius
+549,83,RAV4
+550,83,Raize
+551,83,Rush
+552,83,Sequoia
+553,83,Sienna
+554,83,Starlet
+555,83,Van
+556,83,Veloz
+557,83,Venza
+558,83,Vios
+559,83,Wigo
+560,83,Wish
+561,83,Yaris
+562,83,Zace
+563,84,Hunter
+564,84,Pickup
+565,85,Fadil
+566,85,Lux A 2.0
+567,85,Lux SA 2.0
+568,85,President
+569,85,VF e34
+570,85,VF5
+571,85,VF8
+572,85,VF9
+573,86,1980T
+574,86,990T
+575,86,Jinbei
+576,86,Khác
+577,87,Ec
+578,87,Lac Hong 900
+579,87,Limo
+580,87,Vf3
+581,87,Vf5
+582,87,Vf6
+583,87,Vf7
+584,87,Vf8
+585,87,Vf9
+586,88,Beetle
+587,88,Golf
+588,88,Khác
+589,88,New Beetle
+590,88,Passat
+591,88,Polo
+592,88,Scirocco
+593,88,T-Cross
+594,88,Teramont
+595,88,Tiguan
+596,88,Touareg
+597,88,Viloran
+598,88,Virtus
+599,89,Ec40
+600,89,S60
+601,89,S90
+602,89,V60
+603,89,XC40
+604,89,XC60
+605,89,XC90
+606,89,Xc40
+607,89,Xc60
+608,89,Xc90
+609,90,Hongguang
+610,91,Khác
+611,91,Z500
+612,91,Z8
