@@ -1,0 +1,56 @@
+
+
+--- TRANG 1 ---
+ĐỒÁN CUỐI KỲ
+TRỰC QUAN HÓA DỮLIỆU
+Nội dung
+• Trình bày một dựán ứng dụng trực quan sửdụng dashboard để
+phân tích dữliệu
+• Ngữcảnh của dữliệu là Việt Nam
+• Các nhóm trình bày trong buổi vấn đáp.
+Yêu cầu vềdữliệu
+Dữliệu là dữliệu thật có liên quan đất nước Việt Nam. Dữliệu phải
+có tối thiểu 7 biến độc lập và tối thiểu 2000 dòng. Tổng sốdữliệu
+liên quan đến Việt Nam phải trên 50% dữliệu
+Các tiêu chí đểđánh giá
+1. Kết hợp nguồn dữliệu đáng tin cậy:
+• Nếu có bất kỳnguồn dữliệu nào được sửdụng, đảm bảo rằng
+nó đáng tin cậy và được cung cấp một cách minh bạch.
+• Kiểm tra xem liệu có bất kỳthiếu sót nào trong quy trình xử
+lý dữliệu hay không.
+2. Phù hợp với mục đích:
+1
+
+
+--- TRANG 2 ---
+• Trực quan hóa phải phản ánh mục đích cụthểcủa nó. Ví dụ,
+biểu đồcột thích hợp đểso sánh dữliệu, trong khi biểu đồ
+đường thích hợp đểtheo dõi xu hướng thời gian.
+• Cân nhắc xem liệu trực quan hóa có phù hợp với đối tượng
+mục tiêu hay không.
+3. Rõ ràng và dễhiểu:
+• Trực quan hóa nên truyền đạt thông điệp một cách rõ ràng
+và dễhiểu.
+• Biểu đồvà đồthịnên được thiết kếsao cho người xem có thể
+nhanh chóng nhận thức và hiểu thông tin.
+4. Sựtích hợp và liên kết:
+• Nếu có nhiều biểu đồhoặc đồthị, đảm bảo sựliên kết và tích
+hợp giữa chúng.
+• Mối quan hệgiữa các phần của trực quan hóa nên được làm
+rõ.
+5. Tương tác và điều hướng:
+• Sựtương tác, nếu có, nên được tích hợp một cách hợp lý để
+người xem có thểthăm dò dữliệu.
+• Hệthống điều hướng nên được xây dựng một cách dễsửdụng.
+6. Thiết kếhấp dẫn:
+• Thiết kếđồhọa và màu sắc nên làm cho trực quan hóa trở
+nên hấp dẫn và dễthu hút sựchú ý.
+• Sửdụng màu sắc một cách có ý nghĩa và tránh sựquá tải
+màu.
+7. Phân tích dữliệu:
+• Trực quan hóa nên thểhiện sựthay đổi và xu hướng theo
+thời gian nếu có.
+• Mối quan hệgiữa các biến cần phải rõ ràng.
+• Những kết luận và câu chuyện liên quan.
+8. Tích hợp AI: Thiết kếvà vận hành
+2
