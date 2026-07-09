@@ -102,6 +102,30 @@ Dựa trên yêu cầu từ tài liệu thiết kế và tuân thủ các quy t�
 ### Cell 17: Nhận xét Scatter Plot (Markdown)
 *   Nội dung: Nhận định mối quan hệ nghịch biến giữa số km đã đi và giá bán. Xe đi càng nhiều thì giá bán càng giảm, tuy nhiên độ phân tán rộng cho thấy mức giá còn phụ thuộc vào nhiều yếu tố khác như chất lượng bảo dưỡng hay thương hiệu xe.
 
+## Design Layout
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│ KPI Row: Min 18 triệu | Median 638 triệu | 80% < 1.087 tỷ | Max 54 tỷ │
+├────────────────────────────┬─────────────────────────────────────┤
+│                            │                                     │
+│   Histogram                │   Bar Chart                         │
+│   Phân phối giá xe         │   Giá trung vị theo hãng            │
+│   toàn thị trường          │   (Top 15 Hãng phổ biến)            │
+│                            │                                     │
+├────────────────────────────┼─────────────────────────────────────┤
+│                            │                                     │
+│   Line Chart               │   Scatter Plot                      │
+│   Giá trung vị             │   Số km đã đi vs Giá bán            │
+│   theo năm sản xuất        │   (Xe cũ)                           │
+│                            │                                     │
+└────────────────────────────┴─────────────────────────────────────┘
+```
+
+Bố cục thiết kế 2×2 phân bổ đồng đều, mỗi biểu đồ chiếm một phần tư diện tích để tạo sự cân bằng trực quan. Hàng KPI chạy ngang ở vị trí trên cùng nhằm cung cấp ngay các thông số tổng quát làm bối cảnh phân tích. Các biểu đồ phía trên (Histogram và Bar Chart) giúp phác họa cấu trúc phân loại giá và so sánh theo thương hiệu, trong khi hai biểu đồ bên dưới (Line Chart và Scatter Plot) đi sâu vào các yếu tố ảnh hưởng trực tiếp như tuổi thọ sản xuất và quãng đường di chuyển thực tế của xe.
+
+Toàn bộ nền thống nhất Dark Theme: `#1A1A2E` cho figure, `#16213E` cho từng ô đồ thị.
+
 ## Kỷ luật Tuân thủ (Kiểm tra chéo)
 
 - Thiết kế đồ thị đồng bộ theo phong cách tối với hệ màu được định nghĩa sẵn.
