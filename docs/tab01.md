@@ -92,7 +92,31 @@ Dựa trên yêu cầu từ `DASHBOARD_DESIGN.md` và tuân thủ tuyệt đối
 ### Cell 17: Nhận xét Column Chart (Markdown)
 *   **Nội dung:** Đánh giá xu hướng tập trung giao dịch ở các đời xe 2021-2023 và tác động của thị trường xe điện/VinFast đến nguồn cung xe lướt.
 
+## Design Layout
+
+```text
+┌──────────────────────────────────────────────────────────────────┐
+│ KPI Row: Tổng tin 33,849 | 91 Hãng xe | Giá trung vị | Đời phổ biến │
+├────────────────────────────┬─────────────────────────────────────┤
+│                            │                                     │
+│   Treemap                  │   Bar Chart                         │
+│   Thị phần Top 15 Hãng xe  │   Dòng xe phổ biến                  │
+│                            │                                     │
+├────────────────────────────┼─────────────────────────────────────┤
+│                            │                                     │
+│   Donut Charts             │   Column Chart                      │
+│   Tỷ lệ Mới/Cũ & Lắp ráp/  │   Số lượng xe theo                  │
+│   Nhập khẩu                │   năm sản xuất (15 năm gần nhất)    │
+│                            │                                     │
+└────────────────────────────┴─────────────────────────────────────┘
+```
+
+Bố cục thiết kế 2×2 phân bổ đồng đều, mỗi biểu đồ chiếm một phần tư diện tích để tạo sự cân bằng trực quan. Hàng KPI chạy ngang ở vị trí trên cùng nhằm cung cấp ngay các thông số tổng quát làm bối cảnh phân tích về quy mô thị trường. Các biểu đồ phía trên (Treemap và Bar Chart ngang) giúp phác họa cấu trúc phân loại xe theo hãng và dòng xe, trong khi hai biểu đồ bên dưới (Donut Charts và Column Chart) đi sâu vào các yếu tố tình trạng, xuất xứ và xu hướng thay đổi qua các năm.
+
+Toàn bộ nền thống nhất Dark Theme: `#1A1A2E` cho figure, `#16213E` cho từng ô đồ thị.
+
 ## Kỷ luật Tuân thủ (Kiểm tra chéo)
+
 - Thiết kế Dark Theme được tuân thủ nghiêm ngặt ở nền, nhãn, trục và các thanh dữ liệu.
 - Output, title, label 100% tiếng Việt.
 - Comment code 100% tiếng Anh.
