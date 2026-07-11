@@ -6,16 +6,16 @@ Tab này là phần kết thúc của câu chuyện dữ liệu. Bốn tab trư�
 
 ---
 
-## KPI — Bốn con số mở đầu
+## KPI — Bốn tín hiệu dị thường
 
 | Chỉ số | Giá trị | Ghi chú |
 |---|---|---|
-| Xe đắt nhất trong dữ liệu | 54,000 triệu VND | Ferrari SF90 Stradale 2020 |
-| Xe rẻ nhất trong dữ liệu | 18 triệu VND | Kia Pride Beta 1996 |
-| Xe đi nhiều km nhất | 500,000 km | Đi gần bằng một vòng trái đất ×12 |
-| Khoảng cách giá min–max | ×3,000 lần | Khoảng cách lớn nhất trong mọi loại hàng hóa thông thường |
+| Xe đắt nhất bị rao bán sau khi đã chạy >50,000 km | 12,980 triệu VND | Mercedes Benz G63 AMG 2021 — 129,000 km |
+| Xe chạy nhiều km nhất còn được rao bán | 500,000 km | Tương đương 12 vòng quanh Trái Đất |
+| Số hãng xe hiếm (≤5 xe trong toàn bộ dữ liệu) | 35 hãng / 91 hãng | 38% số hãng hầu như vô hình trên thị trường |
+| Ford 2023 — đột biến bất thường | 1,081 xe (×7.7 so với 2022) | Không có lý giải rõ ràng từ dữ liệu |
 
-Bốn con số đặt cạnh nhau tạo ra bối cảnh cho toàn bộ tab: đây là một thị trường mà cùng một từ "ô tô" được dùng để chỉ một chiếc xe 18 triệu và một siêu xe 54 tỷ đồng. Khoảng cách đó — 3,000 lần — không phải là bất thường nếu nhìn từ góc độ toàn cầu, nhưng chúng tồn tại cùng nhau trên cùng một nền tảng rao vặt tại Việt Nam. Đây là điều tab này cần khám phá.
+Bốn con số này không phải những chỉ số tổng quát — chúng là những điểm gãy trong dữ liệu, nơi quy luật bình thường không còn áp dụng được. Một chiếc G63 AMG đã chạy 129,000 km vẫn được rao 13 tỷ đồng; 35 hãng xe xuất hiện trong dữ liệu nhưng không ai biết tên; Ford đột ngột rao 1,081 xe trong một năm rồi quay về mức 181 xe năm sau. Tab này đi tìm những điểm bất thường đó.
 
 ---
 
@@ -107,49 +107,46 @@ Biểu đồ này chứa ít nhất ba điểm dị thường cần annotation.
 
 ---
 
-## Biểu đồ 3 — Bubble Chart / Scatter Plot: Bản Đồ Định Vị Thương Hiệu
+## Biểu đồ 3 — Diverging Bar Chart: Hãng Xe Nào Bán Được Cả Hai Thái Cực?
 
 ### Loại biểu đồ
-Bubble chart (scatter plot với kích thước bong bóng). Trục X: giá trung vị (triệu VND). Trục Y: số lượng xe trong dữ liệu. Kích thước bong bóng: số lượng xe (tỷ lệ thuận). Nhãn tên hãng đặt trực tiếp gần bong bóng. Chỉ bao gồm các hãng có từ 50 xe trở lên để tránh nhiễu.
+Diverging bar chart nằm ngang: mỗi hãng có hai thanh xuất phát từ điểm trung tâm (giá trung vị của hãng đó), một thanh kéo sang trái thể hiện khoảng cách xuống giá thấp nhất, một thanh kéo sang phải thể hiện khoảng cách lên giá cao nhất. Điểm gốc của mỗi thanh là giá trung vị — không phải 0. Chỉ bao gồm các hãng có ≥20 xe trong dữ liệu để đảm bảo đủ đại diện.
+
+*Lưu ý triển khai Power BI:* Dùng Custom Visual "Tornado Chart" hoặc "Grouped Bar" với hai measure [Khoảng giá xuống] và [Khoảng giá lên] tính từ median. Trong Notebook dùng `plt.barh` hai lần với dấu âm cho thanh trái.
 
 ### Màu sắc
-Phân nhóm theo vùng định vị:
-- Vùng phổ thông (giá <700tr, số lượng cao): `#0F3460` (xanh đậm)
-- Vùng trung cao (700tr–2,000tr): `#A29BFE` (tím)
-- Vùng cao cấp (>2,000tr): `#FDCB6E` (vàng)
-- VinFast: `#E94560` (đỏ cam) để nổi bật riêng.
+Thanh xuống (giá thấp nhất so với median): `#0F3460` (xanh đậm). Thanh lên (giá cao nhất so với median): `#E94560` (đỏ cam). Điểm median: chấm tròn màu `#FDCB6E` (vàng). Nhãn tên hãng: `#FFFFFF`.
 
-### Dữ liệu thực (các hãng có ≥50 xe, theo số lượng giảm dần)
+### Dữ liệu thực (Top 15 hãng có khoảng cách giá nội bộ lớn nhất, ≥20 xe)
 
-| Hãng | Số lượng | Giá trung vị (tr VND) | Nhóm định vị |
-|---|---|---|---|
-| Toyota | 5,861 | 552 | Phổ thông |
-| Hyundai | 3,897 | 528 | Phổ thông |
-| Ford | 3,719 | 699 | Phổ thông–Trung |
-| Mercedes Benz | 3,376 | 1,880 | Cao cấp |
-| Kia | 3,258 | 465 | Phổ thông |
-| Mazda | 2,447 | 598 | Phổ thông |
-| Mitsubishi | 1,540 | 575 | Phổ thông |
-| Honda | 1,322 | 565 | Phổ thông |
-| Lexus | 1,023 | 3,190 | Siêu cao cấp |
-| Chevrolet | 802 | 245 | Giá rẻ |
-| VinFast | 794 | 680 | Phổ thông–Trung |
-| BMW | 668 | 1,460 | Cao cấp |
-| Nissan | 471 | 495 | Phổ thông |
-| Suzuki | 427 | 455 | Phổ thông |
-| Daewoo | 419 | 105 | Giá rẻ cũ |
-| Peugeot | 391 | 870 | Trung–Cao |
-| LandRover | 380 | 3,889 | Siêu cao cấp |
-| Porsche | 379 | 4,150 | Siêu cao cấp |
+| Hãng | Giá thấp nhất (tr) | Trung vị (tr) | Giá cao nhất (tr) | Khoảng cách (tr) |
+|---|---|---|---|---|
+| Rolls Royce | 6,900 | 18,500 | 46,000 | 39,100 |
+| Bentley | 1,200 | 9,999 | 29,500 | 28,300 |
+| Mercedes Benz | 49 | 1,880 | 23,300 | 23,251 |
+| Maserati | 2,599 | 4,999 | 18,999 | 16,400 |
+| LandRover | 650 | 3,889 | 16,941 | 16,291 |
+| Porsche | 199 | 4,150 | 15,500 | 15,301 |
+| Lexus | 150 | 3,190 | 14,200 | 14,050 |
+| Toyota | 25 | 552 | 9,880 | 9,855 |
+| Audi | 285 | 1,059 | 8,880 | 8,595 |
+| BMW | 120 | 1,460 | 7,299 | 7,179 |
+| Ford | 78 | 699 | 6,990 | 6,912 |
+| Vinfast | 192 | 519 | 4,600 | 4,408 |
+| Volvo | 1,260 | 2,274 | 4,890 | 3,630 |
+| Peugeot | 405 | 870 | 4,000 | 3,595 |
+| Isuzu | 95 | 590 | 3,500 | 3,405 |
 
 ### Câu chuyện dữ liệu
-Biểu đồ này phân tách thị trường thành bốn tứ phần rõ ràng. Góc phải dưới — giá cao, số lượng ít — là Porsche (4,150 tr), Lexus (3,190 tr), LandRover (3,889 tr): thị trường sang trọng, ít người chơi nhưng doanh thu lớn theo đơn vị. Góc trái dưới — giá thấp, số lượng ít — là Daewoo (105 tr) và Chevrolet (245 tr): xe cũ đời xa, thị trường co lại tự nhiên theo thời gian.
+Biểu đồ này hỏi một câu khác với Tab 2: không phải hãng nào đắt hay rẻ, mà *hãng nào có biên độ dao động nội bộ lớn nhất* — tức cùng một thương hiệu nhưng bán được cả xe vài chục triệu lẫn xe vài tỷ. Đây là góc nhìn về độ đa dạng sản phẩm và khả năng phủ sóng phân khúc.
 
-Góc trái trên — giá vừa phải, số lượng lớn — là nơi Toyota, Hyundai, Kia, Mazda, Honda tranh nhau thị phần phổ thông. Đây là vùng cạnh tranh khốc liệt nhất và cũng là nơi VinFast đang chen vào với giá trung vị 680 triệu và 794 xe — cao hơn Kia (465 tr) nhưng thấp hơn Ford (699 tr) và đang tăng.
+Mercedes Benz là trường hợp gây sốc nhất: giá thấp nhất là 49 triệu (xe đời 1990 cũ kỹ) và giá cao nhất là 23,300 triệu — biên độ 23,251 triệu. Một thương hiệu "xe sang" nhưng lại có chiếc rẻ hơn cả xe Kia mới. Cơ chế ở đây là thị trường xe cũ đời cũ: những chiếc Mercedes từ thập niên 90–2000 vẫn được rao bán với giá rất thấp, trong khi những chiếc AMG mới nhất đẩy trần lên rất cao.
 
-Điểm quan trọng nhất của biểu đồ này không phải là vị trí ai đứng ở đâu, mà là Mercedes Benz xuất hiện ở vùng trung–cao với số lượng 3,376 xe — cao hơn nhiều so với BMW (668 xe) hay Porsche (379 xe). Tại thị trường Việt Nam, Mercedes Benz không chỉ là xe sang, nó là xe phổ biến ở phân khúc cao cấp — một hiện tượng ít thấy ở các nước phát triển khác.
+Tương tự với Toyota: giá thấp nhất là 25 triệu (Toyota Cressida trước 1990), cao nhất là 9,880 triệu (Land Cruiser V8 đời mới) — biên độ gần 10 tỷ. Chỉ một thương hiệu nhưng phủ toàn bộ dải từ xe lịch sử đến SUV cao cấp.
 
-*Annotation gợi ý:* Vẽ bốn vùng phân cách bằng đường đứt nét màu `#636E72` và đánh nhãn góc: "Sang trọng", "Phổ thông", "Giá rẻ cũ", "Trung–Cao".
+Điểm đối lập thú vị: Vinfast có biên độ 4,408 triệu (192 đến 4,600 triệu) — tương đối hẹp so với Toyota hay Mercedes, nhưng đây lại là thương hiệu trẻ chỉ mới xuất hiện từ 2019. Biên độ hẹp phản ánh việc VinFast chưa có thị trường xe cũ đời cũ, và danh mục sản phẩm còn tập trung.
+
+*Annotation:* Đánh dấu ba điểm đặc biệt bằng nhãn màu `#FDCB6E`: Mercedes (giá thấp nhất 49 tr), Toyota (giá thấp nhất 25 tr), Rolls Royce (giá cao nhất 46,000 tr).
 
 ---
 
@@ -192,7 +189,7 @@ Hai câu hỏi mà biểu đồ này đặt ra: tại sao người ta bán xe s�
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────────┐
-│  KPI: Ferrari 54,000 tr  |  Kia Pride 18 tr  |  500,000 km max  |  ×3,000  │
+│  KPI: G63 AMG 129k km → 13 tỷ  |  500,000 km max  |  35 hãng vô hình  |  Ford ×7.7  │
 ├────────────────────────────────────────────────────────────────────────────┤
 │                                                                              │
 │   Horizontal Bar Chart (đôi — gương nhau)                                   │
@@ -202,11 +199,11 @@ Hai câu hỏi mà biểu đồ này đặt ra: tại sao người ta bán xe s�
 │                                                                              │
 ├──────────────────────────────────────────┬───────────────────────────────────┤
 │                                          │                                   │
-│   Multi-Line Chart                       │   Bubble Chart                    │
-│   Sự Trỗi Dậy và Biến Động Hãng Xe      │   Bản Đồ Định Vị Thương Hiệu     │
-│   2018–2025                              │   Giá Trung Vị × Số Lượng        │
-│   [annotation: Ford 2023 spike]          │   [4 vùng phân cách]              │
-│   [annotation: VinFast dẫn đầu 2025]    │   [Mercedes nổi bật]              │
+│   Multi-Line Chart                       │   Diverging Bar Chart             │
+│   Sự Trỗi Dậy và Biến Động Hãng Xe      │   Biên Độ Giá Nội Bộ Theo Hãng   │
+│   2018–2025                              │   [Giá thấp ← Median → Cao]       │
+│   [annotation: Ford 2023 spike ×7.7]    │   [Mercedes 49 tr → 23,300 tr]    │
+│   [annotation: VinFast dẫn đầu 2025]    │   [Toyota 25 tr → 9,880 tr]       │
 │                                          │                                   │
 ├──────────────────────────────────────────┴───────────────────────────────────┤
 │                                                                              │
@@ -218,8 +215,8 @@ Hai câu hỏi mà biểu đồ này đặt ra: tại sao người ta bán xe s�
 └──────────────────────────────────────────────────────────────────────────────┘
 ```
 
-Bố cục tab này không đối xứng theo đúng nghĩa — và đó là có chủ ý. Biểu đồ đôi (gương nhau) ở phần trên chiếm toàn bộ chiều ngang để tạo ấn tượng mở đầu mạnh: sự tương phản giữa Rolls Royce 46 tỷ và Kia Pride 18 triệu. Hai biểu đồ giữa bố cục 1:1 — Line Chart và Bubble Chart — kể hai câu chuyện song song: diễn biến theo thời gian và vị thế hiện tại. Histogram ở đáy kéo dài toàn bộ chiều ngang để tối đa hóa không gian đọc phân phối km, vốn là dữ liệu có đuôi dài cần nhiều chỗ hiển thị.
+Bố cục tab này không đối xứng theo đúng nghĩa — và đó là có chủ ý. Biểu đồ đôi (gương nhau) ở phần trên chiếm toàn bộ chiều ngang để tạo ấn tượng mở đầu mạnh: sự tương phản giữa Rolls Royce 46 tỷ và Kia Pride 18 triệu. Hai biểu đồ giữa bố cục 1:1 — Line Chart và Diverging Bar Chart — kể hai câu chuyện song song: diễn biến bất thường theo thời gian và biên độ dao động giá nội bộ từng hãng. Histogram ở đáy kéo dài toàn bộ chiều ngang để tối đa hóa không gian đọc phân phối km, vốn là dữ liệu có đuôi dài cần nhiều chỗ hiển thị.
 
-Luồng đọc có chủ ý: KPI gây sốc → Biểu đồ đôi (câu hỏi về cực trị) → Line Chart (ai đang thắng theo thời gian?) → Bubble Chart (mỗi hãng thực sự đứng ở đâu?) → Histogram (người ta bán xe sau bao nhiêu km và những cái đuôi cực đoan ẩn chứa điều gì?). Năm biểu đồ, mỗi cái kể một phần câu chuyện về những thứ mà con số bình thường không nói ra được.
+Luồng đọc có chủ ý: KPI dị thường → Biểu đồ đôi (hai thái cực thị trường) → Line Chart (ai đang thắng và ai đang có đột biến?) → Diverging Bar Chart (cùng một hãng nhưng bán được bao nhiêu mức giá khác nhau?) → Histogram (người ta bán xe sau bao nhiêu km và những cái đuôi cực đoan ẩn chứa điều gì?). Năm biểu đồ, mỗi cái khai thác một khía cạnh dị thường mà bốn tab trước không đề cập.
 
-Toàn bộ nền Dark Theme: `#1A1A2E` cho figure, `#16213E` cho từng ô đồ thị. Annotation text `#FDCB6E` (vàng) để nổi bật trên nền tối mà không gây chói. Đường phân cách vùng trong Bubble Chart dùng `#636E72` đứt nét mờ để không cạnh tranh với dữ liệu chính.
+Toàn bộ nền Dark Theme: `#1A1A2E` cho figure, `#16213E` cho từng ô đồ thị. Annotation text `#FDCB6E` (vàng) để nổi bật trên nền tối mà không gây chói. Thanh diverging dùng hai màu tương phản `#0F3460` và `#E94560` để người đọc phân biệt ngay hướng nào là "xuống đáy", hướng nào là "lên đỉnh".
