@@ -25,7 +25,6 @@ from app.config import (
     EMBEDDING_PROVIDER, ENABLE_FAISS_FALLBACK, PIPELINE_CONFIG,
     RETRIEVER_CANDIDATE_K, RETRIEVER_K, STORAGE_BACKEND, RUNTIME_PROFILE,
 )
-from app.services.knowledge_base import load_knowledge_base
 from app.services.embedding import (
     BaseEmbedding,
     HuggingFaceEndpointEmbedding,
@@ -33,7 +32,7 @@ from app.services.embedding import (
     FallbackEmbedding,
 )
 from app.services.embedding.errors import EmbeddingServiceError
-from app.services.chunking import ClauseChunker
+from app.services.chunking import GenericChunker
 from app.services.search import FAISSSearcher, QdrantSearcher
 from app.services.reranking import (
     NoReranker,
@@ -41,7 +40,7 @@ from app.services.reranking import (
     HuggingFaceEmbeddingSimilarityReranker,
     FallbackReranker,
 )
-from app.services.context_builder import NestedContextBuilder
+from app.services.context_builder import GenericContextBuilder
 from app.services.pipeline_timing import current_timing
 from app.utils.logging import setup_logger
 
@@ -507,7 +506,7 @@ def _create_chunker():
     """Tạo chunker dựa trên config."""
     strategy = PIPELINE_CONFIG.get("chunking", "clause")
     if strategy == "clause":
-        return ClauseChunker()
+        return GenericChunker()
     else:
         raise ValueError(f"Unknown chunking strategy: {strategy}")
 
@@ -583,7 +582,7 @@ def _create_context_builder():
     """Tạo context builder dựa trên config."""
     strategy = PIPELINE_CONFIG.get("context_builder", "nested")
     if strategy == "nested":
-        return NestedContextBuilder()
+        return GenericContextBuilder()
     else:
         raise ValueError(f"Unknown context_builder strategy: {strategy}")
 
@@ -618,7 +617,6 @@ def init_pipeline() -> None:
 
     try:
         # 1. Nạp dữ liệu vào RAM
-        load_knowledge_base()
 
         # 2. Khởi tạo embedding + FAISS index (chỉ khi cần cho FAISS-based backend)
         embedding = None

@@ -40,7 +40,6 @@ from app.api.execute import router as execute_router
 from app.api.logs_analysis import router as logs_analysis_router
 from app.api.config import router as config_router
 from app.services.pipeline import init_pipeline, preload_local_models
-from app.services.knowledge_base import load_knowledge_base
 from app.services.storage import initialize_storage
 from app.utils.logging import setup_logger
 
@@ -316,7 +315,6 @@ def create_app() -> FastAPI:
             logger.warning(
                 "CHAT_STORAGE_MODE=postgres uses shared unauthenticated conversation storage."
             )
-        await asyncio.to_thread(load_knowledge_base)
         asyncio.create_task(asyncio.to_thread(_initialize_runtime_components_sync))
         logger.info("Document metadata loaded; remaining initialization scheduled in background")
 
