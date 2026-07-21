@@ -83,7 +83,7 @@ export const DEFAULT_MODEL = 'gemini-2.5-flash';
 
 // LocalStorage keys
 export const STORAGE_KEYS = {
-  sessions: 'vietlaw_sessions',
-  messages: 'vietlaw_messages',
-  activeSessionId: 'vietlaw_active_session_id',
+  sessions: 'vietcar_sessions',
+  messages: 'vietcar_messages',
+  activeSessionId: 'vietcar_active_session_id',
 } as const;

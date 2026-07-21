@@ -52,8 +52,8 @@ export default function AnalyticsTab() {
         }
 
         // Fallback to local storage (browser mode)
-        const localMessages = localStorage.getItem('vietlaw_messages');
-        const localSessions = localStorage.getItem('vietlaw_sessions');
+        const localMessages = localStorage.getItem('vietcar_messages');
+        const localSessions = localStorage.getItem('vietcar_sessions');
         
         if (localMessages && localSessions) {
           const parsedMsgs = JSON.parse(localMessages);

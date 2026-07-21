@@ -4,7 +4,7 @@ import { I18nProvider } from '@/components/I18nProvider';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'VietLaw AI — Hệ thống Tra cứu Pháp luật Thông minh',
+  title: 'vietcar AI — Hệ thống Tra cứu Pháp luật Thông minh',
   description: 'Trợ lý pháp luật AI giúp tra cứu văn bản pháp lý Việt Nam chính xác và nhanh chóng',
 };
 

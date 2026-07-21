@@ -31,9 +31,9 @@ export interface AISettings {
   useServerFallbacks: boolean;
 }
 
-export const AI_SETTINGS_STORAGE_KEY = 'vietlaw_ai_settings';
-export const AI_SESSION_CREDENTIALS_STORAGE_KEY = 'vietlaw_ai_session_credentials';
-export const AI_SETTINGS_UPDATED_EVENT = 'vietlaw-ai-settings-updated';
+export const AI_SETTINGS_STORAGE_KEY = 'vietcar_ai_settings';
+export const AI_SESSION_CREDENTIALS_STORAGE_KEY = 'vietcar_ai_session_credentials';
+export const AI_SETTINGS_UPDATED_EVENT = 'vietcar-ai-settings-updated';
 
 const DEFAULT_ROLE: InferenceRoleSetting = {
   provider: 'google',

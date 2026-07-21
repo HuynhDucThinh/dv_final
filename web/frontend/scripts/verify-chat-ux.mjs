@@ -94,7 +94,7 @@ if (!emptyState.includes('Tra cứu pháp luật dễ dàng hơn')) {
 }
 
 for (const forbidden of [
-  'VietLaw BGE-M3',
+  'VietCar BGE-M3',
   'đang embedding',
   'đang reranking',
   'đang gọi Qdrant',
