@@ -9,7 +9,7 @@ from app.services.chunking.sub_clause_splitter import split_long_clause
 from app.services.knowledge_base import determine_category
 from app.utils.logging import setup_logger
 
-logger = setup_logger("vietlaw.chunking.clause")
+logger = setup_logger("vietcar.chunking.clause")
 
 
 def _build_embedding_content(

@@ -17,7 +17,7 @@ from app.config import EMBEDDING_MODEL, HUGGINGFACE_API_KEY
 from app.services.embedding.hf_endpoint import HuggingFaceEndpointEmbedding
 from app.utils.logging import setup_logger
 
-logger = setup_logger("vietlaw.reranking.embedding_similarity")
+logger = setup_logger("vietcar.reranking.embedding_similarity")
 
 
 class HuggingFaceEmbeddingSimilarityReranker:

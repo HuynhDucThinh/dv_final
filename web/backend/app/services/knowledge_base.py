@@ -11,7 +11,7 @@ from typing import Dict, Any, List, Optional
 from app.config import JSON_DATA_PATH
 from app.utils.logging import setup_logger
 
-logger = setup_logger("vietlaw.knowledge_base")
+logger = setup_logger("vietcar.knowledge_base")
 
 # --- DỮ LIỆU TOÀN CỤC ---
 KNOWLEDGE_BASE: Dict[str, Any] = {}

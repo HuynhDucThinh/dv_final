@@ -15,7 +15,7 @@ from app.config import (
 )
 from app.utils.logging import setup_logger
 
-logger = setup_logger("vietlaw.embedding.ollama")
+logger = setup_logger("vietcar.embedding.ollama")
 
 
 class OllamaEmbedding(Embeddings):

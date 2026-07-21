@@ -13,7 +13,7 @@ from typing import Any, Dict, Iterator, Optional
 from app.config import PIPELINE_CONFIG
 from app.utils.logging import setup_logger
 
-logger = setup_logger("vietlaw.pipeline.timing")
+logger = setup_logger("vietcar.pipeline.timing")
 
 _current_timing: ContextVar["PipelineTimingCollector | None"] = ContextVar(
     "pipeline_timing",

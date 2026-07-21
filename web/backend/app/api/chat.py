@@ -30,7 +30,7 @@ from app.services.pipeline_timing import (
 from app.services.answer_validation import validate_generated_citations
 from app.utils.logging import setup_logger
 
-logger = setup_logger("vietlaw.api.chat")
+logger = setup_logger("vietcar.api.chat")
 
 router = APIRouter()
 

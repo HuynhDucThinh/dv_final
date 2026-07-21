@@ -18,7 +18,7 @@ from app.config import (
 )
 from app.utils.logging import setup_logger
 
-logger = setup_logger("vietlaw.semantic_cache")
+logger = setup_logger("vietcar.semantic_cache")
 
 _qdrant_client = None
 

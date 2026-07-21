@@ -8,7 +8,7 @@ from app.config import JSON_DATA_PATH, STORAGE_BACKEND
 from app.services.knowledge_base import LAW_METADATA, KNOWLEDGE_BASE
 from app.utils.logging import setup_logger
 
-logger = setup_logger("vietlaw.api.documents")
+logger = setup_logger("vietcar.api.documents")
 router = APIRouter()
 
 @router.get("")

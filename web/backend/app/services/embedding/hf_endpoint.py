@@ -24,7 +24,7 @@ from app.services.embedding.errors import EmbeddingAuthError, EmbeddingServerErr
 from app.services.pipeline_timing import current_timing
 from app.utils.logging import setup_logger
 
-logger = setup_logger("vietlaw.embedding.hf_endpoint")
+logger = setup_logger("vietcar.embedding.hf_endpoint")
 
 _LOCAL_REQUIRED_FILES = (
     "config.json",

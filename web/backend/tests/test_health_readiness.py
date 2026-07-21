@@ -60,7 +60,7 @@ def test_readiness_success_with_mocked_dependencies(monkeypatch):
     monkeypatch.setattr(
         main_module,
         "_check_postgres",
-        lambda: {"status": "ok", "host": "localhost", "port": 15432, "database": "vietlaw"},
+        lambda: {"status": "ok", "host": "localhost", "port": 15432, "database": "vietcar"},
     )
     monkeypatch.setattr(
         main_module,
@@ -68,7 +68,7 @@ def test_readiness_success_with_mocked_dependencies(monkeypatch):
         lambda: {
             "status": "ok",
             "host": "qdrant.example",
-            "collection": "vietlaw_clauses",
+            "collection": "vietcar_clauses",
             "points": 5756,
             "denseVector": {"name": "text-dense", "dimension": 1024, "distance": "Cosine"},
         },

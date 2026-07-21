@@ -24,7 +24,7 @@ _embedding_artifact_suffix = (
 
 FAISS_INDEX_PATH = os.getenv(
     "FAISS_INDEX_PATH",
-    str(_backend_dir / f"vietlaw_faiss_index{_embedding_artifact_suffix}"),
+    str(_backend_dir / f"vietcar_faiss_index{_embedding_artifact_suffix}"),
 )
 JSON_DATA_PATH = str(_backend_dir / "data" / "processed")
 TRACKING_FILE = os.getenv(
@@ -56,17 +56,17 @@ SUPPORTED_CHAT_STORAGE_MODES = frozenset({"postgres", "browser"})
 
 # --- STORAGE BACKEND ---
 STORAGE_BACKEND = os.getenv("STORAGE_BACKEND", "faiss").strip().lower()
-POSTGRES_DSN = os.getenv("POSTGRES_DSN", "postgresql://postgres:postgres@localhost:5432/vietlaw")
+POSTGRES_DSN = os.getenv("POSTGRES_DSN", "postgresql://postgres:postgres@localhost:5432/vietcar")
 QDRANT_URL = os.getenv("QDRANT_URL", "http://localhost:6333")
 QDRANT_API_KEY = os.getenv("QDRANT_API_KEY", "")
-QDRANT_COLLECTION = os.getenv("QDRANT_COLLECTION", "vietlaw_clauses")
+QDRANT_COLLECTION = os.getenv("QDRANT_COLLECTION", "vietcar_clauses")
 DISABLE_AUTO_INGEST = os.getenv("DISABLE_AUTO_INGEST", "false").strip().lower() == "true"
 ENABLE_FAISS_FALLBACK = os.getenv("ENABLE_FAISS_FALLBACK", "false").strip().lower() == "true"
 PIPELINE_TIMING_ENABLED = os.getenv("PIPELINE_TIMING_ENABLED", "false").strip().lower() == "true"
 
 # --- THÔNG SỐ EMBEDDING ---
-DEFAULT_LOCAL_EMBEDDING_MODEL = "../models/embedding/vietlaw-bge-m3-finetuned/best"
-DEFAULT_LOCAL_RERANKER_MODEL = "../models/reranking/vietlaw-bge-reranker-v2-m3-finetuned/selected"
+DEFAULT_LOCAL_EMBEDDING_MODEL = "../models/embedding/vietcar-bge-m3-finetuned/best"
+DEFAULT_LOCAL_RERANKER_MODEL = "../models/reranking/vietcar-bge-reranker-v2-m3-finetuned/selected"
 
 DEFAULT_REMOTE_EMBEDDING_MODEL = "BAAI/bge-m3"
 

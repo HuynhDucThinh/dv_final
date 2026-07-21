@@ -7,7 +7,7 @@ from app.services.storage import is_database_backend_enabled, _ensure_schema
 from app.config import CHAT_STORAGE_MODE, POSTGRES_DSN
 from app.utils.logging import setup_logger
 
-logger = setup_logger("vietlaw.api.feedback")
+logger = setup_logger("vietcar.api.feedback")
 
 router = APIRouter()
 

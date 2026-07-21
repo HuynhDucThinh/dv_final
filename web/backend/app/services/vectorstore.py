@@ -20,7 +20,7 @@ from app.services.embedding.hf_endpoint import HuggingFaceEndpointEmbedding
 from app.services.knowledge_base import determine_category
 from app.utils.logging import setup_logger
 
-logger = setup_logger("vietlaw.vectorstore")
+logger = setup_logger("vietcar.vectorstore")
 
 # --- BIẾN TOÀN CỤC ---
 vectorstore: Optional[FAISS] = None

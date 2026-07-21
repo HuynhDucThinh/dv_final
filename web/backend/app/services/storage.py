@@ -23,7 +23,7 @@ from app.config import (
 )
 from app.utils.logging import setup_logger
 
-logger = setup_logger("vietlaw.storage")
+logger = setup_logger("vietcar.storage")
 
 
 def is_chat_persistence_enabled() -> bool:

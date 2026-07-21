@@ -44,7 +44,7 @@ from app.services.knowledge_base import load_knowledge_base
 from app.services.storage import initialize_storage
 from app.utils.logging import setup_logger
 
-logger = setup_logger("vietlaw.main")
+logger = setup_logger("vietcar.main")
 
 
 def _chat_storage_diagnostics() -> dict:
@@ -169,7 +169,7 @@ def _check_qdrant() -> dict:
 
 def create_app() -> FastAPI:
     """Application factory — tạo và cấu hình FastAPI app."""
-    application = FastAPI(title="VietLaw RAG Backend")
+    application = FastAPI(title="vietcar RAG Backend")
 
     # --- CORS Middleware ---
     application.add_middleware(

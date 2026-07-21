@@ -30,14 +30,14 @@ class _CollectionInfo:
 def test_named_collection_dimension_match():
     info = _CollectionInfo({"text-dense": _Vector(1024)})
 
-    _ensure_collection_dimension(info, "vietlaw_clauses", "text-dense", 1024)
+    _ensure_collection_dimension(info, "vietcar_clauses", "text-dense", 1024)
 
 
 def test_named_collection_dimension_mismatch_raises():
     info = _CollectionInfo({"text-dense": _Vector(768)})
 
     with pytest.raises(StorageInitializationError, match="Re-index"):
-        _ensure_collection_dimension(info, "vietlaw_clauses", "text-dense", 1024)
+        _ensure_collection_dimension(info, "vietcar_clauses", "text-dense", 1024)
 
 
 def test_semantic_cache_rejects_wrong_dimension(monkeypatch):

@@ -15,7 +15,7 @@ from app.services.knowledge_base import (
 )
 from app.utils.logging import setup_logger
 
-logger = setup_logger("vietlaw.search.faiss")
+logger = setup_logger("vietcar.search.faiss")
 
 
 class FAISSSearcher:

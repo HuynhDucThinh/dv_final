@@ -14,7 +14,7 @@ def test_real_embedding_loads_offline():
 
     path = os.getenv(
         "TEST_EMBEDDING_MODEL",
-        "../models/embedding/vietlaw-bge-m3-finetuned/best",
+        "../models/embedding/vietcar-bge-m3-finetuned/best",
     )
     embedding = HuggingFaceEndpointEmbedding(
         model=path,
@@ -35,11 +35,11 @@ def test_real_embedding_loads_offline():
     [
         (
             "TEST_RERANKER_CANDIDATE_002_001",
-            "../models/reranking/vietlaw-bge-reranker-v2-m3-finetuned/candidates/candidate-002-001",
+            "../models/reranking/vietcar-bge-reranker-v2-m3-finetuned/candidates/candidate-002-001",
         ),
         (
             "TEST_RERANKER_CANDIDATE_003_004",
-            "../models/reranking/vietlaw-bge-reranker-v2-m3-finetuned/candidates/candidate-003-004",
+            "../models/reranking/vietcar-bge-reranker-v2-m3-finetuned/candidates/candidate-003-004",
         ),
     ],
 )

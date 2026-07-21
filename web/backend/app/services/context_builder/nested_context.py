@@ -12,7 +12,7 @@ from app.services.knowledge_base import (
 )
 from app.utils.logging import setup_logger
 
-logger = setup_logger("vietlaw.context_builder.nested")
+logger = setup_logger("vietcar.context_builder.nested")
 
 
 class NestedContextBuilder:

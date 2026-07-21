@@ -45,7 +45,7 @@ from app.services.context_builder import NestedContextBuilder
 from app.services.pipeline_timing import current_timing
 from app.utils.logging import setup_logger
 
-logger = setup_logger("vietlaw.pipeline")
+logger = setup_logger("vietcar.pipeline")
 
 
 class RAGPipeline:
@@ -563,7 +563,7 @@ def _create_reranker():
     elif strategy == "cross_encoder":
         model = PIPELINE_CONFIG.get(
             "reranker_model",
-            "../models/reranking/vietlaw-bge-reranker-v2-m3-finetuned/selected",
+            "../models/reranking/vietcar-bge-reranker-v2-m3-finetuned/selected",
         )
         return CrossEncoderReranker(
             model=model,

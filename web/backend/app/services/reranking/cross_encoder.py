@@ -14,9 +14,9 @@ from app.config import LOCAL_MODELS_OFFLINE, PIPELINE_CONFIG
 from app.services.pipeline_timing import current_timing
 from app.utils.logging import setup_logger
 
-logger = setup_logger("vietlaw.reranking.cross_encoder")
+logger = setup_logger("vietcar.reranking.cross_encoder")
 
-DEFAULT_RERANKER_MODEL = "../models/reranking/vietlaw-bge-reranker-v2-m3-finetuned/selected"
+DEFAULT_RERANKER_MODEL = "../models/reranking/vietcar-bge-reranker-v2-m3-finetuned/selected"
 _REQUIRED_FILES = (
     "config.json",
     "model.safetensors",

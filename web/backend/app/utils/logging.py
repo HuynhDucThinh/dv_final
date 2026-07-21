@@ -6,7 +6,7 @@ import logging
 import sys
 
 
-def setup_logger(name: str = "vietlaw") -> logging.Logger:
+def setup_logger(name: str = "vietcar") -> logging.Logger:
     """Tạo logger với format tiếng Việt dễ đọc."""
     logger = logging.getLogger(name)
 

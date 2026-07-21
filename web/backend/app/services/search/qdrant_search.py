@@ -28,7 +28,7 @@ from app.services.knowledge_base import (
 )
 from app.utils.logging import setup_logger
 
-logger = setup_logger("vietlaw.search.qdrant")
+logger = setup_logger("vietcar.search.qdrant")
 
 NORMAL_PREFETCH_MULTIPLIER = 2
 EXPLICIT_CITATION_PREFETCH_MULTIPLIER = 4

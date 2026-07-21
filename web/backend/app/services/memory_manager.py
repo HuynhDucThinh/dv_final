@@ -7,7 +7,7 @@ from app.config import CHAT_STORAGE_MODE
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
-logger = logging.getLogger("vietlaw.memory_manager")
+logger = logging.getLogger("vietcar.memory_manager")
 
 SUMMARIZER_PROMPT = ChatPromptTemplate.from_messages([
     ("system", """You are a legal AI memory manager.

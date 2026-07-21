@@ -22,7 +22,7 @@ class _AsyncFallbackSearcher(_FallbackSearcher):
 
 
 def test_qdrant_error_reraises_when_fallback_disabled(monkeypatch):
-    searcher = QdrantSearcher(vectorstore=None, fallback_searcher=None, collection_name="vietlaw_clauses")
+    searcher = QdrantSearcher(vectorstore=None, fallback_searcher=None, collection_name="vietcar_clauses")
     monkeypatch.setattr(searcher, "_search_qdrant", lambda *args, **kwargs: (_ for _ in ()).throw(RuntimeError("missing collection")))
 
     with pytest.raises(RuntimeError, match="FAISS fallback is disabled") as exc_info:
@@ -33,7 +33,7 @@ def test_qdrant_error_reraises_when_fallback_disabled(monkeypatch):
 
 def test_qdrant_error_uses_fallback_only_when_enabled(monkeypatch):
     fallback = _FallbackSearcher()
-    searcher = QdrantSearcher(vectorstore=None, fallback_searcher=fallback, collection_name="vietlaw_clauses")
+    searcher = QdrantSearcher(vectorstore=None, fallback_searcher=fallback, collection_name="vietcar_clauses")
     monkeypatch.setattr(searcher, "_search_qdrant", lambda *args, **kwargs: (_ for _ in ()).throw(RuntimeError("qdrant down")))
 
     docs = searcher.search("query")
@@ -44,7 +44,7 @@ def test_qdrant_error_uses_fallback_only_when_enabled(monkeypatch):
 
 def test_qdrant_success_does_not_call_fallback(monkeypatch):
     fallback = _FallbackSearcher()
-    searcher = QdrantSearcher(vectorstore=None, fallback_searcher=fallback, collection_name="vietlaw_clauses")
+    searcher = QdrantSearcher(vectorstore=None, fallback_searcher=fallback, collection_name="vietcar_clauses")
     expected = [Document(page_content="qdrant", metadata={"id": "qdrant"})]
     monkeypatch.setattr(searcher, "_search_qdrant", lambda *args, **kwargs: expected)
 
@@ -58,7 +58,7 @@ def test_async_qdrant_error_reraises_when_fallback_disabled(monkeypatch):
     async def immediate_to_thread(func, /, *args, **kwargs):
         return func(*args, **kwargs)
 
-    searcher = QdrantSearcher(vectorstore=None, fallback_searcher=None, collection_name="vietlaw_clauses")
+    searcher = QdrantSearcher(vectorstore=None, fallback_searcher=None, collection_name="vietcar_clauses")
     monkeypatch.setattr(asyncio, "to_thread", immediate_to_thread)
     monkeypatch.setattr(searcher, "_search_qdrant", lambda *args, **kwargs: (_ for _ in ()).throw(RuntimeError("auth failed")))
 
@@ -71,7 +71,7 @@ def test_async_qdrant_error_uses_fallback_only_when_enabled(monkeypatch):
         return func(*args, **kwargs)
 
     fallback = _AsyncFallbackSearcher()
-    searcher = QdrantSearcher(vectorstore=None, fallback_searcher=fallback, collection_name="vietlaw_clauses")
+    searcher = QdrantSearcher(vectorstore=None, fallback_searcher=fallback, collection_name="vietcar_clauses")
     monkeypatch.setattr(asyncio, "to_thread", immediate_to_thread)
     monkeypatch.setattr(searcher, "_search_qdrant", lambda *args, **kwargs: (_ for _ in ()).throw(RuntimeError("qdrant down")))
 
