@@ -3,7 +3,7 @@ from typing import List, Tuple
 from pydantic import BaseModel, Field
 
 class RewriteResult(BaseModel):
-    domain: str = Field(description="Domain of the query, either 'legal' or 'chitchat'")
+    domain: str = Field(description="Domain of the query, either 'data' or 'chitchat'")
     queries: List[str] = Field(description="List of search queries. Empty if domain is chitchat.")
 
 class BaseRewriter(ABC):
@@ -20,6 +20,6 @@ class BaseRewriter(ABC):
             history (str, optional): Recent conversation history for context resolution.
             
         Returns:
-            Tuple[str, List[str]]: A tuple containing the domain ("legal" or "chitchat") and a list of rewritten queries.
+            Tuple[str, List[str]]: A tuple containing the domain ("data" or "chitchat") and a list of rewritten queries.
         """
         pass

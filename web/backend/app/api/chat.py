@@ -190,7 +190,7 @@ async def chat_endpoint(request: ChatRequest, http_request: Request):
                 request.inference_config,
             )
         else:
-            domain, queries = "legal", [last_message]
+            domain, queries = "data", [last_message]
         if domain != "chitchat":
             queries = (queries or [last_message])[:request.maxSubqueries]
         logger.info("Rewriter enabled=%s, domain=%s, queries=%s", request.enableQueryRewriter, domain, queries)
@@ -408,7 +408,7 @@ async def chat_stream_endpoint(request: ChatRequest, http_request: Request):
                     request.inference_config,
                 )
             else:
-                domain, queries = "legal", [last_message]
+                domain, queries = "data", [last_message]
             if domain != "chitchat":
                 queries = (queries or [last_message])[:request.maxSubqueries]
             logger.info("Stream rewriter enabled=%s, domain=%s, queries=%s", request.enableQueryRewriter, domain, queries)

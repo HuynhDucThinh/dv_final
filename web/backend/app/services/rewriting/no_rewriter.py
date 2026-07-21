@@ -7,4 +7,4 @@ class NoOpRewriter(BaseRewriter):
     Useful as a fallback or for ablation studies.
     """
     def rewrite(self, query: str, history: str = None, runtime_config=None) -> Tuple[str, List[str]]:
-        return "legal", [query]
+        return "data", [query]

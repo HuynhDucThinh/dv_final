@@ -10,7 +10,7 @@ from app.services.storage import ingest_json_documents, initialize_storage
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Ingest processed legal JSON into the configured storage backend")
+    parser = argparse.ArgumentParser(description="Ingest processed document JSON into the configured storage backend")
     args = parser.parse_args()
 
     try:

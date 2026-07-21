@@ -1,1 +1,1 @@
-# Vietnam Legal QA System - Backend Package
+# VietCar AI System - Backend Package

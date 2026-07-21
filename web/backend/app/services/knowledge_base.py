@@ -1,6 +1,6 @@
 """
 Generic Knowledge Base Stub.
-Replaces the old legal-specific knowledge_base.py to prevent import errors in the generic backend.
+Replaces the old domain-specific knowledge_base.py to prevent import errors in the generic backend.
 """
 from typing import Dict, Any, Optional
 

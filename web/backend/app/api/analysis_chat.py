@@ -1,5 +1,5 @@
 """
-API Chat Phân tích dữ liệu — tách biệt với Legal Q&A.
+API Chat Phân tích dữ liệu — tách biệt với Data Analysis.
 Nhận yêu cầu phân tích, gọi LLM với system prompt phân tích dữ liệu,
 trả về code Python kèm giải thích.
 
@@ -136,7 +136,7 @@ async def _stream_llm(request: AnalysisChatRequest) -> AsyncGenerator[str, None]
 async def analysis_chat_stream(request: AnalysisChatRequest) -> StreamingResponse:
     """
     Endpoint chat streaming cho module phân tích dữ liệu.
-    Tách biệt hoàn toàn với /chat/stream của Legal Q&A.
+    Tách biệt hoàn toàn với /chat/stream của Data Analysis.
     """
     return StreamingResponse(
         _stream_llm(request),

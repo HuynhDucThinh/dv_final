@@ -8,7 +8,7 @@ from typing import Any, Iterable
 
 _CITE_TAG_RE = re.compile(r"<cite\s+id=[\"']([^\"']+)[\"']>(.*?)</cite>", re.IGNORECASE | re.DOTALL)
 _CITE_ID_RE = re.compile(r"<cite\s+id=[\"']([^\"']+)[\"']>", re.IGNORECASE)
-_LEGAL_REF_RE = re.compile(r"\b(?:Điều|Khoản|Điểm)\s+\d+", re.IGNORECASE)
+_REF_RE = re.compile(r"\b(?:Điều|Khoản|Điểm)\s+\d+", re.IGNORECASE)
 
 
 @dataclass(frozen=True)
@@ -39,7 +39,7 @@ def validate_generated_citations(answer_text: str, context: list[dict[str, Any]]
     """Remove citation markers whose IDs are not in the final context.
 
     The function never adds or remaps citations. It only preserves valid source IDs,
-    removes invalid citation markup, and falls back when a legal answer has no valid
+    removes invalid citation markup, and falls back when a document answer has no valid
     grounding left.
     """
     text = answer_text or ""
@@ -59,8 +59,8 @@ def validate_generated_citations(answer_text: str, context: list[dict[str, Any]]
     sanitized = _CITE_TAG_RE.sub(replace_tag, text)
 
     fallback_used = False
-    has_legal_claim = bool(_LEGAL_REF_RE.search(sanitized))
-    if (not allowed_ids or (cited_ids and not valid_ids and has_legal_claim)) and has_legal_claim:
+    has_claim = bool(_REF_RE.search(sanitized))
+    if (not allowed_ids or (cited_ids and not valid_ids and has_claim)) and has_claim:
         sanitized = "Dữ liệu hiện có chưa cung cấp đủ nguồn tham khảo để trả lời chắc chắn câu hỏi này."
         fallback_used = True
         valid_ids = []

@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 class LLMRewriter(BaseRewriter):
     """
     LLM-based Query Rewriter that classifies queries into domains
-    and translates slang/informal terms into formal legal terminology.
+    and translates slang/informal terms into formal industry terminology.
     """
     def __init__(self):
         provider = PIPELINE_CONFIG.get("rewriter_model_provider", "ollama")
@@ -25,16 +25,16 @@ class LLMRewriter(BaseRewriter):
         self.parser = JsonOutputParser(pydantic_object=RewriteResult)
         
         self.prompt = ChatPromptTemplate.from_messages([
-            ("system", """You are a Vietnamese legal query analyzer.
-Your task is to analyze user queries and format them for a legal vector search engine.
-1. Determine if the query is 'legal' (asking about laws, procedures, penalties) or 'chitchat' (greetings, off-topic).
+            ("system", """You are a Vietnamese data query analyzer.
+Your task is to analyze user queries and format them for a vector search engine.
+1. Determine if the query is 'data' (asking about laws, procedures, penalties) or 'chitchat' (greetings, off-topic).
 2. Read the Conversation History (if provided) to understand the context. Then rewrite the Current User Query into a standalone, formal Vietnamese legal query. Resolve any pronouns or implicit references using the history.
-3. Translate informal terms/slang into formal legal terminology.
+3. Translate informal terms/slang into formal industry terminology.
 4. Provide the formal standalone translation, and optionally 1-2 decomposed sub-queries if the question is complex.
 
 You MUST respond strictly in the following JSON format:
 {{
-  "domain": "legal" or "chitchat",
+  "domain": "data" or "chitchat",
   "queries": ["formal standalone translation", "sub-query (optional)"]
 }}
 
@@ -65,10 +65,10 @@ Do not output any other text or markdown block outside the JSON."""),
                 "query": query,
                 "history": history if history else "No previous history."
             })
-            domain = result.get("domain", "legal").lower()
+            domain = result.get("domain", "data").lower()
             queries = result.get("queries", [])
             
-            if not queries and domain == "legal":
+            if not queries and domain == "data":
                 queries = [query]
                 
             return domain, queries
@@ -76,7 +76,7 @@ Do not output any other text or markdown block outside the JSON."""),
         except OutputParserException as e:
             logger.error(f"Failed to parse JSON from LLM: {e}")
             # Robust fallback on parsing failure
-            return "legal", [query]
+            return "data", [query]
         except Exception as e:
             logger.error(f"Rewriting failed with error: {e}")
-            return "legal", [query]
+            return "data", [query]

@@ -48,7 +48,7 @@ RUNTIME_PROFILE = _runtime_profile_env or (
 SUPPORTED_RUNTIME_PROFILES = frozenset({"local", "serverless"})
 
 # Conversation storage is intentionally separate from STORAGE_BACKEND:
-# PostgreSQL/Qdrant may remain shared for the legal corpus while chat data is
+# PostgreSQL/Qdrant may remain shared for the document corpus while chat data is
 # kept in the user's browser.
 CHAT_STORAGE_MODE = os.getenv("CHAT_STORAGE_MODE", "postgres").strip().lower()
 FRONTEND_CHAT_STORAGE_MODE = os.getenv("NEXT_PUBLIC_CHAT_STORAGE_MODE", "").strip().lower()

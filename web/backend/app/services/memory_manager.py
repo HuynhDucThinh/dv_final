@@ -10,12 +10,12 @@ from langchain_core.output_parsers import StrOutputParser
 logger = logging.getLogger("vietcar.memory_manager")
 
 SUMMARIZER_PROMPT = ChatPromptTemplate.from_messages([
-    ("system", """You are a legal AI memory manager.
+    ("system", """You are a AI memory manager.
 Your task is to merge the "Old Summary" with the "New Interaction" to create a "New Summary".
 
 RULES:
 1. Ignore casual greetings or polite filler words.
-2. RETAIN ALL legal entities (Law names, Decrees, Articles, Clauses).
+2. RETAIN ALL key entities (Car models, Years, Specs).
 3. RETAIN the user's core intent or factual background.
 4. Keep the summary under 100 words. Format as a concise paragraph or short bullet points.
 

@@ -1,5 +1,5 @@
 """
-Qdrant-backed searcher for legal clause retrieval.
+Qdrant-backed searcher for document retrieval.
 
 This implementation uses Qdrant. A FAISS fallback can be injected explicitly,
 but the default runtime should fail clearly instead of querying a stale index.
@@ -32,14 +32,14 @@ logger = setup_logger("vietcar.search.qdrant")
 
 NORMAL_PREFETCH_MULTIPLIER = 2
 EXPLICIT_CITATION_PREFETCH_MULTIPLIER = 4
-_EXPLICIT_LEGAL_CITATION_RE = re.compile(
+_EXPLICIT_CITATION_RE = re.compile(
     r"(?i)(?:\bđiều\s*\.?\s*\d+|\bkhoản\s*\.?\s*\d+|\bđiểm\s*\.?\s*[a-zA-Z0-9]\b|\bđ\s*\.?\s*\d+|\bk\s*\.?\s*\d+)"
 )
 
 
-def contains_explicit_legal_citation(query: str) -> bool:
-    """Return true for high-confidence Vietnamese legal article/clause references."""
-    return bool(_EXPLICIT_LEGAL_CITATION_RE.search(query or ""))
+def contains_explicit_citation(query: str) -> bool:
+    """Return true for high-confidence data reference references."""
+    return bool(_EXPLICIT_CITATION_RE.search(query or ""))
 
 
 class QdrantSearcher:
@@ -63,7 +63,7 @@ class QdrantSearcher:
     @staticmethod
     def _prefetch_limit_for_queries(queries: List[str], k: int) -> int:
         base_limit = max(k, k * NORMAL_PREFETCH_MULTIPLIER)
-        if any(contains_explicit_legal_citation(query) for query in queries):
+        if any(contains_explicit_citation(query) for query in queries):
             return max(base_limit, k * EXPLICIT_CITATION_PREFETCH_MULTIPLIER)
         return base_limit
 

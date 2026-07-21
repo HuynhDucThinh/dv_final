@@ -1,5 +1,5 @@
 """
-Storage bootstrap for Qdrant + PostgreSQL-backed legal corpus persistence.
+Storage bootstrap for Qdrant + PostgreSQL-backed document corpus persistence.
 
 This module introduces a storage abstraction for the new backend while
 preserving backward compatibility with the existing FAISS-based flow.
@@ -323,7 +323,7 @@ def initialize_storage() -> Dict[str, Any]:
 
 
 def ingest_json_documents() -> int:
-    """Ingest processed legal JSON documents into PostgreSQL and Qdrant using the configured embedding backend.
+    """Ingest processed document JSON documents into PostgreSQL and Qdrant using the configured embedding backend.
     
     Returns 0 if data already exists to avoid re-ingesting on every startup.
     Returns the number of records ingested (>0) if new data was added.

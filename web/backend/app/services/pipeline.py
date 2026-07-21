@@ -307,7 +307,7 @@ class RAGPipeline:
         docs: List[Document],
         token_budget: Optional[int],
     ) -> Tuple[List[Document], str]:
-        """Keep complete legal chunks while approximating four characters per token."""
+        """Keep complete document chunks while approximating four characters per token."""
         if not docs or token_budget is None:
             return docs, self.context_builder.build(docs)
 

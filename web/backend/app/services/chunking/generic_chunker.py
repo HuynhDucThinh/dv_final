@@ -2,7 +2,7 @@ from typing import List, Dict, Any
 from langchain_core.documents import Document
 
 class GenericChunker:
-    """Generic chunker implementation for non-legal text."""
+    """Generic chunker implementation for generic text."""
     
     @property
     def strategy_name(self) -> str:

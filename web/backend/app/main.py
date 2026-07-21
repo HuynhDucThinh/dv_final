@@ -34,7 +34,7 @@ from app.api.chat import router as chat_router
 from app.api.documents import router as documents_router
 from app.api.admin import router as admin_router
 from app.api.feedback import router as feedback_router
-# --- Routers mới: Module Phân tích Dữ liệu (THÊM MỚI, không ảnh hưởng Legal Q&A) ---
+# --- Routers mới: Module Phân tích Dữ liệu (THÊM MỚI, không ảnh hưởng Data Analysis) ---
 from app.api.analysis_chat import router as analysis_chat_router
 from app.api.execute import router as execute_router
 from app.api.logs_analysis import router as logs_analysis_router
