@@ -4,8 +4,8 @@ import { I18nProvider } from '@/components/I18nProvider';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'vietcar AI — Hệ thống Tra cứu Pháp luật Thông minh',
-  description: 'Trợ lý pháp luật AI giúp tra cứu văn bản pháp lý Việt Nam chính xác và nhanh chóng',
+  title: 'vietcar AI — Hệ thống Tra cứu Dữ liệu Thông minh',
+  description: 'Trợ lý AI giúp tra cứu phân tích dữ liệu chính xác và nhanh chóng',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

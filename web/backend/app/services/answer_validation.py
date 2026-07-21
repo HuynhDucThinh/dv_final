@@ -61,7 +61,7 @@ def validate_generated_citations(answer_text: str, context: list[dict[str, Any]]
     fallback_used = False
     has_legal_claim = bool(_LEGAL_REF_RE.search(sanitized))
     if (not allowed_ids or (cited_ids and not valid_ids and has_legal_claim)) and has_legal_claim:
-        sanitized = "Dữ liệu hiện có chưa cung cấp đủ căn cứ pháp lý để trả lời chắc chắn câu hỏi này."
+        sanitized = "Dữ liệu hiện có chưa cung cấp đủ nguồn tham khảo để trả lời chắc chắn câu hỏi này."
         fallback_used = True
         valid_ids = []
 

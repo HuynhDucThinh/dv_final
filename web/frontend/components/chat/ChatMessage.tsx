@@ -6,7 +6,7 @@ import { User, Car, BookOpen, Copy, Check, ThumbsUp, ThumbsDown, RotateCcw, Undo
 import { useTranslation } from 'react-i18next';
 import type { Message, DocumentChunk } from '@/lib/types';
 import { ChatProcessingTrace } from './ChatProcessingTrace';
-import { dedupeLegalSources, LegalSourcesTrigger } from './LegalSources';
+import { dedupeSources, SourcesTrigger } from './Sources';
 import { CHAT_CONTENT_WIDTH_CLASS, CHAT_ROW_WIDTH_CLASS } from './layout';
 
 export type { Message, DocumentChunk } from '@/lib/types';
@@ -29,7 +29,7 @@ export function ChatMessage({ message, isStreaming = false, onRefine, onOpenCont
     message.feedback === 1 ? 'up' : message.feedback === -1 ? 'down' : null
   );
   const [showNegativeForm, setShowNegativeForm] = useState(false);
-  const [reason, setReason] = useState('Sai luật');
+  const [reason, setReason] = useState('Sai thông tin');
   const [comment, setComment] = useState('');
   const [selectedCitation, setSelectedCitation] = useState<DocumentChunk | null>(null);
   const [isProcessCollapsed, setIsProcessCollapsed] = useState(true);
@@ -274,11 +274,11 @@ export function ChatMessage({ message, isStreaming = false, onRefine, onOpenCont
               </div>
 
               <div className={CHAT_CONTENT_WIDTH_CLASS}>
-                <LegalSourcesTrigger
+                <SourcesTrigger
                   sources={message.contextUsed}
                   onOpenAll={onOpenContext}
-                  controlsId="legal-sources-panel"
-                  expanded={isSourcesPanelOpen && dedupeLegalSources(message.contextUsed || []).length > 0}
+                  controlsId="sources-panel"
+                  expanded={isSourcesPanelOpen && dedupeSources(message.contextUsed || []).length > 0}
                 />
               </div>
             </>
@@ -299,7 +299,7 @@ export function ChatMessage({ message, isStreaming = false, onRefine, onOpenCont
             <div className="px-6 py-4 border-b border-gray-100 dark:border-white/10 flex justify-between items-center bg-gray-50/80 dark:bg-[#171717]/60">
               <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
                 <BookOpen className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                Trích dẫn pháp lý
+                Nguồn tham khảo
               </h3>
               <button
                 onClick={() => setSelectedCitation(null)}
@@ -314,7 +314,7 @@ export function ChatMessage({ message, isStreaming = false, onRefine, onOpenCont
             <div className="p-6 max-h-[60vh] overflow-y-auto custom-scrollbar">
               <div className="mb-4">
                 <div className="inline-block px-3 py-1 bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 border border-blue-100 dark:border-blue-500/20 rounded-full text-xs font-semibold mb-3">
-                  {selectedCitation.metadata?.source || 'Tài liệu pháp lý'}
+                  {selectedCitation.metadata?.source || 'Tài liệu tham khảo'}
                 </div>
                 {(selectedCitation.metadata?.dieu || selectedCitation.metadata?.khoan) && (
                   <h4 className="text-md font-semibold text-gray-800 dark:text-gray-100 mb-2">

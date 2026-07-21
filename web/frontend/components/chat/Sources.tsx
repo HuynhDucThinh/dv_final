@@ -4,18 +4,18 @@ import { useMemo, useState } from 'react';
 import { BookOpen, Check, ChevronDown, Copy } from 'lucide-react';
 import type { DocumentChunk } from '@/lib/types';
 
-interface LegalSourcesTriggerProps {
+interface SourcesTriggerProps {
   sources?: DocumentChunk[];
   onOpenAll?: (sources: DocumentChunk[]) => void;
   controlsId?: string;
   expanded?: boolean;
 }
 
-interface LegalSourceListProps {
+interface SourceListProps {
   sources?: DocumentChunk[];
 }
 
-export function dedupeLegalSources(sources: DocumentChunk[] = []): DocumentChunk[] {
+export function dedupeSources(sources: DocumentChunk[] = []): DocumentChunk[] {
   const seen = new Set<string>();
   return sources.filter((source, index) => {
     const key = sourceKey(source, index);
@@ -30,7 +30,7 @@ function sourceKey(source: DocumentChunk, index: number): string {
 }
 
 function buildTitle(source: DocumentChunk): string {
-  return source.metadata?.source || source.metadata?.law || 'Tài liệu pháp lý';
+  return source.metadata?.source || source.metadata?.law || 'Tài liệu tham khảo';
 }
 
 function buildMeta(source: DocumentChunk): string {
@@ -46,13 +46,13 @@ function excerpt(text: string, expanded: boolean): string {
   return `${text.slice(0, 260).trim()}...`;
 }
 
-export function LegalSourcesTrigger({
+export function SourcesTrigger({
   sources = [],
   onOpenAll,
   controlsId,
   expanded = false,
-}: LegalSourcesTriggerProps) {
-  const deduped = useMemo(() => dedupeLegalSources(sources), [sources]);
+}: SourcesTriggerProps) {
+  const deduped = useMemo(() => dedupeSources(sources), [sources]);
 
   if (deduped.length === 0 || !onOpenAll) return null;
 
@@ -64,11 +64,11 @@ export function LegalSourcesTrigger({
         className="flex w-full items-center justify-between gap-3 rounded-xl border border-gray-200 bg-gray-50/70 px-3 py-2 text-left text-sm font-semibold text-gray-800 transition hover:border-gray-300 hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 dark:border-gray-700/50 dark:bg-gray-800/50 dark:text-gray-200 dark:hover:bg-gray-800"
         aria-expanded={expanded}
         aria-controls={controlsId}
-        aria-label={`Mở ${deduped.length} căn cứ pháp lý`}
+        aria-label={`Mở ${deduped.length} nguồn tham khảo`}
       >
         <span className="inline-flex min-w-0 items-center gap-2">
           <BookOpen className="h-4 w-4 shrink-0" />
-          <span className="truncate">Căn cứ pháp lý</span>
+          <span className="truncate">nguồn tham khảo</span>
           <span
             className="inline-flex h-6 min-w-6 shrink-0 items-center justify-center rounded-full border border-gray-300/40 bg-gray-500/15 px-1.5 text-xs font-semibold text-gray-800 dark:border-gray-600/30 dark:text-gray-200"
             aria-hidden="true"
@@ -82,11 +82,11 @@ export function LegalSourcesTrigger({
   );
 }
 
-export function LegalSourceList({ sources = [] }: LegalSourceListProps) {
+export function SourceList({ sources = [] }: SourceListProps) {
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
-  const deduped = useMemo(() => dedupeLegalSources(sources), [sources]);
+  const deduped = useMemo(() => dedupeSources(sources), [sources]);
 
   if (deduped.length === 0) return null;
 
@@ -98,7 +98,7 @@ export function LegalSourceList({ sources = [] }: LegalSourceListProps) {
   };
 
   return (
-    <section className="w-full" aria-label="Danh sách căn cứ pháp lý">
+    <section className="w-full" aria-label="Danh sách nguồn tham khảo">
       <div className="space-y-3">
         {deduped.map((source, index) => {
           const key = sourceKey(source, index);

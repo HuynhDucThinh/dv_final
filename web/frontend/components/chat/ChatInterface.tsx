@@ -11,7 +11,7 @@ import { ChatMessage } from './ChatMessage';
 import { Sidebar } from './Sidebar';
 import { ChatEmptyState } from './ChatEmptyState';
 import type { ChatProcessingStage } from './ChatProcessingTrace';
-import { LegalSourceList } from './LegalSources';
+import { SourceList } from './Sources';
 import { CHAT_CONTENT_WIDTH_CLASS, CHAT_ROW_WIDTH_CLASS } from './layout';
 import { useChatSessions } from '@/hooks/use-chat-sessions';
 import { useClickOutside } from '@/hooks/use-click-outside';
@@ -302,7 +302,7 @@ export function ChatInterface() {
       const apiMessages = [...currentMessages, userMessage].map(m => ({ role: m.role, content: m.content }));
       setProcessingStage('searching');
 
-      // ===== THÊM MỚI: Nếu mode Car, gọi analysis API thay vì legal API =====
+      // ===== THÊM MỚI: Nếu mode Car, gọi analysis API thay vì document API =====
       if (chatMode === 'car') {
         const carRes = await fetch(`${BACKEND_URL}/api/analysis/chat/stream`, {
           method: 'POST',
@@ -335,7 +335,7 @@ export function ChatInterface() {
             } catch { /* skip */ }
           }
         }
-        // Flush message và return (không chạy code legal bên dưới)
+        // Flush message và return (không chạy code document bên dưới)
         addMessage({ id: (Date.now() + 1).toString(), role: 'assistant', content: accumulated || 'Không có phản hồi từ AI.', processingStage: streamErrorMessage ? 'error' : 'completed' });
         return;
       }
@@ -446,7 +446,7 @@ export function ChatInterface() {
         ? `${accumulated}${accumulated ? '\n\n' : ''}Đã dừng yêu cầu.`
         : streamErrorMessage
           ? accumulated || (contextUsed.length > 0
-              ? 'Đã tìm thấy căn cứ pháp lý nhưng chưa thể tổng hợp câu trả lời. Bạn vẫn có thể xem các căn cứ bên dưới.'
+              ? 'Đã tìm thấy nguồn tham khảo nhưng chưa thể tổng hợp câu trả lời. Bạn vẫn có thể xem các căn cứ bên dưới.'
               : 'Không thể hoàn tất câu trả lời lúc này. Vui lòng thử lại.')
           : accumulated;
 
@@ -486,7 +486,7 @@ export function ChatInterface() {
       } else {
         setProcessingStage('error');
         const content = contextUsed.length > 0
-          ? 'Đã tìm thấy căn cứ pháp lý nhưng chưa thể tổng hợp câu trả lời. Bạn vẫn có thể xem các căn cứ bên dưới.'
+          ? 'Đã tìm thấy nguồn tham khảo nhưng chưa thể tổng hợp câu trả lời. Bạn vẫn có thể xem các căn cứ bên dưới.'
           : 'Không thể hoàn tất câu trả lời lúc này. Vui lòng thử lại.';
         addMessage({
           id: (Date.now() + 1).toString(),
@@ -751,7 +751,7 @@ export function ChatInterface() {
                     handleSubmit();
                   }
                 }}
-                placeholder={isListening ? t('chat.listening', 'Đang nghe...') : isLoading ? t('chat.processing', 'Đang xử lý yêu cầu...') : chatMode === 'car' ? t('chat.placeholderCar', 'Hỏi về ô tô, giá xe, phân tích dữ liệu...') : t('chat.placeholder', 'Hỏi về điều luật, quyền, nghĩa vụ hoặc thủ tục pháp lý...')}
+                placeholder={isListening ? t('chat.listening', 'Đang nghe...') : isLoading ? t('chat.processing', 'Đang xử lý yêu cầu...') : chatMode === 'car' ? t('chat.placeholderCar', 'Hỏi về ô tô, giá xe, phân tích dữ liệu...') : t('chat.placeholder', 'Hỏi về xe, thông số kỹ thuật, hoặc tính năng...')}
                 className="w-full resize-none bg-transparent pl-5 pr-24 py-3 focus:outline-none text-gray-700 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 leading-relaxed rounded-b-3xl text-[15px] custom-scrollbar"
                 rows={1}
                 style={{ minHeight: '52px', maxHeight: '160px' }}
@@ -812,13 +812,13 @@ export function ChatInterface() {
       <div
         className={`absolute md:relative top-0 right-0 h-full bg-white dark:bg-[#171717] shadow-[0_0_40px_rgba(0,0,0,0.1)] dark:shadow-none transition-all duration-300 z-50 border-l border-gray-200/60 dark:border-white/10 flex-shrink-0 overflow-hidden
           ${drawerContext ? 'translate-x-0 md:w-[400px] w-full' : 'translate-x-full md:translate-x-0 md:w-0 w-full'}`}
-        id="legal-sources-panel"
+        id="sources-panel"
       >
         {drawerContext && (
           <div className="flex flex-col h-full">
             <div className="h-14 flex items-center justify-between px-4 border-b border-gray-100 dark:border-white/10 bg-gray-50/50 dark:bg-[#171717]/50 flex-shrink-0 transition-colors">
               <span className="text-[11px] font-bold uppercase tracking-widest text-gray-700 dark:text-gray-400">
-                {t('chat.legalSources', 'Căn cứ pháp lý')}
+                {t('chat.sources', 'nguồn tham khảo')}
               </span>
               <button
                 onClick={() => setDrawerContext(null)}
@@ -832,10 +832,10 @@ export function ChatInterface() {
               <div className="space-y-3">
                 {drawerContext.length === 0 ? (
                   <p className="text-gray-500 dark:text-gray-400 text-[13px] text-center mt-10 italic">
-                    {t('chat.noSources', 'Không có văn bản pháp lý trích dẫn cho đoạn chat này.')}
+                    {t('chat.noSources', 'Không có tài liệu trích dẫn cho đoạn chat này.')}
                   </p>
                 ) : (
-                  <LegalSourceList sources={drawerContext} />
+                  <SourceList sources={drawerContext} />
                 )}
               </div>
             </div>

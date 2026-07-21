@@ -423,7 +423,7 @@ def ingest_json_documents() -> int:
 
 
 def ingest_documents(records: List[Dict[str, Any]]) -> int:
-    """Persist legal document records into PostgreSQL and upsert vectors into Qdrant."""
+    """Persist document records into PostgreSQL and upsert vectors into Qdrant."""
     if not records:
         return 0
 

@@ -159,7 +159,7 @@ export function Sidebar({
         >
           <LibraryBig className="w-4 h-4" />
           <span className="text-[13px] font-semibold">
-            {t("sidebar.legalData", "Dữ liệu Pháp luật")}
+            {t("sidebar.legalData", "Dữ liệu Tham khảo")}
           </span>
         </Link>
         <Link

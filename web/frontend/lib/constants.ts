@@ -18,43 +18,43 @@ export const CHAT_STORAGE_MODE: ChatStorageMode =
     ? 'browser'
     : 'postgres';
 
-// Các lĩnh vực pháp luật được tách từ ba nhóm nghiệp vụ.
+// Các danh mục tài liệu phân tích.
 export const LAW_CATEGORIES = [
   {
     id: ALL_LAWS_CATEGORY,
-    label: 'Tất cả các luật',
+    label: 'Tất cả tài liệu',
   },
   {
     id: 'LKDBDS_2023',
-    label: 'Luật Kinh doanh bất động sản 2023',
+    label: 'Dữ liệu Xe hơi',
   },
   {
     id: 'LTTPHS_2025',
-    label: 'Luật Tương trợ tư pháp về hình sự 2025',
+    label: 'Phân tích Thị trường',
   },
   {
     id: 'LNO_2023',
-    label: 'Luật Nhà ở 2023',
+    label: 'Báo cáo Bán hàng',
   },
   {
     id: 'LBVMT_2020',
-    label: 'Luật Bảo vệ môi trường 2020',
+    label: 'Thông số Kỹ thuật',
   },
   {
     id: 'LXD_2014',
-    label: 'Luật Xây dựng 2014',
+    label: 'Đánh giá Xe',
   },
   {
     id: 'LDD_2024',
-    label: 'Luật Đất đai 2024',
+    label: 'Chính sách Bảo hành',
   },
   {
     id: 'LCC_2024',
-    label: 'Luật Công chứng 2024',
+    label: 'Hướng dẫn Sử dụng',
   },
   {
     id: 'BLTTDS_2015',
-    label: 'Bộ luật Tố tụng dân sự 2015',
+    label: 'Dữ liệu Khách hàng',
   },
 ] as const satisfies readonly LawCategory[];
 
