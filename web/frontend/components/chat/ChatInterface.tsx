@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Send, PanelLeft, LibraryBig, Check, ChevronDown, Square, ArrowDown, X, Plus, Settings, Mic } from 'lucide-react';
+import { Send, PanelLeft, LibraryBig, Check, ChevronDown, Square, ArrowDown, X, Plus, Settings, Mic, Paperclip, FileText, Image as ImageIcon, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useSpeechRecognition } from '@/hooks/use-speech-recognition';
 import { ProviderSelector } from './ProviderSelector';
@@ -28,9 +28,15 @@ import {
 } from '@/lib/constants';
 import type { Message, DocumentChunk } from '@/lib/types';
 import { useTranslation } from 'react-i18next';
+import { useFileAttachments } from '@/hooks/use-file-attachments';
+import { useSession } from '@/lib/auth-client';
 
 export function ChatInterface() {
   const { t } = useTranslation();
+  const { data: authSession } = useSession();
+  // undefined = auth đang load, null = chưa đăng nhập, string = đã đăng nhập
+  const userId = authSession === undefined ? undefined : (authSession?.user?.id ?? null);
+
   const {
     sessions,
     currentSessionId,
@@ -44,7 +50,7 @@ export function ChatInterface() {
     updateSessionTitle,
     isSessionLoading,
     isSessionsListLoading,
-  } = useChatSessions();
+  } = useChatSessions(userId);
 
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -74,7 +80,11 @@ export function ChatInterface() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [isAtBottom, setIsAtBottom] = useState(true);
+
+  // File attachments
+  const { attachments, isUploading, addFiles, removeAttachment, clearAttachments, getFullTexts } = useFileAttachments();
 
   // States for mini-map
   const [activeMessageId, setActiveMessageId] = useState<string | null>(null);
@@ -272,12 +282,54 @@ export function ChatInterface() {
     }
 
     const userText = (overrideText ?? input).trim();
-    if (!userText || !currentSessionId) return;
+    if (!userText && attachments.length === 0) return;
+    if (!currentSessionId) return;
+
+    // Lấy extracted text từ các file đính kèm
+    let fullMessage = userText;
+    if (attachments.length > 0) {
+      const textMap = await getFullTexts();
+      const fileContextParts: string[] = [];
+
+      for (const att of attachments) {
+        if (att.status !== 'done') continue;
+        if (att.file.type.startsWith('image/') && att.publicUrl) {
+          fileContextParts.push(`[Ảnh đính kèm: ${att.file.name}]\nURL: ${att.publicUrl}`);
+        } else if (textMap.has(att.id)) {
+          const text = textMap.get(att.id)!;
+          fileContextParts.push(`[Nội dung file: ${att.file.name}]\n\"\"\"\n${text}\n\"\"\"`);
+        } else if (att.publicUrl) {
+          fileContextParts.push(`[File đính kèm: ${att.file.name}]\nURL: ${att.publicUrl}`);
+        }
+      }
+
+      if (fileContextParts.length > 0) {
+        fullMessage = fileContextParts.join('\n\n') + (userText ? `\n\nCâu hỏi: ${userText}` : '');
+      }
+    }
 
     setInput('');
+    clearAttachments();
     if (textareaRef.current) textareaRef.current.style.height = '52px';
 
-    const userMessage: Message = { id: Date.now().toString(), role: 'user', content: userText };
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      role: 'user',
+      content: fullMessage,
+      // displayContent: chỉ hiện câu hỏi người dùng gõ (ẩn extracted text)
+      displayContent: userText || undefined,
+      // attachments: danh sách file để hiện card trong chat
+      attachments: attachments
+        .filter(a => a.status === 'done')
+        .map(a => ({
+          id: a.id,
+          name: a.file.name,
+          mimeType: a.file.type,
+          publicUrl: a.publicUrl,
+          previewUrl: a.previewUrl,
+          sizeBytes: a.file.size,
+        })),
+    };
     addMessage(userMessage);
 
     if (currentMessages.length === 0 && currentSessionId) {
@@ -304,13 +356,18 @@ export function ChatInterface() {
 
       // ===== THÊM MỚI: Nếu mode Car, gọi analysis API thay vì document API =====
       if (chatMode === 'car') {
-        const carRes = await fetch(`${BACKEND_URL}/api/analysis/chat/stream`, {
+        // Đi qua Next.js proxy để tự động thêm X-User-Id header
+        const carRes = await fetch('/api/chat/analysis', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             messages: apiMessages,
-            model: 'llama-3.3-70b-versatile',
+            model: aiSettings.roles.answer.model,
             session_id: currentSessionId || 'unknown',
+            session_title: currentMessages.length === 0
+              ? (userText.length > 40 ? userText.substring(0, 40) + '...' : userText)
+              : (sessions.find(s => s.id === currentSessionId)?.title || 'Cuộc trò chuyện mới'),
+            inferenceConfig: toRuntimeInferenceConfig(aiSettings),
           }),
           signal: controller.signal,
         });
@@ -336,7 +393,8 @@ export function ChatInterface() {
           }
         }
         // Flush message và return (không chạy code document bên dưới)
-        addMessage({ id: (Date.now() + 1).toString(), role: 'assistant', content: accumulated || 'Không có phản hồi từ AI.', processingStage: streamErrorMessage ? 'error' : 'completed' });
+        const carContent = accumulated || (streamErrorMessage ? streamErrorMessage : 'Không có phản hồi từ AI.');
+        addMessage({ id: (Date.now() + 1).toString(), role: 'assistant', content: carContent, processingStage: streamErrorMessage ? 'error' : 'completed' });
         return;
       }
       // ===== KẼT THÚC phần Car =====
@@ -734,12 +792,59 @@ export function ChatInterface() {
             )}
 
             <div className="relative rounded-3xl bg-white dark:bg-[#171717] border border-gray-200/80 dark:border-white/10 shadow-xl shadow-blue-100/30 dark:shadow-none input-glow transition-all duration-300">
+
+              {/* File preview chips */}
+              {attachments.length > 0 && (
+                <div className="flex flex-wrap gap-2 px-4 pt-3 pb-1">
+                  {attachments.map(att => (
+                    <div
+                      key={att.id}
+                      className="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 rounded-xl px-2.5 py-1.5 text-xs max-w-[200px] group"
+                    >
+                      {att.file.type.startsWith('image/') && att.previewUrl ? (
+                        <img src={att.previewUrl} alt={att.file.name} className="w-8 h-8 object-cover rounded-lg flex-shrink-0" />
+                      ) : (
+                        <div className="w-8 h-8 bg-orange-100 dark:bg-orange-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <FileText className="w-4 h-4 text-orange-500" />
+                        </div>
+                      )}
+                      <div className="min-w-0">
+                        <p className="truncate font-medium text-gray-700 dark:text-gray-200" title={att.file.name}>{att.file.name}</p>
+                        {att.status === 'uploading' && (
+                          <p className="text-gray-400 flex items-center gap-1"><Loader2 className="w-2.5 h-2.5 animate-spin" />Đang tải...</p>
+                        )}
+                        {att.status === 'error' && <p className="text-red-400">Lỗi upload</p>}
+                        {att.status === 'done' && att.hasText && <p className="text-green-500">Đã đọc nội dung</p>}
+                        {att.status === 'done' && !att.hasText && att.file.type.startsWith('image/') && <p className="text-gray-400">Ảnh</p>}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => removeAttachment(att.id)}
+                        className="ml-auto flex-shrink-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
               <div className="flex items-center gap-2 px-3 pt-3 pb-1">
                 <div className="ml-auto flex min-w-0 flex-wrap items-center justify-end gap-2">
                   <AdvancedSettings config={advancedConfig} setConfig={setAdvancedConfig} />
                   <ProviderSelector model={model} setModel={setModel} />
                 </div>
               </div>
+
+              {/* File input ẩn */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                multiple
+                accept="image/*,.pdf,.txt,.doc,.docx"
+                className="hidden"
+                onChange={e => { if (e.target.files) { addFiles(e.target.files); e.target.value = ''; } }}
+              />
 
               <textarea
                 ref={textareaRef}
@@ -752,10 +857,21 @@ export function ChatInterface() {
                   }
                 }}
                 placeholder={isListening ? t('chat.listening', 'Đang nghe...') : isLoading ? t('chat.processing', 'Đang xử lý yêu cầu...') : chatMode === 'car' ? t('chat.placeholderCar', 'Hỏi về ô tô, giá xe, phân tích dữ liệu...') : t('chat.placeholder', 'Hỏi về xe, thông số kỹ thuật, hoặc tính năng...')}
-                className="w-full resize-none bg-transparent pl-5 pr-24 py-3 focus:outline-none text-gray-700 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 leading-relaxed rounded-b-3xl text-[15px] custom-scrollbar"
+                className="w-full resize-none bg-transparent pl-14 pr-24 py-3 focus:outline-none text-gray-700 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 leading-relaxed rounded-b-3xl text-[15px] custom-scrollbar"
                 rows={1}
                 style={{ minHeight: '52px', maxHeight: '160px' }}
               />
+
+              {/* Nút upload file — bottom-left */}
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isLoading}
+                title="Đính kèm file"
+                className="absolute left-3 bottom-2.5 p-2 rounded-xl text-gray-400 hover:text-orange-500 hover:bg-orange-50 dark:hover:bg-orange-500/10 transition-all disabled:opacity-40"
+              >
+                <Paperclip className="w-4 h-4" />
+              </button>
 
               {/* Nut Send / Stop */}
               <div className="absolute right-2 bottom-2 flex items-center gap-1">
@@ -787,9 +903,9 @@ export function ChatInterface() {
                 ) : (
                   <button
                     onClick={() => handleSubmit()}
-                    disabled={!input.trim()}
+                    disabled={!input.trim() && attachments.length === 0}
                     aria-label={t('chat.sendTooltip', 'Gửi câu hỏi')}
-                    className={`p-2.5 text-white dark:text-gray-900 bg-gray-800 hover:bg-gray-900 dark:bg-gray-200 dark:hover:bg-white rounded-2xl disabled:opacity-40 transition-all shadow-md active:scale-95 flex items-center justify-center ${input.trim() ? 'send-btn-ready' : ''}`}
+                    className={`p-2.5 text-white dark:text-gray-900 bg-gray-800 hover:bg-gray-900 dark:bg-gray-200 dark:hover:bg-white rounded-2xl disabled:opacity-40 transition-all shadow-md active:scale-95 flex items-center justify-center ${(input.trim() || attachments.length > 0) ? 'send-btn-ready' : ''}`}
                   >
                     <Send className="w-4 h-4 translate-x-px translate-y-px" />
                   </button>

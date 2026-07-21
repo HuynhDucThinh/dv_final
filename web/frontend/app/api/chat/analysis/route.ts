@@ -14,9 +14,9 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const backendBase = getBackendUrl(req.url);
-    const streaming = body.streaming !== false;
-    const targetUrl = `${backendBase}${streaming ? '/chat/stream' : '/chat'}`;
+    const targetUrl = `${backendBase}/api/analysis/chat/stream`;
 
+    // Thêm X-User-Id để backend biết user nào đang gửi
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
     try {
       const session = await auth.api.getSession({ headers: req.headers });
@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
         headers['X-User-Id'] = session.user.id;
       }
     } catch {
-      // Bỏ qua lỗi auth (guest mode)
+      // Guest mode — không có session
     }
 
     const backendRes = await fetch(targetUrl, {
@@ -42,13 +42,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (!streaming) {
-      return new NextResponse(await backendRes.arrayBuffer(), {
-        status: backendRes.status,
-        headers: { 'Content-Type': backendRes.headers.get('content-type') || 'application/json' },
-      });
-    }
-
     return new NextResponse(backendRes.body, {
       status: 200,
       headers: {
@@ -60,10 +53,6 @@ export async function POST(req: NextRequest) {
     });
   } catch (error: unknown) {
     const details = error instanceof Error ? error.message : 'Unknown proxy error';
-    console.error('[Proxy Chat Error]', error);
-    return NextResponse.json(
-      { error: 'Backend connection error', details },
-      { status: 502 },
-    );
+    return NextResponse.json({ error: 'Backend connection error', details }, { status: 502 });
   }
 }

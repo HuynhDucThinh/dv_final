@@ -1,11 +1,12 @@
 import json
 from typing import Any, Dict, Optional
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
 from app.services.storage import is_database_backend_enabled, _ensure_schema
 from app.config import CHAT_STORAGE_MODE, POSTGRES_DSN
 from app.utils.logging import setup_logger
+from app.api.auth_deps import get_current_user_id
 
 logger = setup_logger("vietcar.api.feedback")
 
@@ -21,9 +22,15 @@ class FeedbackRequest(BaseModel):
     reason: Optional[str] = None
     comment: Optional[str] = None
     model_used: Optional[str] = None
+    user_id: Optional[str] = None  # Better Auth user ID (từ frontend)
 
 @router.post("")
-async def submit_feedback(request: FeedbackRequest):
+async def submit_feedback(
+    request: FeedbackRequest,
+    jwt_user_id: Optional[str] = Depends(get_current_user_id),
+):
+    # Ưu tiên JWT user_id từ header, fallback về body user_id
+    resolved_user_id = jwt_user_id or request.user_id
     if CHAT_STORAGE_MODE == "browser":
         return {
             "status": "skipped",

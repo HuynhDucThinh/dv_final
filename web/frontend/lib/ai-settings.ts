@@ -109,6 +109,14 @@ function normalizeCredentials(value: Partial<ProviderCredentialSettings> | null 
       apiKey: typeof value?.huggingface?.apiKey === 'string' ? value.huggingface.apiKey : '',
       remember: value?.huggingface?.remember ?? true,
     },
+    groq: {
+      apiKey: typeof value?.groq?.apiKey === 'string' ? value.groq.apiKey : '',
+      remember: value?.groq?.remember ?? true,
+    },
+    openai: {
+      apiKey: typeof value?.openai?.apiKey === 'string' ? value.openai.apiKey : '',
+      remember: value?.openai?.remember ?? true,
+    },
   };
 }
 
@@ -120,6 +128,8 @@ function mergeSessionCredentials(settings: AISettings): AISettings {
     const sessionCredentials = normalizeCredentials(JSON.parse(raw));
     const currentGoogle = settings.providerCredentials.google ?? { apiKey: '', remember: true };
     const currentHuggingFace = settings.providerCredentials.huggingface ?? { apiKey: '', remember: true };
+    const currentGroq = settings.providerCredentials.groq ?? { apiKey: '', remember: true };
+    const currentOpenai = settings.providerCredentials.openai ?? { apiKey: '', remember: true };
     return {
       ...settings,
       providerCredentials: {
@@ -130,6 +140,12 @@ function mergeSessionCredentials(settings: AISettings): AISettings {
         huggingface: sessionCredentials.huggingface?.apiKey
           ? { ...currentHuggingFace, apiKey: sessionCredentials.huggingface.apiKey }
           : currentHuggingFace,
+        groq: sessionCredentials.groq?.apiKey
+          ? { ...currentGroq, apiKey: sessionCredentials.groq.apiKey }
+          : currentGroq,
+        openai: sessionCredentials.openai?.apiKey
+          ? { ...currentOpenai, apiKey: sessionCredentials.openai.apiKey }
+          : currentOpenai,
       },
     };
   } catch {

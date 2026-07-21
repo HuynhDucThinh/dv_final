@@ -7,13 +7,14 @@ import json
 import time
 import traceback
 import asyncio
-from typing import AsyncGenerator
+from typing import AsyncGenerator, Optional
 from datetime import datetime, timedelta
 
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import StreamingResponse
 
 from app.config import CHAT_STORAGE_MODE, PIPELINE_TIMING_ENABLED
+from app.api.auth_deps import get_current_user_id
 from app.models import ChatRequest
 from app.services.pipeline import get_pipeline
 from app.services.llm import get_llm, CHAT_PROMPT, get_output_parser
@@ -92,19 +93,19 @@ def _rewrite_query(rewriter, query: str, history: str, runtime_config):
         return rewriter.rewrite(query, history)
 
 
-async def _persist_turn(session_id: str, session_title: str, user_msg_id: str, user_content: str, ai_msg_id: str, ai_content: str, ai_context: list, user_time: datetime, ai_time: datetime):
+async def _persist_turn(session_id: str, session_title: str, user_msg_id: str, user_content: str, ai_msg_id: str, ai_content: str, ai_context: list, user_time: datetime, ai_time: datetime, user_id: Optional[str] = None):
     """Helper to persist chat turns sequentially to avoid foreign key violations."""
     import asyncio
     from app.services.storage import ensure_session_exists, save_chat_message
     try:
-        await asyncio.to_thread(ensure_session_exists, session_id, session_title)
+        await asyncio.to_thread(ensure_session_exists, session_id, session_title, user_id)
         await asyncio.to_thread(save_chat_message, session_id, user_msg_id, "user", user_content, [], user_time)
         await asyncio.to_thread(save_chat_message, session_id, ai_msg_id, "assistant", ai_content, ai_context, ai_time)
     except Exception as e:
         logger.error("Failed to persist chat turn sequentially for session %s: %s", session_id, e)
 
 
-async def _persist_completed_turn(request: ChatRequest, session_id: str, user_content: str, ai_content: str, ai_context: list):
+async def _persist_completed_turn(request: ChatRequest, session_id: str, user_content: str, ai_content: str, ai_context: list, user_id: Optional[str] = None):
     """Persist a finished turn before the client treats it as complete."""
     if CHAT_STORAGE_MODE != "postgres" or session_id == "unknown":
         return
@@ -125,6 +126,7 @@ async def _persist_completed_turn(request: ChatRequest, session_id: str, user_co
         ai_context=ai_context,
         user_time=user_time,
         ai_time=ai_time,
+        user_id=user_id,
     )
 
 
@@ -138,7 +140,7 @@ def _new_timing(http_request: Request, endpoint: str, streaming: bool) -> Pipeli
 
 
 @router.post("/chat")
-async def chat_endpoint(request: ChatRequest, http_request: Request):
+async def chat_endpoint(request: ChatRequest, http_request: Request, user_id: Optional[str] = Depends(get_current_user_id)):
     """Endpoint non-streaming: nhan cau hoi -> truy xuat -> goi LLM -> tra JSON."""
     timing = _new_timing(http_request, "/chat", streaming=False)
     timing_token = set_current_timing(timing if PIPELINE_TIMING_ENABLED else None)
@@ -223,6 +225,7 @@ async def chat_endpoint(request: ChatRequest, http_request: Request):
                                 last_message,
                                 cached_text,
                                 cached_context,
+                                user_id,
                             )
                             return {
                                 "text": cached_text,
@@ -323,6 +326,7 @@ async def chat_endpoint(request: ChatRequest, http_request: Request):
             last_message,
             output_text,
             frontend_context,
+            user_id,
         )
 
         # Summarize memory asynchronously
@@ -353,7 +357,7 @@ async def chat_endpoint(request: ChatRequest, http_request: Request):
 
 
 @router.post("/chat/stream")
-async def chat_stream_endpoint(request: ChatRequest, http_request: Request):
+async def chat_stream_endpoint(request: ChatRequest, http_request: Request, user_id: Optional[str] = Depends(get_current_user_id)):
     """Endpoint streaming: tra token theo tung chunk qua Server-Sent Events."""
     timing = _new_timing(http_request, "/chat/stream", streaming=True)
 
@@ -445,6 +449,7 @@ async def chat_stream_endpoint(request: ChatRequest, http_request: Request):
                                     last_message,
                                     cached_text,
                                     frontend_context,
+                                    user_id,
                                 )
                                 yield _sse({"type": "done"})
                                 
@@ -558,6 +563,7 @@ async def chat_stream_endpoint(request: ChatRequest, http_request: Request):
                 last_message,
                 accumulated_text,
                 frontend_context,
+                user_id,
             )
 
             # Summarize memory asynchronously
@@ -594,12 +600,12 @@ async def chat_stream_endpoint(request: ChatRequest, http_request: Request):
 
 
 @router.get("/chat/sessions")
-async def get_sessions():
+async def get_sessions(user_id: Optional[str] = Depends(get_current_user_id)):
     if CHAT_STORAGE_MODE == "browser":
         return {"storageMode": "browser", "sessions": []}
-    """Trả về danh sách tất cả sessions từ PostgreSQL."""
+    """Trả về danh sách sessions của user hiện tại từ PostgreSQL."""
     from app.services.storage import list_sessions
-    return list_sessions()
+    return list_sessions(user_id=user_id)
 
 
 @router.get("/chat/session/{session_id}/messages")

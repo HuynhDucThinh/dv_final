@@ -89,7 +89,7 @@ const chooseCompleteMessages = (cached: Message[] | undefined, dbMessages: Messa
   return cached;
 };
 
-export function useChatSessions() {
+export function useChatSessions(userId?: string | null) {
   const [sessions, setSessions] = useState<ChatSession[]>([]);
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const [isSessionLoading, setIsSessionLoading] = useState(false);
@@ -217,17 +217,19 @@ export function useChatSessions() {
 
     setSessions(prev => {
       const idx = prev.findIndex(s => s.id === currentSessionId);
+      // Dùng displayContent làm title nếu có (tránh lấy extracted text từ file)
+      const displayText = message.displayContent || message.content;
       if (idx === -1) {
         return [{
           id: currentSessionId,
-          title: message.content.substring(0, 40) + (message.content.length > 40 ? '...' : ''),
-          lastMessage: message.content,
+          title: displayText.substring(0, 40) + (displayText.length > 40 ? '...' : ''),
+          lastMessage: displayText,
           timestamp: Date.now()
         }, ...prev];
       }
       return prev.map(s =>
         s.id === currentSessionId
-          ? { ...s, lastMessage: message.content, timestamp: Date.now() }
+          ? { ...s, lastMessage: displayText, timestamp: Date.now() }
           : s
       );
     });
@@ -269,120 +271,104 @@ export function useChatSessions() {
     }
   }, []);
 
-  // --- Load từ DB/API khi mount ---
+  // ================================================================
+  // Auth-aware data loading
+  // Triggers on mount AND every time userId changes (login / logout)
+  // ================================================================
   useEffect(() => {
+    // userId === undefined  → auth state still loading, wait
+    if (userId === undefined) return;
+
     setIsMounted(true);
 
+    // Helper: restore from localStorage (guest mode)
     const restoreLocalSnapshot = (snapshot: LocalChatSnapshot) => {
       const localSessions = getLocalSessionsWithMessages(snapshot)
         .sort((a, b) => b.timestamp - a.timestamp);
-
       setSessions(localSessions);
       setMessagesBySession(snapshot.messages);
-
       if (snapshot.activeSessionId && snapshot.messages[snapshot.activeSessionId]) {
         setCurrentSessionId(snapshot.activeSessionId);
-        localStorage.setItem(STORAGE_KEYS.activeSessionId, snapshot.activeSessionId);
         return;
       }
-
       if (localSessions.length > 0) {
         setCurrentSessionId(localSessions[0].id);
         localStorage.setItem(STORAGE_KEYS.activeSessionId, localSessions[0].id);
         return;
       }
-
       handleNewChat();
     };
 
+    // ---- GUEST (not logged in): localStorage only ----
+    if (!userId) {
+      const snapshot = readLocalChatSnapshot();
+      restoreLocalSnapshot(snapshot);
+      setIsSessionLoading(false);
+      setIsSessionsListLoading(false);
+      return;
+    }
+
+    // ---- LOGGED IN: DB only, never localStorage ----
+    // Clear any guest state lingering from before login
+    setSessions([]);
+    setMessagesBySession({});
+    setCurrentSessionId(null);
+    setIsSessionsListLoading(true);
+
     const loadFromDB = async () => {
-      const localSnapshot = readLocalChatSnapshot();
-
-      if (CHAT_STORAGE_MODE === 'browser') {
-        restoreLocalSnapshot(localSnapshot);
-        setIsSessionLoading(false);
-        setIsSessionsListLoading(false);
-        return;
-      }
-
       try {
         const res = await fetch('/api/chat/sessions');
         if (!res.ok) {
           const body = await res.text().catch(() => '');
-          warnRecoverableSessionsIssue(`Sessions API returned ${res.status}; using local history.`, body.slice(0, 160));
-          restoreLocalSnapshot(localSnapshot);
+          warnRecoverableSessionsIssue(`Sessions API returned ${res.status}.`, body.slice(0, 160));
+          handleNewChat();
           return;
         }
 
         const dbSessions = await res.json() as DbSession[];
         if (!Array.isArray(dbSessions)) {
-          warnRecoverableSessionsIssue('Sessions API returned an unexpected payload; using local history.');
-          restoreLocalSnapshot(localSnapshot);
+          warnRecoverableSessionsIssue('Sessions API unexpected payload.');
+          handleNewChat();
           return;
         }
 
         const filteredSessions = dbSessions.filter(s => Number(s.message_count || 0) > 0);
-        const dbMessageCounts = Object.fromEntries(
-          filteredSessions.map(s => [s.session_id, Number(s.message_count || 0)])
-        ) as Record<string, number>;
 
-        let loadedSessions: ChatSession[] = filteredSessions.map(dbSession => ({
+        if (filteredSessions.length === 0) {
+          // User has no sessions yet → start fresh
+          handleNewChat();
+          return;
+        }
+
+        const loadedSessions: ChatSession[] = filteredSessions.map(dbSession => ({
           id: dbSession.session_id,
           title: dbSession.title || 'Cuộc trò chuyện mới',
           lastMessage: '',
           timestamp: dbSession.updated_at ? new Date(dbSession.updated_at).getTime() : Date.now(),
         }));
-
         loadedSessions.sort((a, b) => b.timestamp - a.timestamp);
-
-        const loadedSessionIds = new Set(loadedSessions.map(session => session.id));
-        const localSessions = getLocalSessionsWithMessages(localSnapshot);
-        for (const localSession of localSessions) {
-          if (!loadedSessionIds.has(localSession.id)) {
-            loadedSessions.push(localSession);
-            loadedSessionIds.add(localSession.id);
-          }
-        }
-        loadedSessions.sort((a, b) => b.timestamp - a.timestamp);
-
-        const canRestoreActive = Boolean(
-          localSnapshot.activeSessionId && loadedSessions.some(s => s.id === localSnapshot.activeSessionId)
-        );
-        const activeId = canRestoreActive && localSnapshot.activeSessionId
-          ? localSnapshot.activeSessionId
-          : loadedSessions[0]?.id || createSessionId();
-        const activeSessionExists = loadedSessions.some(s => s.id === activeId);
-        const initialMessages: Record<string, Message[]> = {
-          ...localSnapshot.messages,
-          [activeId]: localSnapshot.messages[activeId] || [],
-        };
+        const activeId = loadedSessions[0].id;
 
         setSessions(loadedSessions);
-        setMessagesBySession(initialMessages);
         setCurrentSessionId(activeId);
-        localStorage.setItem(STORAGE_KEYS.activeSessionId, activeId);
 
-        const cachedActiveMessages = localSnapshot.messages[activeId];
-        const shouldFetchActiveMessages =
-          activeSessionExists &&
-          (!cachedActiveMessages || (dbMessageCounts[activeId] || 0) > cachedActiveMessages.length);
-
-        if (shouldFetchActiveMessages) {
-          setIsSessionLoading(true);
-          const messagesRes = await fetch(`/api/chat/session/${activeId}/messages`);
-          if (messagesRes.ok) {
-            const dbMsgs = await messagesRes.json() as DbMessage[];
-            const dbMessages = dbMsgs.map(mapDbMessage);
-            setMessagesBySession(prev => ({
-              ...prev,
-              [activeId]: chooseCompleteMessages(prev[activeId], dbMessages)
-            }));
+        // Load messages of the active session
+        setIsSessionLoading(true);
+        try {
+          const msgRes = await fetch(`/api/chat/session/${activeId}/messages`);
+          if (msgRes.ok) {
+            const dbMsgs = await msgRes.json() as DbMessage[];
+            setMessagesBySession({ [activeId]: dbMsgs.map(mapDbMessage) });
+          } else {
+            setMessagesBySession({ [activeId]: [] });
           }
+        } catch {
+          setMessagesBySession({ [activeId]: [] });
         }
         setIsSessionLoading(false);
       } catch (err) {
-        warnRecoverableSessionsIssue('Sessions API is unavailable; using local history.', err);
-        restoreLocalSnapshot(localSnapshot);
+        warnRecoverableSessionsIssue('Sessions API unavailable.', err);
+        handleNewChat();
       } finally {
         setIsSessionLoading(false);
         setIsSessionsListLoading(false);
@@ -390,22 +376,26 @@ export function useChatSessions() {
     };
 
     loadFromDB();
-  }, [handleNewChat]);
+  }, [userId, handleNewChat]);
 
-  // --- Lưu vào localStorage khi thay đổi ---
+  // ================================================================
+  // Persist to localStorage — ONLY for guests (userId is null/undefined)
+  // Logged-in users: sessions live in DB, never written to localStorage
+  // ================================================================
   useEffect(() => {
-    if (isMounted) {
-      const validSessions = sessions.filter(s => messagesBySession[s.id] && messagesBySession[s.id].length > 0);
-      // Chỉ lưu messages của các session hợp lệ để tránh tích lũy orphan data
-      const validMessages: Record<string, Message[]> = {};
-      validSessions.forEach(s => { validMessages[s.id] = messagesBySession[s.id]; });
-      localStorage.setItem(STORAGE_KEYS.sessions, JSON.stringify(validSessions));
-      localStorage.setItem(STORAGE_KEYS.messages, JSON.stringify(validMessages));
-      if (currentSessionId) {
-        localStorage.setItem(STORAGE_KEYS.activeSessionId, currentSessionId);
-      }
+    if (!isMounted) return;
+    if (userId) return; // Logged-in users: do NOT touch localStorage
+
+    // Guest mode: save current state as cache
+    const validSessions = sessions.filter(s => messagesBySession[s.id] && messagesBySession[s.id].length > 0);
+    const validMessages: Record<string, Message[]> = {};
+    validSessions.forEach(s => { validMessages[s.id] = messagesBySession[s.id]; });
+    localStorage.setItem(STORAGE_KEYS.sessions, JSON.stringify(validSessions));
+    localStorage.setItem(STORAGE_KEYS.messages, JSON.stringify(validMessages));
+    if (currentSessionId) {
+      localStorage.setItem(STORAGE_KEYS.activeSessionId, currentSessionId);
     }
-  }, [sessions, messagesBySession, currentSessionId, isMounted]);
+  }, [sessions, messagesBySession, currentSessionId, isMounted, userId]);
 
   return {
     sessions,

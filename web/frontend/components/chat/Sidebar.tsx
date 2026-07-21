@@ -19,6 +19,7 @@ import { isToday, isYesterday, differenceInDays, isThisMonth } from "date-fns";
 import type { ChatSession } from "@/lib/types";
 import { useTranslation } from "react-i18next";
 import { LanguageSelector } from "./LanguageSelector";
+import { UserMenu } from "@/components/auth/UserMenu";
 
 export type { ChatSession } from "@/lib/types";
 
@@ -193,13 +194,13 @@ export function Sidebar({
         ) : filteredSessions.length === 0 ? (
           <div className="px-3 py-6 text-[12px] text-gray-400 dark:text-gray-600 text-center italic leading-relaxed">
             {searchQuery ? (
-              "Không tìm thấy đoạn chat nào."
+              t('sidebar.noSearchResults')
             ) : (
               <>
-                Chưa có hội thoại nào.
+                {t('sidebar.noConversations')}
                 <br />
                 <span className="not-italic text-gray-400 dark:text-gray-500">
-                  Bắt đầu một câu hỏi mới!
+                  {t('sidebar.startNewChat')}
                 </span>
               </>
             )}
@@ -280,23 +281,29 @@ export function Sidebar({
       </div>
 
       {/* Footer */}
-      <div className="px-4 py-3 border-t border-gray-200 dark:border-white/5 flex-shrink-0 flex items-center justify-between">
-        <p className="text-xs font-semibold tracking-wide text-gray-500 dark:text-gray-400 leading-relaxed uppercase">
-          {t("sidebar.carData", "Dữ liệu Ô tô Việt Nam")}
-        </p>
-        <div className="flex gap-2">
-          <LanguageSelector />
-          <button
-            onClick={() => setTheme(currentTheme === "dark" ? "light" : "dark")}
-            className="p-1.5 rounded-lg text-gray-500 dark:text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-800 transition-all"
-            title="Chuyển chế độ giao diện"
-          >
-            {currentTheme === "dark" ? (
-              <Sun className="w-4 h-4" />
-            ) : (
-              <Moon className="w-4 h-4" />
-            )}
-          </button>
+      <div className="px-4 py-3 border-t border-gray-200 dark:border-white/5 flex-shrink-0 space-y-3">
+        {/* User auth area */}
+        <UserMenu />
+
+        {/* Bottom bar: label + controls */}
+        <div className="flex items-center justify-between">
+          <p className="text-xs font-semibold tracking-wide text-gray-500 dark:text-gray-400 leading-relaxed uppercase">
+            {t("sidebar.carData", "Dữ liệu Ô tô Việt Nam")}
+          </p>
+          <div className="flex gap-2">
+            <LanguageSelector />
+            <button
+              onClick={() => setTheme(currentTheme === "dark" ? "light" : "dark")}
+              className="p-1.5 rounded-lg text-gray-500 dark:text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-800 transition-all"
+              title="Chuyển chế độ giao diện"
+            >
+              {currentTheme === "dark" ? (
+                <Sun className="w-4 h-4" />
+              ) : (
+                <Moon className="w-4 h-4" />
+              )}
+            </button>
+          </div>
         </div>
       </div>
 

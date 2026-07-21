@@ -28,7 +28,7 @@ export default function SystemSettingsTab() {
     setSaved(false);
   };
 
-  const updateProviderKey = (provider: 'google' | 'huggingface', apiKey: string) => {
+  const updateProviderKey = (provider: 'google' | 'huggingface' | 'groq' | 'openai', apiKey: string) => {
     setDraft(current => ({
       ...current,
       providerCredentials: {
@@ -42,7 +42,7 @@ export default function SystemSettingsTab() {
     setSaved(false);
   };
 
-  const updateProviderRemember = (provider: 'google' | 'huggingface', remember: boolean) => {
+  const updateProviderRemember = (provider: 'google' | 'huggingface' | 'groq' | 'openai', remember: boolean) => {
     setDraft(current => ({
       ...current,
       providerCredentials: {
@@ -124,16 +124,16 @@ export default function SystemSettingsTab() {
                   <label className="text-xs font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400">{provider.name}</label>
                   <input
                     type="password"
-                    value={draft.providerCredentials[provider.id]?.apiKey ?? ''}
-                    onChange={event => updateProviderKey(provider.id as 'google' | 'huggingface', event.target.value)}
+                    value={draft.providerCredentials[provider.id as 'google' | 'huggingface' | 'groq' | 'openai']?.apiKey ?? ''}
+                    onChange={event => updateProviderKey(provider.id as 'google' | 'huggingface' | 'groq' | 'openai', event.target.value)}
                     className="mt-2 w-full rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-sm text-gray-900 dark:text-white outline-none focus:border-gray-500"
                     placeholder="API key"
                   />
                   <label className="mt-3 flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
                     <input
                       type="checkbox"
-                      checked={draft.providerCredentials[provider.id]?.remember ?? true}
-                      onChange={event => updateProviderRemember(provider.id as 'google' | 'huggingface', event.target.checked)}
+                      checked={draft.providerCredentials[provider.id as 'google' | 'huggingface' | 'groq' | 'openai']?.remember ?? true}
+                      onChange={event => updateProviderRemember(provider.id as 'google' | 'huggingface' | 'groq' | 'openai', event.target.checked)}
                     />
                     {t('admin.rememberDevice', 'Remember on this device')}
                   </label>

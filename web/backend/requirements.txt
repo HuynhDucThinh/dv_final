@@ -28,3 +28,6 @@ huggingface_hub>=0.24.0
 # === Ingestion & Local Tools ===
 # faiss-cpu # (Ẩn khi deploy Vercel: Chỉ cần nếu dùng FAISS local fallback)
 tqdm>=4.66.0
+
+# === Auth — JWT verification (Better Auth) ===
+python-jose[cryptography]

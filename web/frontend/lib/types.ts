@@ -16,10 +16,22 @@ export interface DocumentChunk {
   };
 }
 
+// --- Chat Message Attachment (displayed as card in chat, text hidden from user) ---
+export interface MessageAttachment {
+  id: string;
+  name: string;
+  mimeType: string;
+  publicUrl?: string;
+  previewUrl?: string; // blob URL for images
+  sizeBytes?: number;
+}
+
 export interface Message {
   id: string;
   role: 'user' | 'assistant';
-  content: string;
+  content: string;              // full content sent to LLM (may include extracted text)
+  displayContent?: string;      // what user sees in the chat bubble
+  attachments?: MessageAttachment[]; // file cards shown above the bubble
   contextUsed?: DocumentChunk[];
   feedback?: 1 | -1;
   processingStage?: 'idle' | 'analyzing' | 'searching' | 'selecting' | 'generating' | 'completed' | 'cancelled' | 'error';
@@ -108,4 +120,29 @@ export interface FeedbackPayload {
   reason?: string;
   comment?: string;
   model_used?: string;
+  user_id?: string; // Better Auth user ID (optional, gắn nếu đã đăng nhập)
+}
+
+// --- Auth & User ---
+export interface AuthUser {
+  id: string;
+  name: string | null;
+  email: string;
+  image?: string | null;
+  avatarUrl?: string | null;
+  emailVerified: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// --- User File (Supabase Storage) ---
+export interface UserFile {
+  id: string;
+  userId: string;
+  filename: string;
+  storagePath: string;
+  publicUrl: string;
+  size: number;
+  mimeType: string;
+  createdAt: string;
 }

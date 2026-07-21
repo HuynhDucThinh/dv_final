@@ -2,9 +2,9 @@
 
 import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { User, Car, BookOpen, Copy, Check, ThumbsUp, ThumbsDown, RotateCcw, Undo2 } from 'lucide-react';
+import { User, Car, BookOpen, Copy, Check, ThumbsUp, ThumbsDown, RotateCcw, Undo2, FileText, File, Image as ImageIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import type { Message, DocumentChunk } from '@/lib/types';
+import type { Message, DocumentChunk, MessageAttachment } from '@/lib/types';
 import { ChatProcessingTrace } from './ChatProcessingTrace';
 import { dedupeSources, SourcesTrigger } from './Sources';
 import { CHAT_CONTENT_WIDTH_CLASS, CHAT_ROW_WIDTH_CLASS } from './layout';
@@ -69,11 +69,16 @@ export function ChatMessage({ message, isStreaming = false, onRefine, onOpenCont
     setShowNegativeForm(false);
   };
 
-  // Parse <cite id="...">...</cite> into markdown link format
-  const processedContent = message.content?.replace(
-    /<cite\s+id=["']([^"']+)["']>([^<]+)<\/cite>/gi,
-    '[$2](#cite-$1)'
-  ) || '';
+  // Dùng displayContent để hiển thị trong UI (ẩn extracted text), content gửi cho LLM
+  const displayText = (message.displayContent ?? message.content) || '';
+
+  // Parse <cite id="...">...</cite> into markdown link format (chỉ áp dụng cho assistant)
+  const processedContent = isUser
+    ? displayText
+    : (displayText.replace(
+        /<cite\s+id=["']([^"']+)["']>([^<]+)<\/cite>/gi,
+        '[$2](#cite-$1)'
+      ) || '');
 
   return (
     <div id={`message-${message.id}`} className={`group py-5 px-4 message-animate ${showNegativeForm ? 'relative z-[150]' : ''}`}>
@@ -100,11 +105,34 @@ export function ChatMessage({ message, isStreaming = false, onRefine, onOpenCont
           <div
             className={`${
               isUser
-                ? 'inline-block max-w-[92%] sm:max-w-[88%] px-5 py-3.5 rounded-2xl rounded-tr-sm text-gray-800 dark:text-gray-200 bg-gray-100 dark:bg-[#2F2F2F]'
+                ? 'inline-block max-w-[92%] sm:max-w-[88%] rounded-2xl rounded-tr-sm text-gray-800 dark:text-gray-200'
                 : `${CHAT_CONTENT_WIDTH_CLASS} text-gray-800 dark:text-gray-200`
             }`}
           >
-            {message.content && (
+            {/* File attachment cards — chỉ hiển thị với user message */}
+            {isUser && message.attachments && message.attachments.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-2 justify-end">
+                {message.attachments.map(att => (
+                  <AttachmentCard key={att.id} attachment={att} />
+                ))}
+              </div>
+            )}
+
+            {!isUser && message.processingStage && (
+              <ChatProcessingTrace
+                stage={message.processingStage}
+                collapsed={isProcessCollapsed}
+                onToggleCollapsed={() => setIsProcessCollapsed(current => !current)}
+              />
+            )}
+
+            {/* Message bubble */}
+            {processedContent && (
+            <div className={`${
+              isUser
+                ? 'px-5 py-3.5 bg-gray-100 dark:bg-[#2F2F2F]'
+                : ''
+            } rounded-2xl ${isUser ? 'rounded-tr-sm' : 'mt-2'}`}>
               <div className={`prose dark:prose-invert max-w-full overflow-x-auto text-[15px] leading-7 prose-p:my-3 prose-ul:my-3 prose-ol:my-3 prose-li:my-1.5 prose-headings:mb-2 prose-headings:mt-5 prose-h2:text-xl prose-h3:text-lg prose-code:rounded prose-code:bg-slate-100 prose-code:px-1 prose-code:py-0.5 dark:prose-code:bg-white/10 ${isStreaming ? 'typing-cursor' : ''} ${
                 isUser
                   ? 'prose-p:text-gray-800 dark:prose-p:text-gray-200 prose-strong:text-gray-900 dark:prose-strong:text-white prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-headings:text-gray-900 dark:prose-headings:text-white prose-code:text-gray-800 dark:prose-code:text-gray-200 prose-li:text-gray-800 dark:prose-li:text-gray-200'
@@ -138,14 +166,7 @@ export function ChatMessage({ message, isStreaming = false, onRefine, onOpenCont
                   {processedContent}
                 </ReactMarkdown>
               </div>
-            )}
-
-            {!isUser && message.processingStage && (
-              <ChatProcessingTrace
-                stage={message.processingStage}
-                collapsed={isProcessCollapsed}
-                onToggleCollapsed={() => setIsProcessCollapsed(current => !current)}
-              />
+            </div>
             )}
           </div>
 
@@ -342,5 +363,55 @@ export function ChatMessage({ message, isStreaming = false, onRefine, onOpenCont
         </div>
       )}
     </div>
+  );
+}
+// --- AttachmentCard: hiển file card trong chat (không show nội dung) ---
+function AttachmentCard({ attachment }: { attachment: MessageAttachment }) {
+  const isImage = attachment.mimeType.startsWith('image/');
+  const isPdf = attachment.mimeType === 'application/pdf';
+
+  function formatSize(bytes?: number) {
+    if (!bytes) return '';
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+  }
+
+  const iconColor = isImage
+    ? 'text-blue-500 bg-blue-50 dark:bg-blue-500/10'
+    : isPdf
+    ? 'text-red-500 bg-red-50 dark:bg-red-500/10'
+    : 'text-orange-500 bg-orange-50 dark:bg-orange-500/10';
+
+  return (
+    <a
+      href={attachment.publicUrl || '#'}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex items-center gap-2.5 max-w-[240px] bg-white dark:bg-[#1c1c1c] border border-gray-200 dark:border-white/10 rounded-2xl px-3 py-2.5 hover:border-orange-300 dark:hover:border-orange-500/40 transition-all group shadow-sm"
+    >
+      {/* Preview / icon */}
+      {isImage && (attachment.previewUrl || attachment.publicUrl) ? (
+        <img
+          src={attachment.previewUrl || attachment.publicUrl}
+          alt={attachment.name}
+          className="w-10 h-10 object-cover rounded-xl flex-shrink-0"
+        />
+      ) : (
+        <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${iconColor}`}>
+          {isImage ? <ImageIcon className="w-5 h-5" /> : isPdf ? <FileText className="w-5 h-5" /> : <File className="w-5 h-5" />}
+        </div>
+      )}
+
+      {/* Info */}
+      <div className="min-w-0">
+        <p className="text-xs font-semibold text-gray-800 dark:text-gray-100 truncate group-hover:text-orange-500 dark:group-hover:text-orange-400 transition-colors" title={attachment.name}>
+          {attachment.name}
+        </p>
+        {attachment.sizeBytes && (
+          <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">{formatSize(attachment.sizeBytes)}</p>
+        )}
+      </div>
+    </a>
   );
 }

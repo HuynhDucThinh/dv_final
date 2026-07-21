@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@/lib/auth';
 
 function getBackendUrl(reqUrl: string): string {
   let base = process.env.BACKEND_URL || 'http://localhost:8000';
@@ -31,10 +32,23 @@ export async function GET(req: NextRequest) {
   try {
     const backendBase = getBackendUrl(req.url);
     const targetUrl = `${backendBase}/chat/sessions`;
-    
+
+    // Lấy session từ Better Auth (server-side) và pass user_id cho backend
+    const headers: Record<string, string> = { 'Cache-Control': 'no-store' };
+    try {
+      const session = await auth.api.getSession({ headers: req.headers });
+      if (session?.user?.id) {
+        // Header nội bộ — chỉ Next.js server mới gửi được (backend không expose public)
+        headers['X-User-Id'] = session.user.id;
+      }
+    } catch {
+      // Không có session — tiếp tục như guest
+    }
+
     const backendRes = await fetch(targetUrl, {
       method: 'GET',
       cache: 'no-store',
+      headers,
     });
 
     if (!backendRes.ok) {

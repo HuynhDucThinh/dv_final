@@ -39,6 +39,13 @@ GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 
+# --- Auth (Better Auth JWT) ---
+BETTER_AUTH_SECRET = os.getenv("BETTER_AUTH_SECRET", "")
+
+# --- Supabase ---
+SUPABASE_URL = os.getenv("NEXT_PUBLIC_SUPABASE_URL", "")
+SUPABASE_SERVICE_ROLE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")
+
 # Native/Docker runs keep local models by default; Vercel can opt into the
 # deployment-safe profile through its built-in environment marker.
 _runtime_profile_env = os.getenv("RUNTIME_PROFILE", "").strip().lower()

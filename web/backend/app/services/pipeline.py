@@ -530,8 +530,8 @@ def _create_searcher(embedding) -> Any:
         return QdrantSearcher(vectorstore=_faiss_vectorstore, fallback_searcher=faiss_searcher)
 
     # FAISS searcher luôn cần (dùng cho cả hybrid)
-    if _faiss_vectorstore is None:
-        raise RuntimeError("FAISS vectorstore chưa được khởi tạo!")
+    # Không raise RuntimeError ở đây, FAISSSearcher sẽ tự handle vectorstore=None
+    # và trả về kết quả rỗng (chấp nhận được khi chưa có data)
 
     faiss_searcher = FAISSSearcher(vectorstore=_faiss_vectorstore)
 

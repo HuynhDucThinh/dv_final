@@ -136,6 +136,23 @@ def _ensure_schema() -> None:
         """
         ALTER TABLE chat_sessions ADD COLUMN IF NOT EXISTS title TEXT NOT NULL DEFAULT 'Cuộc trò chuyện mới'
         """,
+        # --- Better Auth: thêm user_id vào chat_feedbacks ---
+        """
+        ALTER TABLE chat_feedbacks ADD COLUMN IF NOT EXISTS user_id TEXT
+        """,
+        # --- Bảng user_files: metadata file upload lên Supabase Storage ---
+        """
+        CREATE TABLE IF NOT EXISTS user_files (
+            id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::TEXT,
+            user_id TEXT NOT NULL,
+            filename TEXT NOT NULL,
+            storage_path TEXT NOT NULL,
+            public_url TEXT,
+            size_bytes BIGINT,
+            mime_type TEXT,
+            created_at TIMESTAMPTZ DEFAULT NOW()
+        )
+        """,
     ]
 
     with psycopg.connect(POSTGRES_DSN, autocommit=True) as conn:
@@ -205,7 +222,18 @@ def initialize_storage() -> Dict[str, Any]:
     """Initialize PostgreSQL schema and Qdrant collection if the DB backend is enabled.
     
     Skips re-ingestion if data already exists to avoid expensive re-embedding on every startup.
+    Also initializes chat session schema when CHAT_STORAGE_MODE=postgres (even for faiss backend).
     """
+    # --- Khởi tạo schema cho chat sessions khi dùng postgres mode ---
+    if is_chat_persistence_enabled() and not is_database_backend_enabled():
+        try:
+            import psycopg
+            _ensure_schema()
+            logger.info("Chat session schema initialized in Supabase PostgreSQL.")
+        except Exception as exc:
+            logger.warning("Could not initialize chat schema: %s", exc)
+        return {"backend": STORAGE_BACKEND, "postgres": "chat_only", "qdrant": "skipped"}
+
     if not is_database_backend_enabled():
         logger.info("Storage backend %s requested; skipping DB initialization.", STORAGE_BACKEND)
         return {"backend": STORAGE_BACKEND, "postgres": "skipped", "qdrant": "skipped"}
@@ -609,8 +637,8 @@ def update_session_title(session_id: str, title: str) -> None:
         logger.warning("Error updating session title for %s: %s", session_id, exc)
 
 
-def ensure_session_exists(session_id: str, title: str = "Cuộc trò chuyện mới") -> None:
-    """Create a chat_sessions row if it doesn't exist yet."""
+def ensure_session_exists(session_id: str, title: str = "Cuộc trò chuyện mới", user_id: Optional[str] = None) -> None:
+    """Create a chat_sessions row if it doesn't exist yet, and link to user_id if provided."""
     if not is_chat_persistence_enabled():
         return
     try:
@@ -622,11 +650,11 @@ def ensure_session_exists(session_id: str, title: str = "Cuộc trò chuyện m�
             with conn.cursor() as cursor:
                 cursor.execute(
                     """
-                    INSERT INTO chat_sessions (session_id, title, summary, turn_count, updated_at)
-                    VALUES (%s, %s, '', 0, NOW())
-                    ON CONFLICT (session_id) DO NOTHING
+                    INSERT INTO chat_sessions (session_id, title, summary, turn_count, updated_at, user_id)
+                    VALUES (%s, %s, '', 0, NOW(), %s)
+                    ON CONFLICT (session_id) DO UPDATE SET user_id = COALESCE(chat_sessions.user_id, EXCLUDED.user_id)
                     """,
-                    (session_id, title)
+                    (session_id, title, user_id)
                 )
     except Exception as exc:
         logger.warning("Error ensuring session %s: %s", session_id, exc)
@@ -722,8 +750,12 @@ def get_session_messages(session_id: str) -> List[Dict[str, Any]]:
         return []
 
 
-def list_sessions() -> List[Dict[str, Any]]:
-    """Return all sessions ordered by most recent activity."""
+def list_sessions(user_id: Optional[str] = None) -> List[Dict[str, Any]]:
+    """Return sessions ordered by most recent activity.
+    
+    Nếu user_id được cung cấp, chỉ trả về sessions của user đó.
+    Nếu user_id là None, trả về tất cả (chế độ guest/backward-compat).
+    """
     if not is_chat_persistence_enabled():
         return []
     try:
@@ -733,15 +765,29 @@ def list_sessions() -> List[Dict[str, Any]]:
     try:
         with psycopg.connect(POSTGRES_DSN) as conn:
             with conn.cursor() as cursor:
-                cursor.execute(
-                    """
-                    SELECT s.session_id, s.title, s.turn_count, s.updated_at, COUNT(m.id) as message_count
-                    FROM chat_sessions s
-                    LEFT JOIN chat_messages m ON s.session_id = m.session_id
-                    GROUP BY s.session_id
-                    ORDER BY s.updated_at DESC
-                    """
-                )
+                if user_id:
+                    cursor.execute(
+                        """
+                        SELECT s.session_id, s.title, s.turn_count, s.updated_at, COUNT(m.id) as message_count
+                        FROM chat_sessions s
+                        LEFT JOIN chat_messages m ON s.session_id = m.session_id
+                        WHERE s.user_id = %s
+                        GROUP BY s.session_id
+                        ORDER BY s.updated_at DESC
+                        """,
+                        (user_id,)
+                    )
+                else:
+                    cursor.execute(
+                        """
+                        SELECT s.session_id, s.title, s.turn_count, s.updated_at, COUNT(m.id) as message_count
+                        FROM chat_sessions s
+                        LEFT JOIN chat_messages m ON s.session_id = m.session_id
+                        WHERE s.user_id IS NULL
+                        GROUP BY s.session_id
+                        ORDER BY s.updated_at DESC
+                        """
+                    )
                 rows = cursor.fetchall()
                 return [
                     {

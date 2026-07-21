@@ -1,32 +1,35 @@
 'use client';
 
 import { Car } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface ChatEmptyStateProps {
   onSelectSuggestion: (prompt: string) => void;
 }
 
-const SUGGESTIONS = [
-  'Đánh giá thị trường ô tô điện tại Việt Nam trong năm nay.',
-  'Những dòng xe SUV 7 chỗ nào bán chạy nhất phân khúc?',
-  'So sánh giá lăn bánh các xe hạng B phổ biến?',
-];
-
 export function ChatEmptyState({ onSelectSuggestion }: ChatEmptyStateProps) {
+  const { t } = useTranslation();
+
+  const suggestions = [
+    t('emptyState.suggestion1'),
+    t('emptyState.suggestion2'),
+    t('emptyState.suggestion3'),
+  ];
+
   return (
     <div className="mx-auto flex min-h-full w-full max-w-3xl flex-col justify-center px-4 py-10 text-center">
       <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-orange-500 text-white shadow-lg shadow-orange-500/15">
         <Car className="h-8 w-8" />
       </div>
       <h1 className="text-2xl font-bold tracking-tight text-slate-950 dark:text-white sm:text-3xl">
-        Phân tích Dữ liệu Ô tô
+        {t('emptyState.title')}
       </h1>
       <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-slate-500 dark:text-slate-400 sm:text-base">
-        Hỏi thông tin về giá bán, thông số kỹ thuật, và xu hướng thị trường xe ô tô tại Việt Nam.
+        {t('emptyState.subtitle')}
       </p>
 
       <div className="mt-8 grid gap-2.5 sm:grid-cols-3">
-        {SUGGESTIONS.map(prompt => (
+        {suggestions.map(prompt => (
           <button
             key={prompt}
             type="button"
