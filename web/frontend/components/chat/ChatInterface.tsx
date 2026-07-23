@@ -48,6 +48,7 @@ export function ChatInterface() {
     addMessage,
     updateMessage,
     updateSessionTitle,
+    updateSessionPin,
     isSessionLoading,
     isSessionsListLoading,
   } = useChatSessions(userId);
@@ -70,6 +71,18 @@ export function ChatInterface() {
   // Mode chat: chỉ dùng car
   const chatMode = 'car' as const;
   const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
+
+  // Khi tạo chat mới: xóa Python namespace cũ trên backend để tránh rò rỉ state
+  const handleNewChatWithClear = useCallback(async () => {
+    if (currentSessionId) {
+      try {
+        await fetch(`/api/execute/session/${encodeURIComponent(currentSessionId)}`, { method: 'DELETE' });
+      } catch {
+        // Không block nếu xóa namespace thất bại
+      }
+    }
+    handleNewChat();
+  }, [currentSessionId, handleNewChat]);
 
   // Streaming state
   const [streamingText, setStreamingText] = useState('');
@@ -232,6 +245,29 @@ export function ChatInterface() {
     }
   };
 
+  // Inject kết quả thực thi code vào history dưới dạng message ẩn
+  // content đầy đủ được gửi lên LLM (bao gồm df_context), displayContent rỗng nên không hiện trong UI
+  const handleSendExecutionResult = useCallback((code: string, output: string) => {
+    if (!currentSessionId) return;
+    const hiddenContent = [
+      '[EXECUTION_RESULT]',
+      'Code đã được thực thi bởi người dùng:',
+      '```python',
+      code,
+      '```',
+      '',
+      'Kết quả và trạng thái dữ liệu hiện tại:',
+      output,
+    ].join('\n');
+    const hiddenMessage: Message = {
+      id: Date.now().toString(),
+      role: 'user',
+      content: hiddenContent,   // Gửi cho LLM — có đủ output + df_context
+      displayContent: '',        // Ẩn khỏi UI (không hiện trong chat bubble)
+    };
+    addMessage(hiddenMessage);
+  }, [currentSessionId, addMessage]);
+
   const handleFeedbackSubmit = async (messageId: string, type: 1 | -1, reason?: string, comment?: string) => {
     if (!currentSessionId) return;
     const msgIndex = currentMessages.findIndex(m => m.id === messageId);
@@ -393,7 +429,10 @@ export function ChatInterface() {
           }
         }
         // Flush message và return (không chạy code document bên dưới)
-        const carContent = accumulated || (streamErrorMessage ? streamErrorMessage : 'Không có phản hồi từ AI.');
+        const carContent = streamErrorMessage 
+          ? (accumulated ? accumulated + '\n\n**[Lỗi]** ' + streamErrorMessage : streamErrorMessage)
+          : (accumulated || 'Không có phản hồi từ AI.');
+          
         addMessage({ id: (Date.now() + 1).toString(), role: 'assistant', content: carContent, processingStage: streamErrorMessage ? 'error' : 'completed' });
         return;
       }
@@ -633,13 +672,14 @@ export function ChatInterface() {
           <Sidebar
             sessions={sessions}
             currentSessionId={currentSessionId}
-            onNewChat={handleNewChat}
+            onNewChat={handleNewChatWithClear}
             onSelectSession={(id) => {
               handleSelectSession(id);
               if (window.innerWidth < 768) setIsSidebarOpen(false);
             }}
             onDeleteSession={handleDeleteSession}
             onRenameSession={updateSessionTitle}
+            onTogglePinSession={updateSessionPin}
             onCloseSidebar={() => setIsSidebarOpen(false)}
             isSessionsListLoading={isSessionsListLoading}
           />
@@ -650,7 +690,7 @@ export function ChatInterface() {
             <button onClick={() => setIsSidebarOpen(true)} className="p-2 mb-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-200 dark:hover:text-gray-200 dark:hover:bg-gray-800 transition-colors" title="Mở sidebar">
               <PanelLeft className="w-5 h-5" />
             </button>
-            <button onClick={handleNewChat} className="p-2 mb-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-200 dark:hover:text-gray-200 dark:hover:bg-gray-800 transition-colors" title="Đoạn chat mới">
+            <button onClick={handleNewChatWithClear} className="p-2 mb-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-200 dark:hover:text-gray-200 dark:hover:bg-gray-800 transition-colors" title="Đoạn chat mới">
               <Plus className="w-5 h-5" />
             </button>
             <div className="flex-1"></div>
@@ -748,10 +788,12 @@ export function ChatInterface() {
                       <ChatMessage
                         key={msg.id}
                         message={msg}
+                        sessionId={currentSessionId || undefined}
                         onRefine={(prompt) => handleSubmit(undefined, prompt)}
                         onRetry={previousUser ? () => handleSubmit(undefined, previousUser.content) : undefined}
                         onOpenContext={setDrawerContext}
                         onFeedbackSubmit={handleFeedbackSubmit}
+                        onSendExecutionResult={handleSendExecutionResult}
                         isSourcesPanelOpen={drawerContext === msg.contextUsed}
                       />
                     );

@@ -640,26 +640,32 @@ async def delete_session(session_id: str):
 
 from pydantic import BaseModel
 
-class SessionTitleUpdate(BaseModel):
-    title: str
+class SessionUpdate(BaseModel):
+    title: Optional[str] = None
+    is_pinned: Optional[bool] = None
 
 @router.patch("/chat/session/{session_id}")
-async def update_session_title_endpoint(session_id: str, update: SessionTitleUpdate):
+async def update_session_endpoint(session_id: str, update: SessionUpdate):
     if not session_id or session_id == "unknown":
         raise HTTPException(status_code=400, detail="Invalid session_id")
     if CHAT_STORAGE_MODE == "browser":
         return {"status": "skipped", "storageMode": "browser"}
     
-    if not update.title or not update.title.strip():
+    if update.title is not None and not update.title.strip():
         raise HTTPException(status_code=400, detail="Title cannot be empty")
         
     try:
         import asyncio
-        from app.services.storage import update_session_title
+        from app.services.storage import update_session
         
-        await asyncio.to_thread(update_session_title, session_id, update.title.strip())
+        await asyncio.to_thread(
+            update_session,
+            session_id,
+            update.title.strip() if update.title else None,
+            update.is_pinned
+        )
         
-        return {"status": "success", "message": f"Session {session_id} title updated to {update.title.strip()}"}
+        return {"status": "success", "message": f"Session {session_id} updated."}
     except Exception as e:
-        logger.error(f"Error updating session title for {session_id}: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to update session title: {e}")
+        logger.error(f"Error updating session for {session_id}: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to update session: {e}")

@@ -34,6 +34,7 @@ interface DbSession {
   title?: string;
   updated_at?: string;
   message_count?: number | string;
+  is_pinned?: boolean;
 }
 
 interface LocalChatSnapshot {
@@ -271,6 +272,29 @@ export function useChatSessions(userId?: string | null) {
     }
   }, []);
 
+  // --- Cập nhật trạng thái ghim ---
+  const updateSessionPin = useCallback((sessionId: string, isPinned: boolean) => {
+    setSessions(prev =>
+      prev.map(s =>
+        s.id === sessionId
+          ? { ...s, is_pinned: isPinned }
+          : s
+      )
+    );
+
+    if (CHAT_STORAGE_MODE === 'postgres') {
+      fetch(`/api/chat/session/${sessionId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ is_pinned: isPinned }),
+      }).catch(err => {
+        warnRecoverableSessionsIssue(`Failed to update session pin status on backend for session ${sessionId}.`, err);
+      });
+    }
+  }, []);
+
   // ================================================================
   // Auth-aware data loading
   // Triggers on mount AND every time userId changes (login / logout)
@@ -345,6 +369,7 @@ export function useChatSessions(userId?: string | null) {
           title: dbSession.title || 'Cuộc trò chuyện mới',
           lastMessage: '',
           timestamp: dbSession.updated_at ? new Date(dbSession.updated_at).getTime() : Date.now(),
+          is_pinned: dbSession.is_pinned || false,
         }));
         loadedSessions.sort((a, b) => b.timestamp - a.timestamp);
         const activeId = loadedSessions[0].id;
@@ -408,6 +433,7 @@ export function useChatSessions(userId?: string | null) {
     addMessage,
     updateMessage,
     updateSessionTitle,
+    updateSessionPin,
     isSessionLoading,
     isSessionsListLoading,
   };

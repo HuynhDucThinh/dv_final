@@ -16,10 +16,10 @@ export function ProviderSelector({ model, setModel }: ModelSelectorProps) {
   const [configuredProviders, setConfiguredProviders] = useState<Record<string, boolean>>({});
 
   React.useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'}/api/config/providers`)
+    fetch('/api/config/providers')
       .then(res => res.json())
       .then(data => setConfiguredProviders(data))
-      .catch(err => console.error('Failed to fetch providers config:', err));
+      .catch(() => { /* Backend chưa sẵn sàng — bỏ qua, dùng providers mặc định */ });
   }, []);
 
   const selectedModel = AI_MODELS.find(m => m.id === model) || AI_MODELS[0];

@@ -2,12 +2,14 @@
 
 import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { User, Car, BookOpen, Copy, Check, ThumbsUp, ThumbsDown, RotateCcw, Undo2, FileText, File, Image as ImageIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { Message, DocumentChunk, MessageAttachment } from '@/lib/types';
 import { ChatProcessingTrace } from './ChatProcessingTrace';
 import { dedupeSources, SourcesTrigger } from './Sources';
 import { CHAT_CONTENT_WIDTH_CLASS, CHAT_ROW_WIDTH_CLASS } from './layout';
+import { InteractiveCodeBlock } from './InteractiveCodeBlock';
 
 export type { Message, DocumentChunk } from '@/lib/types';
 
@@ -19,9 +21,11 @@ interface ChatMessageProps {
   onFeedbackSubmit?: (messageId: string, type: 1 | -1, reason?: string, comment?: string) => void;
   onRetry?: () => void;
   isSourcesPanelOpen?: boolean;
+  sessionId?: string; // Truyền xuống InteractiveCodeBlock
+  onSendExecutionResult?: (code: string, output: string) => void; // Callback gửi kết quả cho AI
 }
 
-export function ChatMessage({ message, isStreaming = false, onRefine, onOpenContext, onFeedbackSubmit, onRetry, isSourcesPanelOpen = false }: ChatMessageProps) {
+export function ChatMessage({ message, isStreaming = false, onRefine, onOpenContext, onFeedbackSubmit, onRetry, isSourcesPanelOpen = false, sessionId, onSendExecutionResult }: ChatMessageProps) {
   const { t } = useTranslation();
   const isUser = message.role === 'user';
   const [copied, setCopied] = useState(false);
@@ -70,7 +74,14 @@ export function ChatMessage({ message, isStreaming = false, onRefine, onOpenCont
   };
 
   // Dùng displayContent để hiển thị trong UI (ẩn extracted text), content gửi cho LLM
-  const displayText = (message.displayContent ?? message.content) || '';
+  const rawDisplayText = (message.displayContent ?? message.content) || '';
+
+  // Trích xuất <suggestions>...</suggestions> tag từ response của AI
+  const suggestionsMatch = !isUser ? rawDisplayText.match(/<suggestions>([-\uFFFF]*?)<\/suggestions>/) : null;
+  const suggestedQuestions: string[] = suggestionsMatch
+    ? suggestionsMatch[1].split('|').map(s => s.trim()).filter(Boolean)
+    : [];
+  const displayText = rawDisplayText.replace(/<suggestions>[-\uFFFF]*?<\/suggestions>/g, '').trim() || rawDisplayText;
 
   // Parse <cite id="...">...</cite> into markdown link format (chỉ áp dụng cho assistant)
   const processedContent = isUser
@@ -133,13 +144,85 @@ export function ChatMessage({ message, isStreaming = false, onRefine, onOpenCont
                 ? 'px-5 py-3.5 bg-gray-100 dark:bg-[#2F2F2F]'
                 : ''
             } rounded-2xl ${isUser ? 'rounded-tr-sm' : 'mt-2'}`}>
-              <div className={`prose dark:prose-invert max-w-full overflow-x-auto text-[15px] leading-7 prose-p:my-3 prose-ul:my-3 prose-ol:my-3 prose-li:my-1.5 prose-headings:mb-2 prose-headings:mt-5 prose-h2:text-xl prose-h3:text-lg prose-code:rounded prose-code:bg-slate-100 prose-code:px-1 prose-code:py-0.5 dark:prose-code:bg-white/10 ${isStreaming ? 'typing-cursor' : ''} ${
+              <div className={`prose dark:prose-invert max-w-full text-[15px] leading-[1.75]
+                prose-p:my-3 prose-p:leading-[1.75]
+                prose-ul:my-3 prose-ol:my-3 prose-li:my-1.5 prose-li:leading-[1.75]
+                prose-headings:font-bold prose-headings:tracking-tight
+                prose-h1:text-[1.35rem] prose-h1:mt-6 prose-h1:mb-3
+                prose-h2:text-[1.15rem] prose-h2:mt-5 prose-h2:mb-2.5
+                prose-h3:text-[1rem] prose-h3:mt-4 prose-h3:mb-2
+                prose-strong:font-semibold
+                prose-code:rounded-md prose-code:bg-gray-100 prose-code:dark:bg-gray-800 prose-code:px-1.5 prose-code:py-0.5 prose-code:text-[13px] prose-code:font-mono prose-code:text-rose-600 prose-code:dark:text-rose-400 prose-code:before:content-none prose-code:after:content-none
+                prose-pre:p-0 prose-pre:bg-transparent prose-pre:rounded-none
+                prose-blockquote:border-l-4 prose-blockquote:border-blue-500 prose-blockquote:bg-blue-50 prose-blockquote:dark:bg-blue-950/20 prose-blockquote:pl-4 prose-blockquote:py-1 prose-blockquote:rounded-r-lg prose-blockquote:not-italic prose-blockquote:text-gray-700 prose-blockquote:dark:text-gray-300
+                prose-table:w-full prose-th:bg-gray-100 prose-th:dark:bg-gray-800 prose-th:text-gray-700 prose-th:dark:text-gray-200 prose-th:font-semibold prose-th:text-sm prose-td:text-sm
+                prose-hr:border-gray-200 prose-hr:dark:border-gray-700
+                ${isStreaming ? 'typing-cursor' : ''} ${
                 isUser
-                  ? 'prose-p:text-gray-800 dark:prose-p:text-gray-200 prose-strong:text-gray-900 dark:prose-strong:text-white prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-headings:text-gray-900 dark:prose-headings:text-white prose-code:text-gray-800 dark:prose-code:text-gray-200 prose-li:text-gray-800 dark:prose-li:text-gray-200'
-                  : 'prose-p:text-gray-800 dark:prose-p:text-gray-200 prose-headings:text-gray-900 dark:prose-headings:text-gray-100 prose-strong:text-gray-900 dark:prose-strong:text-gray-100'
+                  ? 'prose-p:text-gray-800 dark:prose-p:text-gray-200 prose-strong:text-gray-900 dark:prose-strong:text-white prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-headings:text-gray-900 dark:prose-headings:text-white prose-li:text-gray-800 dark:prose-li:text-gray-200'
+                  : 'prose-p:text-gray-800 dark:prose-p:text-gray-200 prose-headings:text-gray-900 dark:prose-headings:text-gray-50 prose-strong:text-gray-900 dark:prose-strong:text-gray-100 prose-li:text-gray-800 dark:prose-li:text-gray-200 prose-a:text-blue-600 dark:prose-a:text-blue-400'
               }`}>
                 <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
                   components={{
+                    // --- Headings ---
+                    h1({ children }: any) {
+                      return (
+                        <h1 className="not-prose text-[1.25rem] font-extrabold text-gray-900 dark:text-gray-50 mt-6 mb-3 pb-2.5 border-b-2 border-indigo-400 dark:border-indigo-500 uppercase tracking-wide">
+                          {children}
+                        </h1>
+                      );
+                    },
+                    h2({ children }: any) {
+                      return (
+                        <h2 className="not-prose text-[1rem] font-extrabold text-gray-900 dark:text-gray-100 mt-5 mb-2.5 pb-1.5 border-b border-gray-300 dark:border-gray-700 uppercase tracking-widest">
+                          {children}
+                        </h2>
+                      );
+                    },
+                    h3({ children }: any) {
+                      return (
+                        <h3 className="not-prose text-[0.92rem] font-bold text-gray-800 dark:text-gray-200 mt-4 mb-1.5 uppercase tracking-wide">
+                          {children}
+                        </h3>
+                      );
+                    },
+                    // --- Strong / Bold ---
+                    strong({ children }: any) {
+                      return (
+                        <strong className="font-bold text-gray-900 dark:text-gray-100">
+                          {children}
+                        </strong>
+                      );
+                    },
+                    // --- Lists ---
+                    ul({ children }: any) {
+                      return (
+                        <ul className="not-prose my-3 space-y-1.5 pl-1 chat-ul">{children}</ul>
+                      );
+                    },
+                    ol({ children }: any) {
+                      return (
+                        <ol className="not-prose my-3 space-y-1.5 pl-1 chat-ol">{children}</ol>
+                      );
+                    },
+                    li({ children, ordered }: any) {
+                      if (ordered) {
+                        return (
+                          <li className="flex items-start gap-2.5 leading-[1.75] text-[15px] text-gray-800 dark:text-gray-200 chat-ol-li">
+                            <span className="chat-ol-num flex-shrink-0 min-w-[1.4rem] text-right font-semibold text-gray-500 dark:text-gray-400 text-[14px] mt-0.5" aria-hidden="true" />
+                            <span className="flex-1 min-w-0">{children}</span>
+                          </li>
+                        );
+                      }
+                      return (
+                        <li className="flex items-start gap-2.5 leading-[1.75] text-[15px] text-gray-800 dark:text-gray-200">
+                          <span className="flex-shrink-0 mt-[0.6rem] w-[5px] h-[5px] rounded-full bg-gray-500 dark:bg-gray-400" aria-hidden="true" />
+                          <span className="flex-1 min-w-0">{children}</span>
+                        </li>
+                      );
+                    },
+                    // --- Links ---
                     a: ({ node, ...props }) => {
                       const href = props.href || '';
                       if (href.startsWith('#cite-')) {
@@ -159,14 +242,147 @@ export function ChatMessage({ message, isStreaming = false, onRefine, onOpenCont
                           </a>
                         );
                       }
-                      return <a {...props} className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer" />;
-                    }
+                      return (
+                        <a
+                          {...props}
+                          className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline underline-offset-2 decoration-blue-400/50 transition-colors font-medium"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        />
+                      );
+                    },
+                    // --- Code ---
+                    code({ node, inline, className, children, ...props }: any) {
+                      const match = /language-(\w+)/.exec(className || '');
+                      if (!inline && match) {
+                        return (
+                          <InteractiveCodeBlock
+                            initialCode={String(children).replace(/\n$/, '')}
+                            language={match[1]}
+                            sessionId={sessionId}
+                            onSendResult={onSendExecutionResult}
+                          />
+                        );
+                      }
+                      return (
+                        <code className={`not-prose px-1.5 py-0.5 rounded-md text-[13px] font-mono bg-gray-100 dark:bg-gray-800 text-rose-600 dark:text-rose-400 ${className ?? ''}`} {...props}>
+                          {children}
+                        </code>
+                      );
+                    },
+                    // --- Table ---
+                    table({ children }: any) {
+                      return (
+                        <div className="not-prose overflow-x-auto my-4 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+                          <table className="min-w-full text-sm border-collapse">{children}</table>
+                        </div>
+                      );
+                    },
+                    thead({ children }: any) {
+                      return <thead className="bg-gray-100 dark:bg-gray-800">{children}</thead>;
+                    },
+                    tbody({ children }: any) {
+                      return <tbody className="divide-y divide-gray-100 dark:divide-gray-800">{children}</tbody>;
+                    },
+                    tr({ children }: any) {
+                      return <tr className="hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors">{children}</tr>;
+                    },
+                    th({ children }: any) {
+                      return (
+                        <th className="px-4 py-3 text-left font-bold text-gray-700 dark:text-gray-200 text-[12px] uppercase tracking-widest whitespace-nowrap border-b-2 border-gray-200 dark:border-gray-700">
+                          {children}
+                        </th>
+                      );
+                    },
+                    td({ children }: any) {
+                      return (
+                        <td className="px-4 py-2.5 text-gray-700 dark:text-gray-300 text-[14px] align-top">
+                          {children}
+                        </td>
+                      );
+                    },
+                     // --- Blockquote (GitHub-style alerts) ---
+                     blockquote({ children, node }: any) {
+                       // Lấy raw text từ AST để detect alert type
+                       const getNodeText = (n: any): string => {
+                         if (!n) return '';
+                         if (n.type === 'text') return n.value || '';
+                         if (Array.isArray(n.children)) return n.children.map(getNodeText).join('');
+                         return '';
+                       };
+                       const rawText = node ? getNodeText(node).trim() : '';
+
+                       if (/^\[!IMPORTANT\]/i.test(rawText)) return (
+                         <div className="not-prose my-3.5 border-l-4 border-red-500 bg-red-50 dark:bg-red-950/20 pl-4 pr-3 py-3 rounded-r-lg">
+                           <span className="text-red-600 dark:text-red-400 font-bold text-[11px] uppercase tracking-widest flex items-center gap-1 mb-1.5">&#10071; Quan trọng</span>
+                           <div className="text-gray-800 dark:text-gray-200 text-[14px] leading-relaxed [&>p]:my-1">{children}</div>
+                         </div>
+                       );
+                       if (/^\[!WARNING\]/i.test(rawText)) return (
+                         <div className="not-prose my-3.5 border-l-4 border-amber-500 bg-amber-50 dark:bg-amber-950/20 pl-4 pr-3 py-3 rounded-r-lg">
+                           <span className="text-amber-600 dark:text-amber-400 font-bold text-[11px] uppercase tracking-widest flex items-center gap-1 mb-1.5">⚠️ Cảnh báo</span>
+                           <div className="text-gray-800 dark:text-gray-200 text-[14px] leading-relaxed [&>p]:my-1">{children}</div>
+                         </div>
+                       );
+                       if (/^\[!TIP\]/i.test(rawText)) return (
+                         <div className="not-prose my-3.5 border-l-4 border-emerald-500 bg-emerald-50 dark:bg-emerald-950/20 pl-4 pr-3 py-3 rounded-r-lg">
+                           <span className="text-emerald-600 dark:text-emerald-400 font-bold text-[11px] uppercase tracking-widest flex items-center gap-1 mb-1.5">✅ Gợi ý</span>
+                           <div className="text-gray-800 dark:text-gray-200 text-[14px] leading-relaxed [&>p]:my-1">{children}</div>
+                         </div>
+                       );
+                       if (/^\[!NOTE\]/i.test(rawText)) return (
+                         <div className="not-prose my-3.5 border-l-4 border-blue-500 bg-blue-50 dark:bg-blue-950/20 pl-4 pr-3 py-3 rounded-r-lg">
+                           <span className="text-blue-600 dark:text-blue-400 font-bold text-[11px] uppercase tracking-widest flex items-center gap-1 mb-1.5">📋 Ghi chú</span>
+                           <div className="text-gray-800 dark:text-gray-200 text-[14px] leading-relaxed [&>p]:my-1">{children}</div>
+                         </div>
+                       );
+                       // Default blockquote
+                       return (
+                         <blockquote className="not-prose border-l-[3px] border-blue-400 dark:border-blue-500 bg-blue-50/60 dark:bg-blue-950/25 pl-4 pr-3 py-2.5 my-3.5 rounded-r-lg text-gray-700 dark:text-gray-300 text-[14.5px] leading-relaxed">
+                           {children}
+                         </blockquote>
+                       );
+                     },
+                     // --- HR ---
+                     hr() {
+                       return (
+                         <div className="my-5 flex items-center gap-3">
+                           <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent" />
+                           <span className="text-[10px] text-gray-400 dark:text-gray-500 font-medium tracking-widest uppercase">&#9670;</span>
+                           <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent" />
+                         </div>
+                       );
+                     },
+                    // --- Paragraph ---
+                    p({ children }: any) {
+                      return <p className="my-3 leading-[1.8] text-[15px] text-gray-800 dark:text-gray-200">{children}</p>;
+                    },
                   }}
                 >
                   {processedContent}
                 </ReactMarkdown>
               </div>
             </div>
+            )}
+
+            {/* Gợi ý câu hỏi tiếp theo — chỉ hiện sau khi streaming xong và có suggestions */}
+            {!isUser && !isStreaming && suggestedQuestions.length > 0 && onRefine && (
+              <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-800/60">
+                <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">
+                  💡 Câu hỏi gợi ý
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {suggestedQuestions.map((q, i) => (
+                    <button
+                      key={i}
+                      onClick={() => onRefine(q)}
+                      className="text-[12px] px-3 py-1.5 rounded-full bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-500/30 hover:bg-blue-100 dark:hover:bg-blue-500/20 transition-all hover:shadow-sm text-left"
+                    >
+                      {q}
+                    </button>
+                  ))}
+                </div>
+              </div>
             )}
           </div>
 

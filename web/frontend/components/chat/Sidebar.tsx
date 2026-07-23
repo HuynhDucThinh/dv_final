@@ -12,6 +12,8 @@ import {
   LibraryBig,
   Settings,
   X,
+  Pin,
+  PinOff,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import Link from "next/link";
@@ -30,6 +32,7 @@ interface SidebarProps {
   onSelectSession: (id: string) => void;
   onDeleteSession: (id: string) => void;
   onRenameSession: (id: string, newTitle: string) => void;
+  onTogglePinSession?: (id: string, isPinned: boolean) => void;
   onCloseSidebar: () => void;
   isSessionsListLoading?: boolean;
 }
@@ -41,6 +44,7 @@ export function Sidebar({
   onSelectSession,
   onDeleteSession,
   onRenameSession,
+  onTogglePinSession,
   onCloseSidebar,
   isSessionsListLoading = false,
 }: SidebarProps) {
@@ -67,11 +71,18 @@ export function Sidebar({
     (acc, session) => {
       const date = new Date(session.timestamp);
       let group = t("sidebar.older", "Cũ hơn");
-      if (isToday(date)) group = t("sidebar.today", "Hôm nay");
-      else if (isYesterday(date)) group = t("sidebar.yesterday", "Hôm qua");
-      else if (differenceInDays(new Date(), date) <= 7)
+      
+      if (session.is_pinned) {
+        group = t("sidebar.pinned", "Đã ghim");
+      } else if (isToday(date)) {
+        group = t("sidebar.today", "Hôm nay");
+      } else if (isYesterday(date)) {
+        group = t("sidebar.yesterday", "Hôm qua");
+      } else if (differenceInDays(new Date(), date) <= 7) {
         group = t("sidebar.last7Days", "7 ngày trước");
-      else if (isThisMonth(date)) group = t("sidebar.thisMonth", "Tháng này");
+      } else if (isThisMonth(date)) {
+        group = t("sidebar.thisMonth", "Tháng này");
+      }
 
       if (!acc[group]) acc[group] = [];
       acc[group].push(session);
@@ -81,6 +92,7 @@ export function Sidebar({
   );
 
   const groupOrder = [
+    t("sidebar.pinned", "Đã ghim"),
     t("sidebar.today", "Hôm nay"),
     t("sidebar.yesterday", "Hôm qua"),
     t("sidebar.last7Days", "7 ngày trước"),
@@ -147,7 +159,7 @@ export function Sidebar({
       <div className="px-3 py-2 flex-shrink-0 space-y-2">
         <button
           onClick={onNewChat}
-          className="w-full flex items-center justify-center gap-2 rounded-xl py-2.5 px-3 transition-all duration-200 bg-transparent hover:bg-gray-200 dark:hover:bg-gray-800 text-gray-800 dark:text-gray-200 active:scale-98"
+          className="w-full flex items-center justify-start gap-2 rounded-xl py-2.5 px-3 transition-all duration-200 bg-transparent hover:bg-gray-200 dark:hover:bg-gray-800 text-gray-800 dark:text-gray-200 active:scale-98"
         >
           <Plus className="w-4 h-4" />
           <span className="text-[13px] font-semibold">
@@ -156,7 +168,7 @@ export function Sidebar({
         </button>
         <Link
           href="/docs"
-          className="w-full flex items-center justify-center gap-2 rounded-xl py-2.5 px-3 transition-all duration-200 bg-transparent text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-800 active:scale-98"
+          className="w-full flex items-center justify-start gap-2 rounded-xl py-2.5 px-3 transition-all duration-200 bg-transparent text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-800 active:scale-98"
         >
           <LibraryBig className="w-4 h-4" />
           <span className="text-[13px] font-semibold">
@@ -165,7 +177,7 @@ export function Sidebar({
         </Link>
         <Link
           href="/admin"
-          className="w-full flex items-center justify-center gap-2 rounded-xl py-2.5 px-3 transition-all duration-200 bg-transparent text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-800 active:scale-98 mt-2"
+          className="w-full flex items-center justify-start gap-2 rounded-xl py-2.5 px-3 transition-all duration-200 bg-transparent text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-800 active:scale-98 mt-2"
         >
           <Settings className="w-4 h-4" />
           <span className="text-[13px] font-semibold">
@@ -261,13 +273,29 @@ export function Sidebar({
                           </span>
                         )}
                       </div>
+                      {onTogglePinSession && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onTogglePinSession(session.id, !session.is_pinned);
+                          }}
+                          className={`absolute right-8 p-1.5 rounded-lg transition-all opacity-0 group-hover:opacity-100 ${
+                            session.is_pinned 
+                              ? "text-blue-500 hover:bg-blue-500/10 opacity-100" 
+                              : "text-gray-600 hover:text-blue-400 hover:bg-blue-400/10"
+                          }`}
+                          title={session.is_pinned ? t("sidebar.unpin", "Bỏ ghim") : t("sidebar.pin", "Ghim")}
+                        >
+                          {session.is_pinned ? <PinOff className="w-3 h-3" /> : <Pin className="w-3 h-3" />}
+                        </button>
+                      )}
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           setSessionToDelete(session.id);
                         }}
                         className="absolute right-2 p-1.5 rounded-lg text-gray-600 hover:text-red-400 hover:bg-red-400/10 transition-all opacity-0 group-hover:opacity-100"
-                        title="Xóa đoạn chat"
+                        title={t("sidebar.deleteChat", "Xóa đoạn chat")}
                       >
                         <Trash2 className="w-3 h-3" />
                       </button>

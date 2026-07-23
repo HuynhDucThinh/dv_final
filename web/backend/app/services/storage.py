@@ -120,6 +120,7 @@ def _ensure_schema() -> None:
             title TEXT NOT NULL DEFAULT 'Cuộc trò chuyện mới',
             summary TEXT NOT NULL DEFAULT '',
             turn_count INTEGER NOT NULL DEFAULT 0,
+            is_pinned BOOLEAN DEFAULT FALSE,
             updated_at TIMESTAMPTZ DEFAULT NOW()
         )
         """,
@@ -135,6 +136,9 @@ def _ensure_schema() -> None:
         """,
         """
         ALTER TABLE chat_sessions ADD COLUMN IF NOT EXISTS title TEXT NOT NULL DEFAULT 'Cuộc trò chuyện mới'
+        """,
+        """
+        ALTER TABLE chat_sessions ADD COLUMN IF NOT EXISTS is_pinned BOOLEAN DEFAULT FALSE
         """,
         # --- Better Auth: thêm user_id vào chat_feedbacks ---
         """
@@ -613,8 +617,8 @@ def upsert_session_summary(session_id: str, summary: str, turn_count: int) -> No
     except Exception as exc:
         logger.warning("Error upserting session summary for %s: %s", session_id, exc)
 
-def update_session_title(session_id: str, title: str) -> None:
-    """Update the title of a specific chat session."""
+def update_session(session_id: str, title: Optional[str] = None, is_pinned: Optional[bool] = None) -> None:
+    """Update the title and/or pinned status of a specific chat session."""
     if not is_chat_persistence_enabled():
         return
     try:
@@ -622,19 +626,29 @@ def update_session_title(session_id: str, title: str) -> None:
     except ImportError:
         return
 
+    if title is None and is_pinned is None:
+        return
+
     try:
         with psycopg.connect(POSTGRES_DSN, autocommit=True) as conn:
             with conn.cursor() as cursor:
-                cursor.execute(
-                    """
-                    UPDATE chat_sessions
-                    SET title = %s, updated_at = NOW()
-                    WHERE session_id = %s
-                    """,
-                    (title, session_id)
-                )
+                if title is not None and is_pinned is not None:
+                    cursor.execute(
+                        "UPDATE chat_sessions SET title = %s, is_pinned = %s, updated_at = NOW() WHERE session_id = %s",
+                        (title, is_pinned, session_id)
+                    )
+                elif title is not None:
+                    cursor.execute(
+                        "UPDATE chat_sessions SET title = %s, updated_at = NOW() WHERE session_id = %s",
+                        (title, session_id)
+                    )
+                elif is_pinned is not None:
+                    cursor.execute(
+                        "UPDATE chat_sessions SET is_pinned = %s, updated_at = NOW() WHERE session_id = %s",
+                        (is_pinned, session_id)
+                    )
     except Exception as exc:
-        logger.warning("Error updating session title for %s: %s", session_id, exc)
+        logger.warning("Error updating session %s: %s", session_id, exc)
 
 
 def ensure_session_exists(session_id: str, title: str = "Cuộc trò chuyện mới", user_id: Optional[str] = None) -> None:
@@ -768,24 +782,24 @@ def list_sessions(user_id: Optional[str] = None) -> List[Dict[str, Any]]:
                 if user_id:
                     cursor.execute(
                         """
-                        SELECT s.session_id, s.title, s.turn_count, s.updated_at, COUNT(m.id) as message_count
+                        SELECT s.session_id, s.title, s.turn_count, s.updated_at, COUNT(m.id) as message_count, s.is_pinned
                         FROM chat_sessions s
                         LEFT JOIN chat_messages m ON s.session_id = m.session_id
                         WHERE s.user_id = %s
                         GROUP BY s.session_id
-                        ORDER BY s.updated_at DESC
+                        ORDER BY s.is_pinned DESC, s.updated_at DESC
                         """,
                         (user_id,)
                     )
                 else:
                     cursor.execute(
                         """
-                        SELECT s.session_id, s.title, s.turn_count, s.updated_at, COUNT(m.id) as message_count
+                        SELECT s.session_id, s.title, s.turn_count, s.updated_at, COUNT(m.id) as message_count, s.is_pinned
                         FROM chat_sessions s
                         LEFT JOIN chat_messages m ON s.session_id = m.session_id
                         WHERE s.user_id IS NULL
                         GROUP BY s.session_id
-                        ORDER BY s.updated_at DESC
+                        ORDER BY s.is_pinned DESC, s.updated_at DESC
                         """
                     )
                 rows = cursor.fetchall()
@@ -796,6 +810,7 @@ def list_sessions(user_id: Optional[str] = None) -> List[Dict[str, Any]]:
                         "turn_count": r[2],
                         "updated_at": r[3].isoformat() if r[3] else None,
                         "message_count": r[4],
+                        "is_pinned": r[5] if len(r) > 5 and r[5] is not None else False,
                     }
                     for r in rows
                 ]

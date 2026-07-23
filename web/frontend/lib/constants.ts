@@ -68,15 +68,15 @@ export const AI_PROVIDERS: InferenceProvider[] = [
 ];
 
 export const AI_MODELS: AIModel[] = [
-  { id: 'gemini-2.5-flash', provider: 'google', name: 'Gemini 2.5', fullName: 'Gemini 2.5 Flash' },
+  { id: 'gemini-1.5-pro', provider: 'google', name: 'Gemini 1.5 Pro', fullName: 'Gemini 1.5 Pro' },
   { id: 'gemini-1.5-flash', provider: 'google', name: 'Gemini 1.5', fullName: 'Gemini 1.5 Flash' },
   { id: 'gpt-4o-mini', provider: 'openai', name: 'GPT-4o Mini', fullName: 'GPT-4o Mini' },
   { id: 'gpt-4o', provider: 'openai', name: 'GPT-4o', fullName: 'GPT-4o' },
   { id: 'llama-3.3-70b-versatile', provider: 'groq', name: 'Llama 3.3 70B', fullName: 'Llama 3.3 70B (Groq)' },
   { id: 'llama-3.1-8b-instant', provider: 'groq', name: 'Llama 3.1 8B', fullName: 'Llama 3.1 8B Instant (Groq)' },
-  { id: 'gemma2-9b-it', provider: 'groq', name: 'Gemma2 9B', fullName: 'Gemma2 9B (Groq)' },
-  { id: 'Qwen/Qwen2.5-7B-Instruct', provider: 'huggingface', name: 'Qwen 2.5', fullName: 'Qwen2.5 7B' },
-  { id: 'qwen2.5:7b-instruct', provider: 'ollama', name: 'Qwen Local', fullName: 'Qwen2.5 7B via Ollama' },
+  { id: 'llama3.2', provider: 'ollama', name: 'Llama 3.2 Local', fullName: 'Llama 3.2 3B (Ollama)' },
+  { id: 'llama3.1', provider: 'ollama', name: 'Llama 3.1 Local', fullName: 'Llama 3.1 8B (Ollama)' },
+  { id: 'qwen2.5:7b-instruct', provider: 'ollama', name: 'Qwen Local', fullName: 'Qwen 2.5 7B (Ollama)' },
 ];
 
 // Model mặc định

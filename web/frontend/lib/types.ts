@@ -43,6 +43,7 @@ export interface ChatSession {
   title: string;
   lastMessage: string;
   timestamp: number;
+  is_pinned?: boolean;
 }
 
 // --- Model ---

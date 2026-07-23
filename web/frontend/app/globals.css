@@ -160,4 +160,17 @@ html, body {
   0%, 100% { box-shadow: 0 4px 12px rgba(75,85,99,0.3); }
   50% { box-shadow: 0 4px 20px rgba(75,85,99,0.55); }
 }
+
+/* ============================================
+   CHAT MESSAGE — ORDERED LIST COUNTER
+   ============================================ */
+.chat-ol {
+  counter-reset: chat-list-counter;
+}
+.chat-ol-li {
+  counter-increment: chat-list-counter;
+}
+.chat-ol-num::before {
+  content: counter(chat-list-counter) ".";
+}
 
