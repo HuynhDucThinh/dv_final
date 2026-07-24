@@ -1,0 +1,8 @@
+import matplotlib.pyplot as plt
+brands = ['Toyota', 'Hyundai', 'Ford', 'Mercedes', 'Kia']
+counts = [5859, 3897, 3719, 3376, 3258]
+plt.figure(figsize=(8, 5))
+plt.bar(brands, counts, color='blue')
+plt.title('Top 5 Hãng Xe Ô Tô Việt Nam')
+plt.savefig('d:/TU HOC/DV_Final/report/car_chart.png')
+print('Chart v1 saved!')

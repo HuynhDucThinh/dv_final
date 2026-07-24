@@ -1,0 +1,16 @@
+import matplotlib.pyplot as plt
+import pandas as pd
+
+# 1. Chuẩn bị dữ liệu vẽ biểu đồ
+fuel_data = {'Nhiên liệu': ['Xăng', 'Dầu', 'Điện', 'Hybrid'], 'Số lượng': [22500, 8900, 1800, 648]}
+df_fuel = pd.DataFrame(fuel_data)
+
+# 2. Vẽ biểu đồ cột
+plt.figure(figsize=(7, 4))
+plt.title('Thống kê Thị phần Nhiên liệu Ô tô hdthinh')
+plt.title('Thống kê Thị phần Nhiên liệu Ô tô')
+plt.xlabel('Loại nhiên liệu')
+plt.ylabel('Số lượng xe')
+plt.grid(axis='y', linestyle='--', alpha=0.5)
+
+print("Đã hoàn tất tính toán và vẽ biểu đồ thị phần nhiên liệu!")
