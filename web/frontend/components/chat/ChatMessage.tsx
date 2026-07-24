@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { User, Car, BookOpen, Copy, Check, ThumbsUp, ThumbsDown, RotateCcw, Undo2, FileText, File, Image as ImageIcon } from 'lucide-react';
+import { User, Car, BookOpen, Copy, Check, ThumbsUp, ThumbsDown, RotateCcw, Undo2, FileText, File, Image as ImageIcon, Loader2, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { Message, DocumentChunk, MessageAttachment } from '@/lib/types';
 import { ChatProcessingTrace } from './ChatProcessingTrace';
@@ -23,6 +23,141 @@ interface ChatMessageProps {
   isSourcesPanelOpen?: boolean;
   sessionId?: string; // Truyền xuống InteractiveCodeBlock
   onSendExecutionResult?: (code: string, output: string) => void; // Callback gửi kết quả cho AI
+}
+
+const API_BASE = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
+
+function FileActionApprovalCard({ actionId }: { actionId: string }) {
+  const [status, setStatus] = useState<'idle' | 'loading' | 'approved' | 'rejected' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const handleApprove = async () => {
+    setStatus('loading');
+    try {
+      const approveRes = await fetch(`${API_BASE}/api/file-operations/${actionId}/approve`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      if (!approveRes.ok) {
+        let errDetail = `Lỗi ${approveRes.status}`;
+        try {
+          const err = await approveRes.json();
+          errDetail = err.detail || errDetail;
+        } catch {
+          // ignore
+        }
+        throw new Error(errDetail);
+      }
+
+      const executeRes = await fetch(`${API_BASE}/api/file-operations/${actionId}/execute`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      if (!executeRes.ok) {
+        let errDetail = `Lỗi ${executeRes.status}`;
+        try {
+          const err = await executeRes.json();
+          errDetail = err.detail || errDetail;
+        } catch {
+          // ignore
+        }
+        throw new Error(errDetail);
+      }
+
+      setStatus('approved');
+    } catch (err: any) {
+      setStatus('error');
+      setErrorMessage(err.message || 'Lỗi khi thực thi thao tác file');
+    }
+  };
+
+  const handleReject = async () => {
+    setStatus('loading');
+    try {
+      const res = await fetch(`${API_BASE}/api/file-operations/${actionId}/reject`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action_id: actionId, decision: 'reject', reason: 'Người dùng từ chối' }),
+      });
+      if (!res.ok) {
+        let errDetail = `Lỗi ${res.status}`;
+        try {
+          const err = await res.json();
+          errDetail = err.detail || errDetail;
+        } catch {
+          // ignore
+        }
+        throw new Error(errDetail);
+      }
+      setStatus('rejected');
+    } catch (err: any) {
+      setStatus('error');
+      setErrorMessage(err.message || 'Lỗi khi từ chối thao tác');
+    }
+  };
+
+  if (status === 'approved') {
+    return (
+      <div className="mt-3.5 p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs font-semibold flex items-center gap-2">
+        <Check className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+        <span>Thao tác file đã được phê duyệt và ghi thành công xuống ổ đĩa.</span>
+      </div>
+    );
+  }
+
+  if (status === 'rejected') {
+    return (
+      <div className="mt-3.5 p-3.5 rounded-xl bg-gray-500/10 border border-gray-500/30 text-gray-600 dark:text-gray-400 text-xs font-semibold flex items-center gap-2">
+        <X className="w-4 h-4 text-gray-500 flex-shrink-0" />
+        <span>Thao tác file đã bị từ chối.</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-3.5 p-4 rounded-xl bg-gray-50 dark:bg-[#1E1E1E] border border-amber-500/40 shadow-sm space-y-3 text-xs">
+      <div className="flex items-center justify-between font-semibold text-amber-600 dark:text-amber-400">
+        <span className="text-xs uppercase tracking-wider font-bold">Yêu cầu phê duyệt thao tác file</span>
+        <span className="font-mono text-[11px] bg-amber-500/15 text-amber-700 dark:text-amber-300 px-2 py-0.5 rounded border border-amber-500/30">
+          ID: {actionId.slice(0, 8)}...
+        </span>
+      </div>
+
+      <p className="text-gray-600 dark:text-gray-300 text-[12px] leading-relaxed">
+        AI vừa tạo một yêu cầu quản lý file trong dự án. Vui lòng <strong>phê duyệt</strong> để thực hiện ghi đè lên đĩa hoặc <strong>từ chối</strong> để hủy.
+      </p>
+
+      {status === 'error' && (
+        <div className="text-rose-500 text-xs font-medium">
+          Lỗi: {errorMessage}
+        </div>
+      )}
+
+      <div className="flex items-center gap-2.5 pt-1">
+        <button
+          onClick={handleApprove}
+          disabled={status === 'loading'}
+          className="flex-1 py-2 px-4 rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-semibold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm"
+        >
+          {status === 'loading' ? (
+            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+          ) : (
+            <Check className="w-3.5 h-3.5" />
+          )}
+          <span>Phê duyệt (Approve)</span>
+        </button>
+
+        <button
+          onClick={handleReject}
+          disabled={status === 'loading'}
+          className="py-2 px-4 rounded-lg bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 disabled:opacity-50 text-gray-700 dark:text-gray-300 font-medium text-xs flex items-center justify-center gap-1.5 transition-colors border border-gray-300 dark:border-gray-700"
+        >
+          <X className="w-3.5 h-3.5" />
+          <span>Từ chối</span>
+        </button>
+      </div>
+    </div>
+  );
 }
 
 export function ChatMessage({ message, isStreaming = false, onRefine, onOpenContext, onFeedbackSubmit, onRetry, isSourcesPanelOpen = false, sessionId, onSendExecutionResult }: ChatMessageProps) {
@@ -77,11 +212,11 @@ export function ChatMessage({ message, isStreaming = false, onRefine, onOpenCont
   const rawDisplayText = (message.displayContent ?? message.content) || '';
 
   // Trích xuất <suggestions>...</suggestions> tag từ response của AI
-  const suggestionsMatch = !isUser ? rawDisplayText.match(/<suggestions>([-\uFFFF]*?)<\/suggestions>/) : null;
+  const suggestionsMatch = !isUser ? rawDisplayText.match(/<suggestions>([ -\uFFFF]*?)<\/suggestions>/) : null;
   const suggestedQuestions: string[] = suggestionsMatch
     ? suggestionsMatch[1].split('|').map(s => s.trim()).filter(Boolean)
     : [];
-  const displayText = rawDisplayText.replace(/<suggestions>[-\uFFFF]*?<\/suggestions>/g, '').trim() || rawDisplayText;
+  const displayText = rawDisplayText.replace(/<suggestions>[ -\uFFFF]*?<\/suggestions>/g, '').trim() || rawDisplayText;
 
   // Parse <cite id="...">...</cite> into markdown link format (chỉ áp dụng cho assistant)
   const processedContent = isUser
@@ -90,6 +225,10 @@ export function ChatMessage({ message, isStreaming = false, onRefine, onOpenCont
         /<cite\s+id=["']([^"']+)["']>([^<]+)<\/cite>/gi,
         '[$2](#cite-$1)'
       ) || '');
+
+  // Extract Action ID (VD: Action ID: `6426c588-a4ed-4da9-882a-d9c8e188d99b`)
+  const actionIdMatch = !isUser ? processedContent.match(/Action ID[:\s*`*]+([a-f0-9-]{12,})/i) : null;
+  const actionId = actionIdMatch ? actionIdMatch[1] : null;
 
   return (
     <div id={`message-${message.id}`} className={`group py-5 px-4 message-animate ${showNegativeForm ? 'relative z-[150]' : ''}`}>
@@ -164,7 +303,21 @@ export function ChatMessage({ message, isStreaming = false, onRefine, onOpenCont
               }`}>
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
+                  urlTransform={(url) => url}
                   components={{
+                    // --- Images (Allow Base64 PNGs) ---
+                    img({ src, alt }: any) {
+                      if (!src) return null;
+                      return (
+                        <span className="block my-4 overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700/80 shadow-md bg-white dark:bg-[#1E1E1E] p-2">
+                          <img
+                            src={src}
+                            alt={alt || 'Biểu đồ'}
+                            className="w-full max-h-[500px] object-contain rounded-lg"
+                          />
+                        </span>
+                      );
+                    },
                     // --- Headings ---
                     h1({ children }: any) {
                       return (
@@ -255,11 +408,14 @@ export function ChatMessage({ message, isStreaming = false, onRefine, onOpenCont
                     code({ node, inline, className, children, ...props }: any) {
                       const match = /language-(\w+)/.exec(className || '');
                       if (!inline && match) {
+                        const rawCode = String(children).replace(/\n$/, '');
+                        const effectiveSessionId = sessionId || message.id;
                         return (
                           <InteractiveCodeBlock
-                            initialCode={String(children).replace(/\n$/, '')}
+                            key={`code-${message.id}-${rawCode.slice(0, 30)}`}
+                            initialCode={rawCode}
                             language={match[1]}
-                            sessionId={sessionId}
+                            sessionId={effectiveSessionId}
                             onSendResult={onSendExecutionResult}
                           />
                         );
@@ -363,6 +519,11 @@ export function ChatMessage({ message, isStreaming = false, onRefine, onOpenCont
                 </ReactMarkdown>
               </div>
             </div>
+            )}
+
+            {/* Thẻ Phê duyệt Thao tác File (Không dùng Emoji) */}
+            {actionId && !isUser && (
+              <FileActionApprovalCard actionId={actionId} />
             )}
 
             {/* Gợi ý câu hỏi tiếp theo — chỉ hiện sau khi streaming xong và có suggestions */}

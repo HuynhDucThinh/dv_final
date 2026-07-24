@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Play, RotateCcw, Check, XCircle, SendHorizonal } from "lucide-react";
+import { Play, RotateCcw, Check, XCircle, SendHorizonal, Copy } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import Editor from "react-simple-code-editor";
 import Prism from "prismjs";
@@ -15,6 +15,23 @@ interface InteractiveCodeBlockProps {
   onSendResult?: (code: string, output: string) => void; // Callback gửi kết quả cho AI
 }
 
+interface ExecutionResultCache {
+  status: "pending" | "executing" | "success" | "error";
+  output: {
+    stdout: string;
+    stderr: string;
+    images: string[];
+    dfContext: string;
+  } | null;
+  errorMessage: string | null;
+  code: string;
+  sent: boolean;
+}
+
+// Global cache để lưu kết quả thực thi code theo session + initialCode
+// Giúp giữ lại kết quả (biểu đồ, stdout) ngay cả khi React component re-render
+const globalExecutionCache = new Map<string, ExecutionResultCache>();
+
 export function InteractiveCodeBlock({
   initialCode,
   language = "python",
@@ -22,18 +39,23 @@ export function InteractiveCodeBlock({
   onSendResult,
 }: InteractiveCodeBlockProps) {
   const { t } = useTranslation();
-  const [code, setCode] = useState(initialCode);
+  const cacheKey = `${sessionId}::${initialCode.trim()}`;
+  const cached = globalExecutionCache.get(cacheKey);
+
+  const [code, setCode] = useState(cached?.code ?? initialCode);
   const [status, setStatus] = useState<
     "pending" | "executing" | "success" | "error"
-  >("pending");
+  >(cached?.status ?? "pending");
   const [output, setOutput] = useState<{
     stdout: string;
     stderr: string;
     images: string[];
     dfContext: string;
-  } | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [sent, setSent] = useState(false); // Chống gửi kết quả 2 lần
+  } | null>(cached?.output ?? null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(
+    cached?.errorMessage ?? null
+  );
+  const [sent, setSent] = useState(cached?.sent ?? false); // Chống gửi kết quả 2 lần
 
   const handleExecute = async () => {
     setStatus("executing");
@@ -50,32 +72,60 @@ export function InteractiveCodeBlock({
       const data = await res.json();
 
       if (!res.ok || !data.success) {
+        const errStr = data.error || data.details || "Lỗi thực thi mã";
+        const errOutput = (data.stdout || data.stderr) ? {
+          stdout: data.stdout || "",
+          stderr: data.stderr || "",
+          images: [],
+          dfContext: "",
+        } : null;
+
         setStatus("error");
-        setErrorMessage(data.error || data.details || "Lỗi thực thi mã");
-        if (data.stdout || data.stderr) {
-          setOutput({
-            stdout: data.stdout || "",
-            stderr: data.stderr || "",
-            images: [],
-            dfContext: "",
-          });
-        }
+        setErrorMessage(errStr);
+        setOutput(errOutput);
+
+        globalExecutionCache.set(cacheKey, {
+          status: "error",
+          output: errOutput,
+          errorMessage: errStr,
+          code,
+          sent: false,
+        });
       } else {
-        setStatus("success");
-        setOutput({
+        const successOutput = {
           stdout: data.stdout || "",
           stderr: data.stderr || "",
           images: data.images || [],
           dfContext: data.df_context || "",
+        };
+
+        setStatus("success");
+        setOutput(successOutput);
+
+        globalExecutionCache.set(cacheKey, {
+          status: "success",
+          output: successOutput,
+          errorMessage: null,
+          code,
+          sent: false,
         });
       }
     } catch (err) {
+      const errStr = err instanceof Error ? err.message : "Unknown error";
       setStatus("error");
-      setErrorMessage(err instanceof Error ? err.message : "Unknown error");
+      setErrorMessage(errStr);
+      globalExecutionCache.set(cacheKey, {
+        status: "error",
+        output: null,
+        errorMessage: errStr,
+        code,
+        sent: false,
+      });
     }
   };
 
   const handleReset = () => {
+    globalExecutionCache.delete(cacheKey);
     setCode(initialCode);
     setStatus("pending");
     setOutput(null);
@@ -91,6 +141,11 @@ export function InteractiveCodeBlock({
       : output.stdout;
     onSendResult(code, combinedOutput);
     setSent(true);
+
+    const c = globalExecutionCache.get(cacheKey);
+    if (c) {
+      globalExecutionCache.set(cacheKey, { ...c, sent: true });
+    }
   };
 
   const getStatusLabel = () => {
@@ -119,6 +174,18 @@ export function InteractiveCodeBlock({
     }
   };
 
+  const [copiedCode, setCopiedCode] = useState(false);
+
+  const handleCopyCode = async () => {
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopiedCode(true);
+      setTimeout(() => setCopiedCode(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy code:", err);
+    }
+  };
+
   // Chỉ hỗ trợ thực thi code Python
   const isPythonExecutable = ["python", "py", "python3"].includes(
     language.toLowerCase(),
@@ -138,6 +205,23 @@ export function InteractiveCodeBlock({
           </span>
         </div>
         <div className="flex items-center gap-2">
+          <button
+            onClick={handleCopyCode}
+            className="flex items-center gap-1.5 px-2 py-1 text-xs font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+            title="Sao chép mã code"
+          >
+            {copiedCode ? (
+              <>
+                <Check className="w-3.5 h-3.5 text-emerald-500" />
+                <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Đã chép</span>
+              </>
+            ) : (
+              <>
+                <Copy className="w-3.5 h-3.5" />
+                <span>Sao chép</span>
+              </>
+            )}
+          </button>
           <button
             onClick={handleReset}
             disabled={status === "executing"}

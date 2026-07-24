@@ -418,14 +418,20 @@ export function ChatInterface() {
           carBuf += carDecoder.decode(value, { stream: true });
           const lines = carBuf.split('\n');
           carBuf = lines.pop() || '';
-          for (const line of lines) {
+          for (const rawLine of lines) {
+            const line = rawLine.trim(); // Fix Windows \r\n → strips \r before JSON.parse
             if (!line.startsWith('data: ')) continue;
             try {
               const ev = JSON.parse(line.slice(6));
-              if (ev.type === 'token') { accumulated += ev.content; setStreamingText(accumulated); }
+              if (ev.type === 'token') {
+                accumulated += ev.content;
+                setStreamingText(accumulated);
+                // requestAnimationFrame: break React 18 auto-batching → each token renders individually
+                await new Promise<void>((r) => requestAnimationFrame(() => r()));
+              }
               else if (ev.type === 'done') setProcessingStage('completed');
               else if (ev.type === 'error') { streamErrorMessage = ev.content; setProcessingStage('error'); }
-            } catch { /* skip */ }
+            } catch (e) { console.warn('[SSE] parse error:', e, line.slice(0, 60)); }
           }
         }
         // Flush message và return (không chạy code document bên dưới)

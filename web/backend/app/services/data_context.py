@@ -22,8 +22,9 @@ from typing import Optional
 logger = logging.getLogger(__name__)
 
 # ─── Đường dẫn ───────────────────────────────────────────────────────────────
-_DATA_ROOT     = Path(__file__).resolve().parents[4] / "data"
-_DOCS_ROOT     = Path(__file__).resolve().parents[4] / "docs"
+ROOT_DIR       = Path(__file__).resolve().parents[4]
+_DATA_ROOT     = ROOT_DIR / "data"
+_DOCS_ROOT     = ROOT_DIR / "docs"
 PROCESSED_CSV  = _DATA_ROOT / "processed" / "car_detail_processed.csv"
 RAW_CSV        = _DATA_ROOT / "raw"       / "car_detail.csv"
 DASHBOARD_JSON = _DOCS_ROOT / "Dashboard.json"
@@ -52,60 +53,41 @@ _context_cache_mtime = 0.0
 
 def build_data_context_card() -> str:
     """
-    Tổng hợp context card hoàn chỉnh:
-    - Schema + thống kê CSV thực tế
-    - Knowledge Base tính sẵn (để AI trả lời trực tiếp)
-    - Dashboard insights từ Dashboard.json
-    - Quy tắc tiền xử lý từ các notebooks
-
-    Sử dụng cache dựa trên thời gian chỉnh sửa file (mtime) để luôn cập nhật dữ liệu mới nhất.
+    Trả về context card nhẹ (~400 tokens) về dataset CSV.
+    Dashboard data KHÔNG được inject ở đây — AI sẽ tự gọi get_dashboard_info()
+    khi user hỏi về tab/dashboard (on-demand, từ cache).
     """
-    global _context_cache, _context_cache_mtime
+    data_path = get_data_file_path() or "D:/TU HOC/DV_Final/data/processed/car_detail_processed.csv"
+    return f"""## DỮ LIỆU CHỦ ĐẠO — car_detail_processed.csv
+- **File:** `{data_path}`
+- **Kích thước:** 33,848 tin đăng × 30 cột | Nguồn: bonbanh.com
+- Biến `df` đã được load sẵn trong RAM (cache) khi dùng tool `query_dataset_readonly`
 
-    csv_path = PROCESSED_CSV if PROCESSED_CSV.exists() else (RAW_CSV if RAW_CSV.exists() else None)
+### CÁC CỘT CHÍNH (tên chính xác — giữ nguyên dấu tiếng Việt khi viết code):
+| Cột | Kiểu | Thống kê nhanh |
+|-----|------|----------------|
+| `Hãng` | str | Toyota 5,861 \| Hyundai 3,897 \| Ford 3,719 \| Mercedes Benz 3,376 \| Kia 3,258 |
+| `Dòng xe` | str | SUV 12,289 \| Sedan 10,777 \| Crossover 3,131 \| Hatchback 2,997 \| Bán tải 2,536 |
+| `Giá (triệu VND)` | float | min=18 \| median=638 \| mean=1,201 \| max=54,000 |
+| `Năm sản xuất` | float | 1990–2025, phổ biến 2015–2023 |
+| `Số Km đã đi (km)` | float | đã lọc outlier (giá trị tỷ km → NaN) |
+| `Loại nhiên liệu` | str | Xăng 78.8% \| Dầu 17.4% \| Điện 2.3% \| Hybrid 1.5% |
+| `Hộp số` | str | Tự động 74.3% \| Tay 16.2% |
+| `Tình trạng` | str | Đã qua sử dụng 79.7% \| Xe mới 20.3% |
+| `Xuất xứ` | str | Lắp ráp trong nước 58% \| Nhập khẩu 42% |
+| `Màu ngoại thất` | str | Trắng 33.5% \| Đen 22% \| Đỏ 12.7% \| Bạc 8.7% |
+| `Số chỗ ngồi sạch` | float | 2–16 chỗ, phổ biến: 5 chỗ |
+| `Dung tích động cơ (lít)` | float | 0.1–18L, median ≈ 2.0L |
+| `Tiêu thụ nhiên liệu sạch` | float | L/100km, đã lọc outlier |
 
-    # Tính mtime mới nhất của toàn bộ folder processed và JSON
-    current_mtime = 0.0
-    try:
-        if PROCESSED_CSV.parent.exists():
-            for f in PROCESSED_CSV.parent.glob("*.csv"):
-                current_mtime = max(current_mtime, os.path.getmtime(f))
-        if DASHBOARD_JSON.exists():
-            current_mtime = max(current_mtime, os.path.getmtime(DASHBOARD_JSON))
-    except Exception:
-        pass
+### CỘT ĐÃ LÀM SẠCH (hậu tố "sạch" — dùng cho phân tích chính xác):
+`Số cửa sạch` · `Số chỗ ngồi sạch` · `Số Km đã đi sạch` · `Tiêu thụ nhiên liệu sạch`
 
-    # Trả về cache nếu file không đổi
-    if _context_cache is not None and current_mtime <= _context_cache_mtime and current_mtime > 0:
-        return _context_cache
-    try:
-        import pandas as pd
-    except ImportError:
-        logger.warning("pandas chưa được cài — trả về context mặc định")
-        return _fallback_context()
+### CÁC BẢNG DIMENSION (cùng thư mục):
+`fact_car_listings.csv` · `dim_brand.csv` · `dim_body_type.csv` · `dim_fuel_type.csv`
+`dim_transmission.csv` · `dim_condition.csv` · `dim_origin.csv` · `dim_exterior_color.csv`
+"""
 
-    csv_path = PROCESSED_CSV if PROCESSED_CSV.exists() else (RAW_CSV if RAW_CSV.exists() else None)
-    if csv_path is None:
-        logger.warning("Không tìm thấy file CSV dataset — dùng context mặc định")
-        return _fallback_context()
-
-    try:
-        df = pd.read_csv(csv_path, low_memory=False)
-        logger.info("DataContext: đọc %s — shape %s", csv_path.name, df.shape)
-    except Exception as exc:
-        logger.error("Lỗi đọc CSV: %s", exc)
-        return _fallback_context()
-
-    parts = [
-        _build_preprocessing_rules(),
-        _build_schema_section(df, csv_path),
-        _build_all_tables_schema(),
-        _build_knowledge_base(df),
-        _build_dashboard_section(),
-    ]
-    _context_cache = "\n\n".join(p for p in parts if p)
-    _context_cache_mtime = current_mtime
-    return _context_cache
 
 
 # ─── Section 1: Schema ───────────────────────────────────────────────────────
@@ -168,7 +150,7 @@ def _build_all_tables_schema() -> str:
             
             try:
                 # Đọc nhanh (chỉ lấy header)
-                df_preview = pd.read_csv(csv_file, nrows=0)
+                df_preview = pd.read_csv(csv_file, nrows=0, encoding="utf-8-sig", encoding_errors="replace")
                 cols = ", ".join(df_preview.columns)
                 lines.append(f"- {csv_file.name}: [{cols}]")
             except Exception:
@@ -182,6 +164,91 @@ def _build_all_tables_schema() -> str:
 
 
 # ─── Section 1.5: Preprocessing Rules ────────────────────────────────────────
+
+def _build_project_overview() -> str:
+    """Tạo cái nhìn tổng quan về cấu trúc dữ liệu và notebooks của dự án."""
+    lines = ["## 📁 PROJECT OVERVIEW (TỰ ĐỘNG CẬP NHẬT)", ""]
+
+    # Notebooks — với mô tả nội dung để AI trả lời trực tiếp
+    notebook_dir = ROOT_DIR / "notebook"
+    NOTEBOOK_DESCRIPTIONS = {
+        "01_data_overview.ipynb": (
+            "Tổng quan dữ liệu thô: đọc car_detail.csv, kiểm tra shape, null values, "
+            "thống kê mô tả (describe), phân phối các cột chính như Hãng, Dòng xe, Giá, Năm sản xuất."
+        ),
+        "02_preprocessing.ipynb": (
+            "Tiền xử lý dữ liệu: làm sạch Số Km đã đi (loại giá trị ảo tỷ km), "
+            "tạo cột 'sạch' (Số cửa sạch, Số chỗ ngồi sạch, Tiêu thụ nhiên liệu sạch), "
+            "chuẩn hóa Hệ thống nạp nhiên liệu (802 biến thể → chuẩn hóa), "
+            "chuẩn hóa 3NF (Star Schema): tách fact + dimension tables, xuất UTF-8-SIG."
+        ),
+        "03_eda.ipynb": (
+            "Exploratory Data Analysis (EDA) toàn diện: phân tích phân phối giá theo hãng/dòng xe/năm SX, "
+            "so sánh xe điện vs xe xăng vs hybrid, xu hướng thị trường 2015-2025, "
+            "phân tích màu sắc/số chỗ/hộp số ưa chuộng, biểu đồ treemap/histogram/scatter/boxplot."
+        ),
+    }
+    if notebook_dir.exists():
+        nbs = sorted(notebook_dir.glob("*.ipynb"))
+        if nbs:
+            lines.append("### 📓 Notebooks Phân Tích")
+            lines.append(f"> Thư mục: `{notebook_dir.as_posix()}`")
+            lines.append("")
+            for nb in nbs:
+                desc = NOTEBOOK_DESCRIPTIONS.get(nb.name, "Notebook phân tích dữ liệu ô tô.")
+                lines.append(f"**`{nb.name}`**")
+                lines.append(f"→ {desc}")
+                lines.append("")
+
+    # Data Folders
+    lines.append("### 📂 Data Folders")
+    if RAW_CSV.parent.exists():
+        raws = list(RAW_CSV.parent.glob("*.csv"))
+        if raws:
+            lines.append(f"**Dữ liệu gốc (raw):** `{RAW_CSV.parent.as_posix()}`")
+            for r in sorted(raws):
+                lines.append(f"- `{r.name}`")
+            lines.append("")
+
+    if PROCESSED_CSV.parent.exists():
+        procs = list(PROCESSED_CSV.parent.glob("*.csv"))
+        if procs:
+            lines.append(f"**Dữ liệu đã xử lý (processed):** `{PROCESSED_CSV.parent.as_posix()}`")
+            for p in sorted(procs):
+                lines.append(f"- `{p.name}`")
+            lines.append("")
+
+    # CSV Key Facts — để AI trả lời câu hỏi về schema không cần gọi tool
+    lines.append("### 🔑 CSV KEY FACTS — car_detail_processed.csv")
+    lines.append("```")
+    lines.append("Tổng: 33,848 dòng × 30 cột | Nguồn: bonbanh.com")
+    lines.append("Cột phân tích chính (TÊN CHÍNH XÁC, dùng đúng dấu tiếng Việt):")
+    lines.append("  'Hãng'                      → string  (Toyota 5,859 | Hyundai 3,897 | Ford 3,719 | Mercedes Benz 3,376 | Kia 3,258...)")
+    lines.append("  'Dòng xe'                   → string  (SUV 12,289 | Sedan 10,777 | Crossover 3,131 | Hatchback 2,997 | Bán tải 2,536...)")
+    lines.append("  'Giá (triệu VND)'           → float64 (min=18 | median=638 | mean=1,201 | max=54,000)")
+    lines.append("  'Năm sản xuất'              → float64 (1990–2025, phổ biến: 2015–2023)")
+    lines.append("  'Số Km đã đi (km)'          → float64 (đã lọc outlier tỷ km)")
+    lines.append("  'Loại nhiên liệu'           → string  (Xăng 78.8% | Dầu 17.4% | Điện 2.3% | Hybrid 1.5%)")
+    lines.append("  'Hộp số'                   → string  (Số tự động 74.3% | Số tay 16.2%)")
+    lines.append("  'Tình trạng'               → string  (Xe đã dùng 79.7% | Xe mới 20.3%)")
+    lines.append("  'Xuất xứ'                  → string  (Lắp ráp trong nước 58% | Nhập khẩu 42%)")
+    lines.append("  'Màu ngoại thất'           → string  (Trắng 33.5% | Đen 22% | Đỏ 12.7% | Bạc 8.7%...)")
+    lines.append("  'Số chỗ ngồi sạch'         → float64 (2–16, phổ biến: 5 chỗ)")
+    lines.append("  'Dung tích động cơ (lít)'  → float64 (0.1–18L, median≈2.0L)")
+    lines.append("Cột đã làm sạch (dùng khi cần dữ liệu không có outlier):")
+    lines.append("  'Số cửa sạch', 'Số chỗ ngồi sạch', 'Số Km đã đi sạch', 'Tiêu thụ nhiên liệu sạch'")
+    lines.append("```")
+    lines.append("")
+
+    lines.append("### 💡 LƯU Ý KHI NGƯỜI DÙNG HỎI CHI TIẾT:")
+    lines.append("- Hỏi về notebook/EDA/tiền xử lý → trả lời thẳng từ mô tả notebook ở trên (KHÔNG gọi tool)")
+    lines.append("- Hỏi về cột/schema CSV → trả lời từ CSV KEY FACTS ở trên (KHÔNG gọi tool)")
+    lines.append("- Hỏi về số liệu chi tiết CSV (giá trung bình hãng X, top N, filter...) → TỰ GỌI `query_dataset_readonly` ngầm")
+    lines.append("- KHÔNG ĐƯA CODE LÊN MÀN HÌNH khi user chỉ hỏi thông tin — chỉ sinh code khi user YÊU CẦU RÕ RÀNG")
+    lines.append("")
+    return "\n".join(lines)
+
+
 
 def _build_preprocessing_rules() -> str:
     # Lấy danh sách các file trong thư mục processed
@@ -352,7 +419,10 @@ def _build_dashboard_section() -> str:
         return ""
 
     lines = ["## DASHBOARD INSIGHTS — KẾT QUẢ PHÂN TÍCH THỰC TẾ"]
-    lines.append("> Dữ liệu được tính sẵn từ Dashboard. AI dùng trực tiếp để trả lời.")
+    lines.append("> 🚨 CHÚ Ý ĐẶC BIỆT DÀNH CHO AI:")
+    lines.append("> TOÀN BỘ DỮ LIỆU CỦA DASHBOARD (TỪ TAB 1 ĐẾN TAB 5) ĐÃ ĐƯỢC TỔNG HỢP SẴN Ở DƯỚI ĐÂY.")
+    lines.append("> KHI NGƯỜI DÙNG HỎI VỀ 'TAB 1', 'TAB 2', 'DASHBOARD', v.v. BẠN PHẢI TRẢ LỜI TRỰC TIẾP DỰA VÀO CÁC DÒNG DƯỚI ĐÂY.")
+    lines.append("> TUYỆT ĐỐI KHÔNG ĐƯỢC BẢO LÀ THIẾU THÔNG TIN, KHÔNG ĐƯỢC ĐÒI FILE DASHBOARD.JSON, VÀ KHÔNG CẦN GỌI TOOL KHI HỎI VỀ DASHBOARD!")
 
     # ── TAB 1: Thị trường ─────────────────────────────────────────────────────
     try:

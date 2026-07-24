@@ -39,6 +39,8 @@ from app.api.analysis_chat import router as analysis_chat_router
 from app.api.execute import router as execute_router
 from app.api.logs_analysis import router as logs_analysis_router
 from app.api.config import router as config_router
+# --- Router mới: File Operations & Approval Workflow (Phase 1 MVP - Agentic AI) ---
+from app.api.file_operations import router as file_operations_router
 from app.services.pipeline import init_pipeline, preload_local_models
 from app.services.storage import initialize_storage
 from app.utils.logging import setup_logger
@@ -189,6 +191,8 @@ def create_app() -> FastAPI:
     application.include_router(execute_router)
     application.include_router(logs_analysis_router, prefix="/api/logs", tags=["Logs"])
     application.include_router(config_router, prefix="/api/config", tags=["Config"])
+    # --- Router mới: File Operations & Approval Workflow (Phase 1 MVP) ---
+    application.include_router(file_operations_router)
 
     @application.get("/health")
     async def health():

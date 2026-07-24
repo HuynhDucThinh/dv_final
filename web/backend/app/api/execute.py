@@ -72,7 +72,13 @@ def _get_or_create_namespace(session_id: str) -> dict[str, Any]:
         from app.services.data_context import get_data_file_path
         data_path = get_data_file_path()
         if data_path:
-            ns["df"] = pd.read_csv(data_path, low_memory=False)
+            try:
+                ns["df"] = pd.read_csv(data_path, encoding="utf-8-sig", on_bad_lines="skip", engine="python")
+            except Exception:
+                try:
+                    ns["df"] = pd.read_csv(data_path, encoding="utf-8", on_bad_lines="skip")
+                except Exception:
+                    pass
             
     except ImportError:
         pass
