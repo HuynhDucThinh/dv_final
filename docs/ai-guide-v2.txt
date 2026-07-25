@@ -1,0 +1,91 @@
+--- Trang 1 ---
+HƯỚNG DẪN TÍCH HỢP AI
+1 Yêu cầu tích hợp AI
+Tích hợp tính năng AI vào phân tích dữliệu: có thểlà ứng dụng độc lập hoặc
+tích hợp vào dashboard hoặc tạo API đểcác ứng dụng khác sửdụng.
+Khuyến khích tạo API đểcác ứng dụng khác sửdụng
+1.1 Nguyên tắc cơ bản
+• AI: Đóng vai trò
+– trợgiúp đềxuất ý tưởng
+– viết code dựa vào yêu cầu của người dùng
+– trình bày kết quảphân tích với sốliệu và hình ảnh, biểu đồđược
+cung cấp bởi con người, không được tựý thêm sốliệu hay hình ảnh
+khác.
+• Con người: Đóng vai trò
+– định hướng, đềxuất các yêu cầu phân tích, ra quyết định thực thi
+code.
+– nếu con người chưa biết, chưa có ý tưởng vềcách phân tích như
+thếnào thì có thểyêu cầu AI đưa ra các gợi ý, phương pháp đểcon
+người lựa chọn.
+• Thực thi code: phải trên môi trường local của người dùng. Không
+được thực thi trên môi trường online.
+2 Nguyên tắc “không thực thi ngầm”
+AI không được phép tựý thay đổi dữliệu gốc hay âm thầm chạy các thuật
+toán.
+1
+
+
+--- Trang 2 ---
+• Hiển thịcode bắt buộc: Mỗi khi AI tạo code theo yêu cầu của con
+người, nó bắt buộc phải hiển thịrõ ràng.
+• Giải thích bằng ngôn ngữtựnhiên: Ngay trên đoạn code đó, AI
+phải đính kèm các dòng comment giải thích bằng ngôn ngữtựnhiên:
+“Đoạn code này sẽxóa 15 dòng có giá trịNULL ởcột Doanh Thu, sử
+dụng hàm dropna() của Pandas.”
+2.1 Nguyên tắc phê duyệt
+Thểhiện vai trò “Người quyết định”.
+• Trạng thái chờ: Code do AI sinh ra ban đầu sẽởtrạng thái “Chờ
+duyệt”. Con người có thểthay đổi, bổsung hoặc loại bỏcode này.
+• Chỉnh sửa: Con người có quyền trực tiếp can thiệp, gõ sửa các tham
+sốtrong đoạn code AI vừa viết (ví dụ: đổi giới hạn outlier từ3 standard
+deviations xuống 2).
+• Chấp nhận & thực thi: Đoạn code chỉđược thực thi và trảvềkết
+quả/biểu đồkhi và chỉkhi con người chấp thuận.
+2.2 Nguyên tắc lưu trữ
+Hệthống phải lưu trữtất cảcác yêu cầu, mã nguồn, kết quảphân tích và giải
+thích đểcó thểtruy xuất lại được.
+3 Trong vấn đáp
+Các nhóm sẽđược yêu cầu sửdụng module AI đã phát triển đểtrảlời các câu
+hỏi phân tích dựa trên dữliệu của nhóm và các câu hỏi phân tích đã chuẩn
+bịsẵn, nhằm tránh lan man. Tuy nhiên, vẫn có thểđược yêu cầu trảlời câu
+hỏi ngoài lềđểđánh giá mức độlinh hoạt của AI. Lưu ý, sốlượng câu hỏi tối
+thiểu bằng sốlượng thành viên trong nhóm.
+4 Trong báo cáo
+Phải tóm tắt lại quá trình sửdụng AI, những yêu cầu đã đặt ra, những kết
+quảđã nhận được, những thay đổi đã thực hiện và những nhận xét vềAI.
+5 Gợi ý thiết kế
+Phân chia cấu trúc API và Frontend
+2
+
+
+--- Trang 3 ---
+5.1 Phần Giao diện & Tương tác người dùng (Frontend)
+Công nghệphát triển giao diện Frontend là tùy chọn (có thểdùng Streamlit,
+Gradio, React, hoặc các công cụDashboard có khảnăng tương tác, …). Các
+nhóm chỉcần đảm bảo các chức năng cơ bản. Khuyến khích các nhóm tạo ra
+những giao diện đẹp, trực quan, dễsửdụng cho người dùng.
+• Chức năng nhận yêu cầu:
+– Ví dụ: Một ô chat hoặc form nhập liệu đểngười dùng gửi yêu cầu
+phân tích/viết code cho AI.
+• Chức năng xem & chỉnh sửa mã nguồn
+• Chức năng phê duyệt
+• Chức năng hiển thịkết quả
+5.2 Phần API
+• API AI (bắt buộc):
+– Tiếp nhận yêu cầu từFront-end.
+– Gửi kèm ngữcảnh (ví dụ: cấu trúc dữliệu hiện có) cho mô hình
+AI (Gemini/OpenAI) (được sửdụng local model).
+– Yêu cầu AI trảvềcảcode và giải thích tương ứng; hoặc kết quả
+trình bày.
+• API Thực thi (bắt buộc):
+– Tiếp nhận đoạn mã đã được con người “chỉnh sửa” và “phê duyệt”
+từfrontend.
+– Thực hiện chạy code trực tiếp trên dữliệu tại máy.
+– Thu thập kết quả(ảnh biểu đồ, bảng dữliệu, logs) đểtrảvềcho
+frontend hiển thị.
+• API Logs (bắt buộc):
+– Lưu trữtất cảcác yêu cầu, mã nguồn, kết quảphân tích và giải
+thích.
+3
+
+
