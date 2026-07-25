@@ -1,0 +1,77 @@
+\section{Giới thiệu bài toán phân tích}\label{sec:gioi-thieu}
+
+\subsection{Bài toán phân tích chung}
+
+Bài toán của đồ án là phân tích tập \texttt{car\_detail.csv} gồm 30.652 tin đăng ô tô từ \texttt{bonbanh.com}, với 21 cột mô tả đặc điểm xe và bài đăng. Mục tiêu là xây dựng một báo cáo Power BI giúp người xem nắm được bức tranh tổng quan về thị trường xe ô tô Việt Nam trong dữ liệu: xe lắp ráp trong nước hay nhập khẩu, xe mới hay xe đã dùng, dòng xe nào phổ biến, hãng nào có nhiều tin đăng, phân bố nhiên liệu/hộp số/dẫn động ra sao, giá xe thay đổi thế nào theo hãng, dòng xe và năm sản xuất. Từ đó trả lời cho câu hỏi trung tâm của đồ án: \textit{``Dữ liệu tin đăng ô tô cho thấy thị trường ô tô Việt Nam được cấu trúc như thế nào về nguồn cung, mức giá và quy luật khấu hao; đồng thời phản ánh ra sao sự chuyển dịch sang xe điện, thị hiếu của người mua và những điểm bất thường cần lưu ý?''}
+
+Báo cáo chỉ phản ánh phạm vi tập dữ liệu được mô tả. Vì dữ liệu là các tin đăng xe, các kết luận được hiểu là xu hướng trong tập tin \texttt{car\_detail.csv}, không mặc nhiên đại diện tuyệt đối cho toàn bộ thị trường ô tô Việt Nam.
+
+\subsection{Mục tiêu phân tích chung}
+
+Bám sát nguyên lý kể chuyện bằng dữ liệu (Data Storytelling), các mục tiêu chung:
+
+\begin{itemize}
+    \item Mô tả cấu trúc dữ liệu, nguồn gốc, phạm vi năm sản xuất và các nhóm thuộc tính quan trọng nhằm thiết lập bối cảnh nền tảng vững chắc cho câu chuyện dữ liệu.
+    \item Tiền xử lý các trường dạng text để tạo biến định lượng có thể phân tích, đặc biệt là giá xe, số km, nhiên liệu, dung tích động cơ và tiêu thụ nhiên liệu, biến các dữ liệu thô thành các chỉ báo cốt lõi để xây dựng mạch truyện.
+    \item Thiết kế dashboard Power BI gồm 5 tab: Tổng quan thị trường, phân tích giá xe, so sánh xe xăng và điện, chân dung người mua và góc khuất thị trường. Chuỗi 5 tab này hoạt động như 5 chương của một cốt truyện, dẫn dắt người xem đi từ bức tranh vĩ mô đến những điểm thắt nút kịch tính.
+    \item Trình bày các insight sơ lược dựa trên số liệu được cung cấp trong mô tả đồ án, không thêm giả định ngoài dữ liệu, đảm bảo các thông điệp đúc kết luôn khách quan, chân thực và có sức thuyết phục cao.
+    \item Đề xuất hướng ứng dụng AI/ML phù hợp như dự đoán giá, phân cụm phân khúc, phân tích mô tả, phát hiện giá bất thường, gợi ý xe tương tự và dự báo xu hướng, nhằm mở ra những định hướng phát triển mở rộng cho câu chuyện phân tích trong tương lai.
+\end{itemize}
+
+
+\subsection{Mục tiêu phân tích cụ thể của từng thành viên}
+
+\subsubsection{Mục tiêu 1: Bức tranh thị trường}
+ 
+\noindent\textbf{Mục tiêu:} Thiết lập cái nhìn toàn cảnh về thị trường xe ô tô Việt Nam tính đến thời điểm thu thập dữ liệu thông qua việc định lượng tỷ trọng phân bổ của 91 hãng xe, xuất xứ (nhập khẩu so với lắp ráp) và tình trạng phương tiện. Từ đó, xác định các xu hướng vĩ mô về nguồn cung để cung cấp bối cảnh nền tảng vững chắc cho các phân tích chuyên sâu tiếp theo.
+
+\noindent\textbf{Câu hỏi phân tích:}
+\begin{enumerate}
+  \item Cơ cấu thị phần theo thương hiệu và kiểu dáng thân xe (dòng xe) trên thị trường ô tô Việt Nam phân hóa như thế nào, và những thương hiệu/dòng xe nào đang nắm giữ vị thế thống trị?
+  \item Cấu trúc nguồn cung thị trường được phân bổ như thế nào theo tình trạng phương tiện (Xe cũ và Xe mới), xuất xứ nguồn cung (Lắp ráp vs Nhập khẩu) và chu kỳ sản xuất (năm sản xuất)?
+\end{enumerate}
+
+\subsubsection{Mục tiêu 2: Phân tích giá xe}
+ 
+\noindent\textbf{Mục tiêu:} Phân tích cấu trúc phân bổ dải giá xe trên thị trường nhằm xác định các mức giá trị trung vị (638 triệu đồng) và các phân khúc giá phổ biến nhất. Tiếp đó, lượng hóa mức độ tác động của các yếu tố cốt lõi bao gồm thương hiệu, tuổi đời phương tiện cho các dòng xe sản xuất giai đoạn 1990 - 2025 và số km đã đi để giải mã quy luật khấu hao giá trị tài sản.
+
+\noindent\textbf{Câu hỏi phân tích:}
+\begin{enumerate}
+  \item Cấu trúc dải giá trên thị trường được phân bổ như thế nào và các thương hiệu siêu sang thiết lập mức giá trần ra sao?
+  \item Giá trị của phương tiện khấu hao như thế nào theo tuổi đời (năm sản xuất) và cường độ sử dụng (số kilomet)?
+\end{enumerate}
+
+
+\subsubsection{Mục tiêu 3: Cuộc chiến xe xăng và điện}
+ 
+\noindent\textbf{Mục tiêu:} Đánh giá tốc độ thâm nhập thị trường của dòng xe năng lượng mới so với xe động cơ đốt trong truyền thống thông qua sự dịch chuyển cơ cấu nhiên liệu trong giai đoạn 2020 - 2025. Đồng thời, đối chiếu chiến lược định giá và đặc tính sản phẩm (xe mới/cũ, phân khúc) giữa hai dòng xe để làm rõ động lực thúc đẩy xu hướng chuyển đổi xanh.
+
+\noindent\textbf{Câu hỏi phân tích:}
+\begin{enumerate}
+  \item Xe điện chỉ chiếm 2.3\% toàn bộ dữ liệu — vậy tại sao gọi đây là một "cuộc bứt phá", và điều gì đang âm thầm xảy ra song song mà ít người để ý?
+  \item Quan niệm phổ biến cho rằng xe điện đắt hơn và được giữ dùng lâu dài — dữ liệu thực tế có xác nhận điều này không?
+\end{enumerate}
+
+\subsubsection{Mục tiêu 4: Chân dung người mua}
+ 
+\noindent\textbf{Mục tiêu:} Phác họa hành vi và thị hiếu của người tiêu dùng thông qua việc thống kê tỷ lệ lựa chọn các cấu hình phổ biến (màu ngoại thất, hệ thống truyền động tự động/số sàn, và cấu hình số chỗ ngồi), đồng thời đối chiếu với hành vi rao bán lại xe cũ. Từ đó, nhận diện sự dịch chuyển trong thói quen mua sắm và sử dụng xe theo giai đoạn 2016 - 2025 để hỗ trợ các đại lý đưa ra quyết định tối ưu hóa danh mục sản phẩm nhập kho.
+
+\noindent\textbf{Câu hỏi phân tích:}
+\begin{enumerate}
+  \item Thị trường ô tô ngày càng đa dạng màu sắc và kiểu dáng, nhưng người mua xe Việt lại ngày càng giống nhau trong lựa chọn — đâu là lý do đằng sau sự đồng nhất bất thường này?
+  \item Điều gì xảy ra khi một thế hệ người mua xe đồng loạt chuyển sang số tự động và cũng đồng loạt bán xe sớm hơn — liệu đây là 2 xu hướng độc lập, hay cùng phản ánh một cách tiêu dùng xe đang thay đổi tận gốc?
+\end{enumerate}
+
+\subsubsection{Mục tiêu 5: Góc khuất thị trường}
+
+\noindent\textbf{Mục tiêu:} Phát hiện và phân tích các điểm dữ liệu nằm ngoài quy luật thông thường của thị trường, bao gồm hai đuôi phân phối giá (các dòng xe có mức giá thấp nhất và cao nhất), biên độ dao động giá trong nội bộ từng thương hiệu hạng sang, và các hiện tượng đột biến nguồn cung theo năm sản xuất. Qua đó, thiết lập cơ sở để xử lý dữ liệu bất thường trước khi đưa vào các bước mô hình hóa và dự báo tiếp theo.
+
+\noindent\textbf{Câu hỏi phân tích:}
+\begin{enumerate}
+  \item Mức giá ở hai đầu cực của thị trường được thiết lập như thế nào, và biên độ chênh lệch giá nội bộ của các thương hiệu hạng sang phân bố ra sao?
+  \item Có hiện tượng đột biến nguồn cung bất thường nào theo năm sản xuất ở các thương hiệu phổ thông không?
+\end{enumerate}
+
+
+
+\clearpage

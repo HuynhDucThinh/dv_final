@@ -1,0 +1,46 @@
+\begin{longtable}{L{0.28\textwidth} L{0.62\textwidth}}
+\textbf{Ký hiệu / Thuật ngữ} & \textbf{Ý nghĩa} \\
+\hline
+\endfirsthead
+\textbf{Ký hiệu / Thuật ngữ} & \textbf{Ý nghĩa} \\
+\hline
+\endhead
+
+\texttt{car\_detail.csv} & Tập dữ liệu chính của đồ án, gồm 30.652 bản ghi tin đăng xe và 21 cột thông tin. \\
+bonbanh.com & Sàn mua bán ô tô trực tuyến tại Việt Nam, được mô tả là nguồn dữ liệu của tập \texttt{car\_detail.csv}. \\
+Mã tin & Mã định danh của mỗi bài đăng xe. \\
+Xuất xứ & Nhóm phân loại xe lắp ráp trong nước hoặc xe nhập khẩu. \\
+Tình trạng & Nhóm phân loại xe mới hoặc xe đã dùng. \\
+Dòng xe & Kiểu thân xe, ví dụ SUV, Sedan, Hatchback, Crossover, bán tải, Van/Minivan, Truck, Coupe, Convertible/Cabriolet hoặc Wagon. \\
+Grade & Model hoặc phiên bản của xe, ví dụ Land Cruiser, Vios, CRV. \\
+Giá & Trường văn bản thể hiện giá xe, ví dụ ``249 Triệu'' hoặc ``1 Tỷ 229 Triệu'', cần parse sang số để phân tích. \\
+Gia\_TrieuVND & Cột đề xuất sau tiền xử lý, biểu diễn giá xe theo đơn vị triệu VND. \\
+Số Km đã đi & Quãng đường xe đã vận hành; giá trị 0 Km thường gắn với xe mới trong mô tả dữ liệu. \\
+Động cơ & Trường văn bản chứa thông tin nhiên liệu và dung tích, ví dụ Xăng 2.0L. \\
+Nhiên liệu & Loại nhiên liệu được tách từ cột Động cơ, gồm Xăng, Dầu, Điện hoặc Hybrid theo mô tả dữ liệu. \\
+Dung tích\_L & Dung tích động cơ sau khi tách từ cột Động cơ, phục vụ nhóm và so sánh kỹ thuật. \\
+Hộp số & Kiểu truyền động điều khiển, gồm số tự động, số tay hoặc số hỗn hợp theo dữ liệu gốc. \\
+Dẫn động & Hệ dẫn động của xe, gồm FWD, RFD, AWD hoặc 4WD theo mô tả dữ liệu. \\
+FWD & Dẫn động cầu trước. \\
+RFD & Dẫn động cầu sau theo ký hiệu xuất hiện trong mô tả dữ liệu. \\
+AWD & Dẫn động bốn bánh toàn thời gian. \\
+4WD & Dẫn động bốn bánh. \\
+Power Query & Công cụ trong Power BI dùng để làm sạch, chuẩn hóa và tạo cột mới trước khi dựng mô hình dữ liệu. \\
+DAX & Ngôn ngữ biểu thức trong Power BI dùng để tạo measure và chỉ số tổng hợp. \\
+KPI Card & Thẻ chỉ số dùng để hiển thị các số liệu tổng quan như tổng số xe, số xe mới, số xe đã dùng và số hãng. \\
+Donut Chart & Biểu đồ vòng dùng để thể hiện tỷ lệ cơ cấu như xuất xứ hoặc tình trạng xe. \\
+Treemap & Biểu đồ cây dùng để so sánh tỷ trọng các dòng xe theo diện tích. \\
+Scatter Plot & Biểu đồ phân tán dùng để phân tích quan hệ giữa giá và năm sản xuất, có thể mã hóa thêm hãng hoặc số km. \\
+Matrix / Heatmap & Bảng ma trận hoặc bản đồ nhiệt dùng để so sánh hai chiều như Hãng $\times$ Dòng xe hoặc Hãng $\times$ Nhiên liệu. \\
+Key Influencers & Tính năng AI trong Power BI giúp nhận diện yếu tố ảnh hưởng mạnh đến một kết quả phân tích, ví dụ giá xe cao hơn 1 tỷ. \\
+Decomposition Tree & Trực quan phân rã trong Power BI để đi từ tổng thể đến các cấp Hãng, Model, Năm và Giá. \\
+Smart Narrative & Tính năng tự động tạo đoạn tóm tắt insight trong Power BI. \\
+Anomaly Detection & Phát hiện điểm bất thường trong chuỗi thời gian hoặc xu hướng dữ liệu. \\
+Forecast & Dự báo xu hướng trong Power BI, được đề xuất cho số lượng xe niêm yết giai đoạn 2024--2025. \\
+Random Forest & Thuật toán học máy được đề xuất cho bài toán dự đoán giá xe. \\
+XGBoost & Thuật toán boosting cây quyết định, cũng được đề xuất cho bài toán dự đoán giá xe. \\
+K-Means Clustering & Thuật toán phân cụm được đề xuất để chia thị trường xe thành các phân khúc. \\
+Isolation Forest & Thuật toán phát hiện bất thường, có thể dùng để nhận diện xe có giá bất thường. \\
+TF-IDF / BERT & Nhóm phương pháp xử lý ngôn ngữ tự nhiên có thể dùng để khai thác cột mô tả bài đăng. \\
+ARIMA / Prophet & Nhóm mô hình dự báo chuỗi thời gian, được đề xuất cho xu hướng số lượng xe. \\
+\end{longtable}

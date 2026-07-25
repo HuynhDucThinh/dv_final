@@ -1,0 +1,248 @@
+\section{Dataset và quy trình xử lý dữ liệu}\label{sec:dataset}
+
+\subsection{Nguồn gốc và phạm vi dữ liệu}
+
+Tập dữ liệu chính là \texttt{car\_detail.csv}, được thu thập từ \texttt{bonbanh.com}, sàn mua bán ô tô trực tuyến lớn tại Việt Nam. Mỗi bản ghi tương ứng một tin đăng xe và có URL dạng \texttt{https://bonbanh.com/xe-<hang>-<model>-<nam>-<ma-tin>}.
+
+Theo phân tích từ dữ liệu gốc, tập dữ liệu gồm 33.848 bản ghi và 21 cột, bao phủ cả xe mới và xe đã dùng. Phạm vi năm sản xuất nằm trong khoảng 1990 đến 2025. Vì dữ liệu phản ánh tin đăng, báo cáo tập trung mô tả cơ cấu và xu hướng của các tin đăng trong tập dữ liệu, không khẳng định toàn bộ quy mô thị trường thực tế.
+
+\subsection{Lý do chọn dữ liệu}
+
+Dữ liệu phù hợp với môn trực quan hóa dữ liệu vì có nhiều nhóm biến khác nhau: biến phân loại như hãng, dòng xe, xuất xứ, tình trạng, hộp số; biến số hoặc có thể chuẩn hóa thành số như năm sản xuất, giá, số km đã đi, dung tích động cơ; và biến văn bản như mô tả bài đăng. Sự kết hợp này cho phép thiết kế nhiều loại biểu đồ, từ KPI, bar chart, donut chart đến scatter plot, matrix, treemap và các visual AI trong Power BI.
+
+Bên cạnh đó, dữ liệu gắn với thị trường Việt Nam nên dễ diễn giải về mặt nghiệp vụ: người xem có thể quan tâm đến hãng phổ biến, dòng xe thịnh hành, mức giá theo năm, tỷ lệ xe nhập khẩu, xu hướng SUV hoặc sự xuất hiện của xe điện và hybrid.
+
+\subsection{Cấu trúc dữ liệu}
+
+\subsubsection{Schema và định dạng}
+
+\begin{xltabular}{\textwidth}{L{3.4cm} L{3.1cm} Y}
+\caption{Cấu trúc 21 cột của tập \texttt{car\_detail.csv}} \\
+\textbf{Tên cột} & \textbf{Kiểu dữ liệu} & \textbf{Mô tả} \\ \hline
+\endfirsthead
+\multicolumn{3}{l}{\textit{(tiếp theo)}} \\
+\textbf{Tên cột} & \textbf{Kiểu dữ liệu} & \textbf{Mô tả} \\ \hline
+\endhead
+\multicolumn{3}{r}{\textit{(còn tiếp)}} \\
+\endfoot
+\endlastfoot
+Mã tin & ID & Mã định danh bài đăng. \\
+Xuất xứ & Categorical & Lắp ráp trong nước hoặc nhập khẩu. \\
+Tình trạng & Categorical & Xe mới hoặc xe đã dùng. \\
+Dòng xe & Categorical & SUV, Sedan, Hatchback, Crossover, bán tải, Van/Minivan, Truck, Coupe, Convertible/Cabriolet, Wagon. \\
+Số Km đã đi & Text / số & Quãng đường xe đã đi; 0 Km thường gắn với xe mới. \\
+Màu ngoại thất & Categorical & Màu bên ngoài xe. \\
+Màu nội thất & Categorical & Màu nội thất. \\
+Số cửa & Categorical & 2, 4 hoặc 5 cửa. \\
+Số chỗ ngồi & Categorical & Từ 2 đến 47 chỗ. \\
+Động cơ & Text & Loại nhiên liệu và dung tích, ví dụ Xăng 2.0L. \\
+Hệ thống nạp nhiên liệu & Text & Turbo, phun xăng điện tử, TDCi, v.v. \\
+Hộp số & Categorical & Số tự động, số tay hoặc số hỗn hợp. \\
+Dẫn động & Categorical & FWD, RFD, AWD hoặc 4WD. \\
+Tiêu thụ nhiên liệu & Text & Mức tiêu thụ dạng L/100Km. \\
+Mô tả & Text dài & Nội dung bài đăng bán xe. \\
+Hãng & Categorical & Toyota, Hyundai, Ford, Mercedes Benz, v.v. \\
+Grade & Categorical & Model hoặc phiên bản xe. \\
+Năm sản xuất & Số & Năm trong khoảng 1990 đến 2025. \\
+Tên xe & Text & Tên đầy đủ của xe. \\
+Giá & Text & Ví dụ ``249 Triệu'', ``1 Tỷ 229 Triệu''. \\
+URL & Link & Đường dẫn đến bài đăng gốc. \\
+\end{xltabular}
+
+\subsubsection{Phân loại câu hỏi}
+
+Các trường dữ liệu có thể chia thành bốn nhóm phục vụ phân tích:
+
+\begin{itemize}
+    \item \textbf{Thông tin định danh:} Mã tin, Tên xe, URL.
+    \item \textbf{Thông tin thị trường:} Hãng, Grade, dòng xe, xuất xứ, tình trạng, năm sản xuất, giá.
+    \item \textbf{Thông số kỹ thuật:} Động cơ, nhiên liệu, dung tích, hộp số, dẫn động, số cửa, số chỗ, tiêu thụ nhiên liệu.
+    \item \textbf{Thuộc tính mô tả:} Màu ngoại thất, màu nội thất, số km đã đi, mô tả bài đăng.
+\end{itemize}
+
+\subsection{Chất lượng dữ liệu}
+
+\subsubsection{Tổng quan tỷ lệ thiếu và tính nhất quán}
+
+Khảo sát thực tế trên toàn bộ 33.848 dòng dữ liệu đã phát hiện một số vấn đề về chất lượng cần được xử lý trước khi tiến hành trực quan hóa:
+\begin{itemize}
+    \item \textbf{Tỷ lệ rỗng:} Nhìn chung, tổng tỷ lệ rỗng trên toàn bộ tập dữ liệu khá thấp (chỉ khoảng 5,28\%). Trong đó, có 12 cột cốt lõi đạt tỷ lệ điền đầy 100\%. Tuy nhiên, cột Hệ thống nạp nhiên liệu rỗng rất cao (80,07\%). Cụm Hộp số, Dẫn động, Tiêu thụ nhiên liệu cùng rỗng 9,44\%. Cột Số Km đã đi khuyết 2,35\% và Năm sản xuất khuyết 0,09\% (32 dòng).
+    \item \textbf{Tính nhất quán:} Có 17 dòng bị trùng lặp Mã tin. Ngoài ra, cột Giá lưu dưới dạng chuỗi hỗn hợp (Triệu, Tỷ) và cột Hộp số có giá trị ``-'' cần chuẩn hóa. Cột Số cửa và Số chỗ ngồi cũng chứa dữ liệu lỗi (như ``45 cửa'', ``47 chỗ'').
+\end{itemize}
+
+\subsubsection{Tỷ lệ điền đầy theo trường quan trọng}
+
+Các trường quan trọng nhất cho dashboard gồm Hãng, Dòng xe, Tình trạng, Xuất xứ, Năm sản xuất, Giá, Hộp số, Dẫn động và Động cơ. Khi triển khai Power BI, cần kiểm tra số dòng hợp lệ của từng trường sau khi parse để tránh hiển thị sai tỷ lệ. Với trường Năm sản xuất, mô tả đề xuất loại 32 bản ghi thiếu năm khỏi các phân tích theo thời gian.
+
+\subsection{Thống kê mô tả}
+
+\begin{xltabular}{\textwidth}{L{4cm} L{4cm} Y}
+\caption{Một số thống kê mô tả chính từ mô tả dữ liệu} \\
+\textbf{Nhóm} & \textbf{Giá trị nổi bật} & \textbf{Diễn giải} \\ \hline
+\endfirsthead
+\multicolumn{3}{l}{\textit{(tiếp theo)}} \\
+\textbf{Nhóm} & \textbf{Giá trị nổi bật} & \textbf{Diễn giải} \\ \hline
+\endhead
+\endlastfoot
+Tổng bản ghi & 33.848 & Mỗi bản ghi là một tin đăng xe. \\
+Tổng cột & 21 & Bao gồm thông tin thị trường, kỹ thuật, giá và mô tả. \\
+Phạm vi năm & 1990 đến 2025 & Phân tích thời gian dựa trên năm sản xuất. \\
+Xe đã dùng & 26.982 (79,72\%) & Chiếm đa số trong dữ liệu. \\
+Xe mới & 6.866 (20,28\%) & Chiếm khoảng một phần năm dữ liệu. \\
+Lắp ráp trong nước & 19.645 (58,04\%) & Cao hơn nhóm nhập khẩu. \\
+Nhập khẩu & 14.203 (41,96\%) & Chiếm tỷ trọng đáng kể trong dữ liệu. \\
+Dòng xe lớn nhất & SUV: 12.289 & SUV chiếm 36,31\%, nhỉnh hơn Sedan. \\
+Hãng nhiều nhất & Toyota: 5.861 & Toyota đứng đầu về số lượng bản ghi (chiếm 17,32\%). \\
+Nhiên liệu chủ đạo & Xăng: 26.668 & Xăng chiếm 78,79\% sau khi trích xuất từ cột Động cơ. \\
+\end{xltabular}
+
+\subsection{Quy trình tiền xử lý dữ liệu}
+
+\subsubsection{Khảo sát và đánh giá chất lượng dữ liệu gốc}
+Bộ dữ liệu thô ban đầu có quy mô 33.848 dòng và 21 cột, tiêu tốn khoảng 27,21 MB dung lượng bộ nhớ. Khảo sát sơ bộ cho thấy hầu hết các trường dữ liệu đều ở định dạng chuỗi ký tự, ngoại trừ mã tin và năm sản xuất. Quá trình kiểm tra trùng lặp xác nhận không có bản ghi nào trùng lặp hoàn toàn trên toàn bộ các cột và mỗi bài đăng đều trỏ tới một liên kết URL duy nhất. Mặc dù hệ thống ghi nhận 17 trường hợp trùng mã tin, các bản ghi này lại có sự khác biệt về liên kết URL hoặc thông tin chi tiết. Do đó, toàn bộ các dòng này được giữ lại để đảm bảo không thất thoát thông tin trong quá trình phân tích.
+
+Về tình trạng khuyết thiếu, dữ liệu tập trung lỗi ở một số nhóm thông số kỹ thuật đặc thù. Bảng dưới đây tóm tắt tỷ lệ thiếu của các trường dữ liệu bị khuyết.
+
+\begin{table}[htpb]
+\centering
+\caption{Thống kê các trường dữ liệu có giá trị khuyết thiếu}
+\begin{tabular}{l c c}
+\textbf{Tên trường dữ liệu} & \textbf{Số lượng thiếu} & \textbf{Tỷ lệ thiếu} \\ \hline
+Hệ thống nạp nhiên liệu & 27.103 & 80,07\% \\
+Hộp số & 3.196 & 9,44\% \\
+Dẫn động & 3.196 & 9,44\% \\
+Tiêu thụ nhiên liệu & 3.196 & 9,44\% \\
+Số Km đã đi & 796 & 2,35\% \\
+Năm sản xuất & 32 & 0,09\% \\
+\end{tabular}
+\end{table}
+
+\subsubsection{Chuẩn hóa chuỗi và định dạng kiểu dữ liệu}
+Tên các cột được giữ nguyên tiếng Việt nhằm duy trì tính nhất quán và thuận tiện cho quá trình phân tích nghiệp vụ sau này. Đối với các trường dữ liệu dạng chuỗi, hệ thống tiến hành loại bỏ toàn bộ khoảng trắng thừa ở hai đầu và giữa chuỗi. Ký tự gạch ngang đại diện cho dữ liệu rỗng xuất hiện nhiều ở cột màu nội thất, dẫn động và hộp số đã được chuyển đổi đồng loạt sang định dạng NaN để hệ thống hiểu đúng bản chất là dữ liệu khuyết.
+
+Bước trích xuất đơn vị đóng vai trò quan trọng trong việc định lượng hóa bộ dữ liệu. Cột giá xe dạng văn bản được phân tách cú pháp để quy đổi thống nhất về định dạng số thực với đơn vị triệu VND. Các trường số km đã đi, số cửa và số chỗ ngồi được loại bỏ phần chữ và chuyển sang kiểu dữ liệu số nguyên hoặc số thực. Trường động cơ chứa nhiều thông tin phức hợp nên được bóc tách thành hai cột độc lập là loại nhiên liệu và dung tích động cơ tính bằng lít. Cột tiêu thụ nhiên liệu cũng được trích xuất phần số nguyên bản. Qua quá trình này, cấu trúc dữ liệu được mở rộng từ 21 lên 31 cột, cung cấp thêm nhiều biến định lượng cho bước trực quan hóa.
+
+\subsubsection{Xử lý dữ liệu khuyết thiếu và loại bỏ ngoại lệ}
+Chiến lược xử lý khuyết thiếu được phân tách rõ ràng theo đặc điểm của từng biến. Đối với các biến phân loại như màu sắc, hệ thống nạp nhiên liệu, hộp số và loại nhiên liệu, khoảng trống được lấp đầy bằng nhãn Không rõ. Ngược lại, đối với các biến định lượng như số km đã đi, dung tích động cơ, tiêu thụ nhiên liệu và năm sản xuất, giá trị NaN được giữ nguyên. Việc không điền các đại lượng thống kê thay thế giúp ngăn ngừa tình trạng sai lệch phân phối thực tế của tập dữ liệu.
+
+Phân tích thống kê mô tả phát hiện nhiều điểm bất thường do lỗi nhập liệu thủ công. Cụ thể, số km đã đi lớn nhất vượt mốc 4 tỷ km, tiêu thụ nhiên liệu đạt mức vô lý là 200.000 lít, số cửa là 54 và số chỗ ngồi là 47. Để khắc phục, dữ liệu được lọc qua các ngưỡng giới hạn vật lý tiêu chuẩn như trình bày trong bảng sau. Mọi giá trị vi phạm ngưỡng đều bị chuyển thành NaN ở các cột làm sạch tương ứng, giúp bảo toàn nguyên vẹn các thuộc tính hợp lệ khác của chiếc xe thay vì xóa bỏ toàn bộ dòng.
+
+\begin{table}[htpb]
+\centering
+\caption{Các ngưỡng giới hạn được áp dụng để lọc giá trị ngoại lệ}
+\begin{tabular}{l l c}
+\textbf{Đại lượng vật lý} & \textbf{Ngưỡng giới hạn hợp lý} & \textbf{Số dòng vi phạm} \\ \hline
+Số Km đã đi & Từ 0 đến 500.000 km & 260 \\
+Số cửa & Từ 2 đến 6 cửa & 101 \\
+Số chỗ ngồi & Từ 2 đến 16 chỗ & 84 \\
+Tiêu thụ nhiên liệu & Từ 1 đến 30 lít/100km & 38 \\
+\end{tabular}
+\end{table}
+
+\subsubsection{Mô hình hóa dữ liệu và xuất tệp}
+Nhằm tối ưu hóa không gian lưu trữ và tăng hiệu năng truy vấn cho công cụ phân tích, tập dữ liệu được chuẩn hóa theo mô hình dữ liệu dạng sao đạt chuẩn 3NF. Bảng thực thể trung tâm fact car listings được hình thành với 33.848 dòng, quản lý các chỉ số định lượng và hệ thống khóa ngoại. Các dữ liệu văn bản phân loại lặp lại nhiều lần được tách thành 10 bảng chiều độc lập.
+
+Trường hệ thống nạp nhiên liệu vốn có 802 biến thể cách viết thô đã được chuẩn hóa bằng biểu thức chính quy, thu gọn quy mô xuống còn 262 nhóm danh mục chuẩn. Quy trình tiền xử lý kết thúc bằng việc xuất 13 tệp CSV riêng biệt với bảng mã utf-8-sig. Bảng mã này tích hợp dấu byte order mark, giúp các phần mềm bảng tính đọc và hiển thị chính xác bộ ký tự tiếng Việt, tạo cơ sở vững chắc cho giai đoạn kết nối dữ liệu vào hệ thống trực quan hóa.
+
+\subsection{Mô tả các trường dữ liệu quan trọng}
+
+\subsubsection{Tab 01: Bức tranh thị trường}
+
+Tab này sử dụng các trường Tên hãng, Tên dòng xe (kiểu dáng thân xe), Tình trạng, Xuất xứ và Năm sản xuất. Các chỉ số chính gồm tổng số tin đăng, số hãng xe, giá trung vị toàn thị trường và năm sản xuất phổ biến nhất. Phân tích tập trung vào thị phần theo thương hiệu, cơ cấu kiểu dáng thân xe, tỷ lệ xe cũ và xe mới, tỷ lệ lắp ráp trong nước và nhập khẩu, cùng phân bố số lượng xe theo năm sản xuất.
+
+\subsubsection{Tab 02: Phân tích giá xe}
+
+Tab này sử dụng cột \texttt{Giá (triệu VND)}, kết hợp với Tên hãng, Tên dòng xe, Năm sản xuất và Số km đã đi sạch. Phân tích gồm phân phối giá theo phân khúc, giá trung vị của các hãng xe hạng sang, xu hướng khấu hao giá theo năm sản xuất và mối quan hệ giữa giá bán với quãng đường đã sử dụng.
+
+\subsubsection{Tab 03: Cuộc chiến xe xăng và điện}
+
+Tab này sử dụng các trường Loại nhiên liệu, Năm sản xuất và Tên hãng. Phân tích tập trung vào thị phần các loại nhiên liệu (xăng, diesel, điện, hybrid), xu hướng tăng trưởng xe điện theo năm, sự trỗi dậy của VinFast trong phân khúc xe điện và so sánh mức giá trung vị giữa các nhóm nhiên liệu.
+
+\subsubsection{Tab 04: Hành vi người mua}
+
+Tab này sử dụng các trường Màu ngoại thất, Loại hộp số, Số chỗ ngồi, Số km đã đi sạch và Năm đăng tin. Phân tích tập trung vào sở thích màu sắc của người mua, xu hướng chuyển dịch từ số sàn sang số tự động theo năm sản xuất, cấu hình số chỗ ngồi phổ biến nhất và diễn biến quãng đường trung vị của xe cũ tại thời điểm rao bán lại.
+
+\subsubsection{Tab 05: Góc khuất thị trường}
+
+Tab này sử dụng các trường Giá (triệu VND), Số km đã đi sạch, Năm sản xuất và Tên hãng. Phân tích tập trung vào hai đuôi phân phối giá (top 7 dòng xe rẻ nhất và top 8 dòng xe đắt nhất), biên độ dao động giá nội bộ theo từng thương hiệu hạng sang và hiện tượng đột biến nguồn cung theo năm sản xuất.
+
+\subsection{Phân tích khám phá dữ liệu}
+
+\subsubsection{Mục tiêu và phạm vi EDA}
+
+\textbf{Mục tiêu phân tích:} Phân tích này nhằm kiểm tra tính ổn định của dữ liệu sau quá trình tiền xử lý và giúp nhận diện những xu hướng chính yếu về thị hiếu tiêu dùng, cấu trúc giá xe và mức độ khấu hao theo thời gian, từ đó chọn lọc các biến số quan trọng nhất đưa vào thiết kế dashboard.
+
+\textbf{Dữ liệu sử dụng:} Quá trình phân tích sử dụng bảng thực tế \texttt{fact\_car\_listings} với 33.848 bản ghi hợp lệ, kết nối chặt chẽ với hệ thống bảng chiều thông qua các khóa ngoại.
+
+
+\subsubsection{Cơ cấu và thị hiếu thị trường}
+
+\textbf{Thương hiệu và kiểu dáng:} Toyota, Hyundai, Ford, Mercedes-Benz, và Kia là các hãng dẫn đầu về số lượng tin bán. Về kiểu dáng, người tiêu dùng đặc biệt ưa chuộng dòng xe gầm cao (SUV) và xe 5 chỗ (Sedan), chiếm tỷ trọng áp đảo. Sự phân bổ này phản ánh đúng xu hướng chọn xe gầm cao thực tế của thị trường xe hơi Việt Nam hiện nay.
+
+\textbf{Xuất xứ và tình trạng:} Hơn 50\% lượng xe giao dịch là xe lắp ráp trong nước. Đồng thời, thị trường thứ cấp chiếm ưu thế với gần 80\% tin đăng là xe đã qua sử dụng. Điều này cho thấy sự sôi động của mảng kinh doanh xe cũ và tính thanh khoản cao của ô tô tại Việt Nam.
+
+
+\subsubsection{Cấu trúc giá và vòng đời sản phẩm}
+
+\textbf{Phân phối giá xe:} Biểu đồ giá xe có hình dáng lệch phải cực kỳ rõ rệt, với số lượng giao dịch khổng lồ tập trung ở phân khúc dưới 1,5 tỷ VNĐ. Đồng thời, biểu đồ cũng ghi nhận một cái đuôi dài trải rộng đến mốc 40 - 50 tỷ VNĐ dành cho các siêu xe và xe sang trọng (như Rolls-Royce, Ferrari), phản ánh sự chênh lệch lớn giữa các phân khúc.
+
+\textbf{Sự biến động giá theo năm sản xuất:} Giá xe trung vị dốc lên mạnh mẽ từ 540 triệu lên 900 triệu VNĐ trong giai đoạn 2017 - 2021. Tuy nhiên, có sự sụt giảm nghịch lý ở nhóm xe siêu lướt (2022 - 2024), lùi về lại mức 780 - 890 triệu VNĐ. Nguyên nhân chủ yếu là do sự thay đổi cơ cấu nguồn cung, khi các mẫu xe rao bán ở đời mới nhất phần lớn thuộc về nhóm xe cỡ nhỏ và xe phổ thông.
+
+
+\subsubsection{Đặc tính kỹ thuật và khấu hao}
+
+\textbf{Mối tương quan về giá:} Ma trận tương quan xác nhận dung tích động cơ có mối liên hệ thuận chiều mạnh nhất với giá bán (hệ số +0.55). Ngược lại, số Km đã đi (ODO) có tương quan nghịch (-0.15), phản ánh rõ mức độ khấu hao tài sản theo quá trình sử dụng.
+
+\textbf{Dung tích động cơ:} Thị trường chủ yếu xoay quanh các dòng xe trang bị động cơ 2.0L và 1.5L. Các mốc dung tích khác chiếm tỷ trọng thấp hơn hẳn, tạo thành các cụm phân khúc rõ nét. Sự phân rã này hỗ trợ rất tốt cho việc áp dụng các thuật toán phân cụm nhằm định vị phân khúc khách hàng mục tiêu sau này.
+
+
+\subsubsection{Chất lượng dữ liệu và điểm bất thường}
+
+\textbf{Vấn đề chất lượng:} Việc kiểm tra cho thấy vẫn còn tồn tại khoảng 1.597 bản ghi có năm sản xuất bất thường (trước 1990 hoặc sau 2024) và một số trường hợp mâu thuẫn khi được gắn mác ``Xe mới'' nhưng đồng hồ ODO lại ghi nhận quãng đường đi lớn, đòi hỏi các bước làm sạch chuyên sâu.
+
+\textbf{Dữ liệu ngoại lai:} Hệ thống phát hiện một lượng lớn xe có giá vượt mức trần ngoại lai 2.080 triệu VNĐ. Hầu hết trong số đó thuộc về các hãng siêu xe, tuy nhiên ở quy mô nội bộ một số hãng phổ thông, vẫn xuất hiện các outlier có thể đến từ phiên bản đặc biệt hoặc do lỗi người bán điền sai số 0 khi đăng tin.
+
+
+\subsection{Mô hình dữ liệu trong Power BI}
+
+\noindent\textbf{Kiến trúc tổng thể:}
+\begin{itemize}[leftmargin=1.0cm]
+    \item Mô hình dữ liệu được tổ chức theo dạng hình sao, trong đó bảng \texttt{fact\_car\_listings} đóng vai trò là bảng trung tâm.
+    \item Mỗi dòng trong bảng trung tâm đại diện cho một tin đăng bán xe cụ thể trên thị trường.
+    \item Các bảng chiều lưu thông tin mô tả chi tiết như hãng xe (\texttt{dim\_brand}), dòng xe (\texttt{dim\_body\_type}), tình trạng (\texttt{dim\_condition}), xuất xứ (\texttt{dim\_origin}), v.v.
+    \item Cách tổ chức này giúp tách bạch dữ liệu đo lường định lượng và dữ liệu mô tả phân loại, từ đó hạn chế trùng lặp, tối ưu dung lượng và thuận tiện cho việc thiết kế các trang trực quan.
+\end{itemize}
+
+\noindent\textbf{Bảng trung tâm:}
+\begin{itemize}[leftmargin=1.0cm]
+    \item Bảng \texttt{fact\_car\_listings} lưu giữ các chỉ số đo lường chính phục vụ tính toán: giá xe (triệu VNĐ), năm sản xuất, số Km đã đi (ODO), và dung tích động cơ.
+    \item Bảng này chứa các khóa ngoại liên kết đến bảng chiều như \texttt{id\_hãng}, \texttt{id\_dòng\_xe}, \texttt{id\_tình\_trạng}, \texttt{id\_xuất\_xứ}.
+    \item Các trường định lượng được tập trung tại bảng fact để dễ dàng thực hiện các phép tổng hợp như tính trung bình, trung vị, tổng số lượng tin đăng và tỷ lệ phần trăm phân bổ.
+    % \item Các trường văn bản dài được đẩy hoàn toàn sang bảng chiều để mô hình hoạt động mượt mà hơn.
+\end{itemize}
+
+\noindent\textbf{Bảng chiều:}
+\begin{itemize}[leftmargin=1.0cm]
+    \begin{sloppypar}
+    \item Các bảng chiều \texttt{dim\_brand}, \texttt{dim\_body\_type}, \texttt{dim\_condition}, và \texttt{dim\_origin} xử lý các thuộc tính phân loại và định danh của từng tin đăng.
+    \end{sloppypar}
+    \item Việc chuẩn hóa nhãn văn bản (ví dụ: chuẩn hóa tên hãng xe, loại bỏ các biến thể viết sai) được thực hiện một lần duy nhất tại bảng chiều, đảm bảo tính nhất quán trên toàn bộ báo cáo.
+    \item Các bảng chiều đóng vai trò là nguồn cung cấp hạng mục danh sách cho các bộ lọc trong Power BI, giúp tránh lặp lại chuỗi văn bản dài trong bảng trung tâm.
+\end{itemize}
+
+\noindent\textbf{Quan hệ và hướng lọc:}
+\begin{itemize}[leftmargin=1.0cm]
+    \item Các bảng chiều liên kết với bảng \texttt{fact\_car\_listings} theo quan hệ một-nhiều (1:N) thông qua khóa định danh tương ứng.
+    \item Hướng lọc chính đi từ bảng chiều sang bảng trung tâm theo dạng chiều đơn, đảm bảo không xảy ra hiện tượng vòng lặp lọc.
+    \item Cách thiết lập này giúp khi người dùng tương tác chọn một hãng xe hoặc một loại tình trạng xe trên bộ lọc, toàn bộ các biểu đồ phân tích giá bán và phân phối năm sản xuất sẽ được cập nhật đồng bộ và chính xác.
+\end{itemize}
+
+\noindent\textbf{Lý do lựa chọn mô hình:}
+\begin{itemize}[leftmargin=1.0cm]
+    \item Mô hình hình sao là chuẩn mực cho thiết kế cơ sở dữ liệu phân tích trong Power BI vì nó mang lại tốc độ truy vấn tối ưu nhất.
+    \item Mô hình cực kỳ phù hợp với dữ liệu thương mại, nơi số lượng giao dịch tăng trưởng liên tục nhưng các danh mục mô tả lại rất tĩnh và ít biến động.
+    \item Cấu trúc này hỗ trợ khả năng mở rộng Dashboard dễ dàng trong tương lai, cho phép thêm các bảng chiều mới (ví dụ: bảng khu vực địa lý, hệ dẫn động) mà không làm phá vỡ logic tính toán hiện tại.
+\end{itemize}
+
+
+\clearpage

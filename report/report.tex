@@ -1,0 +1,104 @@
+% 'draft' mode can be used to speed up compilation
+\documentclass[oneside]{hcmus-report}
+\usepackage{codespace}
+
+% Encodings
+\usepackage{gensymb,textcomp}
+
+% Better tables
+\usepackage{array,longtable,multicol,multirow,siunitx,tabularx,booktabs,ragged2e}
+
+% Better enum
+\usepackage{enumitem}
+
+% Graphics
+\usepackage{caption,float}
+\usepackage[export]{adjustbox}
+\usepackage{graphicx}
+\usepackage{subcaption}
+
+% References
+\usepackage[nameinlink]{cleveref}
+\usepackage{xurl}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage{xltabular}
+\usepackage[table]{xcolor}
+
+
+\usepackage{placeins}
+
+\renewcommand{\arraystretch}{1.3}
+\newcolumntype{L}[1]{>{\RaggedRight\arraybackslash}p{#1}}
+\newcolumntype{Y}{>{\RaggedRight\arraybackslash}X}
+\setlist[itemize]{topsep=2pt,itemsep=2pt,leftmargin=1.8em}
+\setlist[enumerate]{topsep=2pt,itemsep=2pt,leftmargin=2em}
+
+\newcommand{\fillin}[1]{\textit{[#1]}}
+\newcommand{\placeholder}[1]{%
+  \begin{center}
+    \fbox{\parbox[c][0.28\textheight][c]{0.9\textwidth}{\centering\textit{#1}}}
+  \end{center}
+}
+
+% Configurations
+\coursename{Trực quan hóa dữ liệu}
+\reporttype{BÁO CÁO ĐỒ ÁN CUỐI KÌ}
+\title{Khai thác và trực quan hóa dữ liệu bằng Power BI}
+\advisor{& TS. Bùi Tiến Lên
+}\stuname{%
+  & 23120087 & Phạm Ngọc Thanh \\
+  & 23120088 & Cao Tiến Thành \\
+  & 23120195 & Lê Hà Thanh Chương \\
+  & 23120198 & Nguyễn Nhựt Thanh \\
+  & 23120199 & Huỳnh Đức Thịnh \\
+}
+
+\AtBeginDocument{\counterwithin{lstlisting}{section}}
+\AtBeginDocument{\renewcommand{\contentsname}{Mục lục}}
+\AtBeginDocument{\renewcommand{\listfigurename}{Danh sách hình ảnh}}
+\AtBeginDocument{\renewcommand{\listtablename}{Danh sách bảng}}
+\AtBeginDocument{\renewcommand{\tablename}{Bảng}}
+\AtBeginDocument{\renewcommand{\figurename}{Hình}}
+\AtBeginDocument{\renewcommand{\refname}{Tài liệu tham khảo}}
+
+
+\begin{document}
+\coverpage%
+
+\tableofcontents
+
+\clearpage
+\phantomsection
+\addcontentsline{toc}{section}{Danh sách hình ảnh}
+\listoffigures
+
+\clearpage
+\phantomsection
+\addcontentsline{toc}{section}{Danh sách bảng}
+\listoftables
+
+\clearpage
+\phantomsection
+\section*{Danh sách thuật ngữ và ký hiệu}
+\addcontentsline{toc}{section}{Danh sách thuật ngữ và ký hiệu}
+\input{chapters/00_thuat_ngu}
+
+\clearpage
+\input{chapters/01_thong_tin_nhom}
+% \input{chapters/02_power_bi}
+\input{chapters/03_gioi_thieu_bai_toan}
+\input{chapters/04_dataset_va_quy_trinh}
+\input{chapters/05_phan_tich_truc_quan}
+\input{chapters/07_ket_luan}
+\input{chapters/08_ml}
+
+\clearpage
+\phantomsection
+\addcontentsline{toc}{section}{Tài liệu tham khảo}
+\bibliographystyle{plain}
+\bibliography{refs/references}
+\nocite{*}
+
+\end{document}

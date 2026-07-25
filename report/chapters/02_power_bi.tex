@@ -1,0 +1,40 @@
+\section{Tìm hiểu công cụ Power BI}
+
+\subsection{Giới thiệu tổng quan về Power BI}
+
+Power BI là nền tảng phân tích dữ liệu và trực quan hóa phù hợp với đồ án vì có thể kết nối dữ liệu dạng bảng, làm sạch bằng Power Query, xây dựng mô hình dữ liệu, tính toán chỉ số bằng DAX và trình bày dashboard tương tác. Với tập \texttt{car\_detail.csv}, Power BI giúp chuyển dữ liệu tin đăng xe dạng thô thành các góc nhìn trực quan về cơ cấu thị trường, giá xe, thông số kỹ thuật và xu hướng theo năm sản xuất.
+
+Trong đồ án này, Power BI không chỉ được dùng để vẽ biểu đồ mà còn đóng vai trò như môi trường phân tích hoàn chỉnh. Các thao tác quan trọng gồm parse cột Giá từ văn bản sang số, tách cột Động cơ thành Nhiên liệu và Dung tích, chuẩn hóa Số Km đã đi, tạo slicer theo hãng/năm/xuất xứ/tình trạng và tổ chức dashboard thành 5 tab theo mô tả bài toán.
+
+\subsection{Các thành phần chính của Power BI}
+
+Các thành phần chính được sử dụng trong đồ án gồm:
+
+\begin{itemize}
+    \item \textbf{Power Query Editor:} Làm sạch dữ liệu trước khi nạp vào mô hình, đặc biệt với các trường dạng text như Giá, Động cơ, Số Km đã đi và Tiêu thụ nhiên liệu.
+    \item \textbf{Data Model:} Lưu trữ bảng xe sau xử lý và các cột phái sinh như \texttt{Gia\_TrieuVND}, \texttt{NhienLieu}, \texttt{DungTich\_L}.
+    \item \textbf{DAX Measures:} Tính tổng số xe, số xe mới, số xe đã dùng, số hãng, giá trung bình, tỷ lệ xuất xứ và các chỉ số phục vụ dashboard.
+    \item \textbf{Visualizations:} Dùng KPI Card, Donut Chart, Bar Chart, Line Chart, Treemap, Matrix, Scatter Plot, Area Chart và các visual AI như Key Influencers hoặc Decomposition Tree.
+    \item \textbf{Slicers và Interactions:} Cho phép lọc theo hãng, năm, dòng xe, xuất xứ, tình trạng, hộp số, dẫn động, nhiên liệu, số chỗ và khoảng giá.
+\end{itemize}
+
+\subsection{Các chức năng cơ bản của Power BI}
+
+Các chức năng Power BI được khai thác trực tiếp trong báo cáo gồm:
+
+\begin{enumerate}
+    \item \textbf{Import dữ liệu CSV:} Nạp tập \texttt{car\_detail.csv} gồm 33.848 bản ghi và 21 cột.
+    \item \textbf{Transform Data:} Chuẩn hóa trường giá, số km, nhiên liệu, dung tích và xử lý giá trị thiếu.
+    \item \textbf{Tạo measure:} Xây dựng các chỉ số tổng hợp để dùng lại trên nhiều tab.
+    \item \textbf{Thiết kế dashboard:} Chia báo cáo thành 5 tab tương ứng 5 góc nhìn phân tích.
+    \item \textbf{Lọc tương tác:} Người dùng chọn hãng, năm hoặc dòng xe để các biểu đồ còn lại cập nhật theo cùng ngữ cảnh.
+    \item \textbf{AI Visuals:} Dùng Q\&A, Key Influencers, Decomposition Tree, Smart Narrative, Anomaly Detection và Forecast để hỗ trợ khám phá insight.
+\end{enumerate}
+
+\subsection{Minh họa các chức năng bằng dataset mẫu}
+
+Với tập dữ liệu xe, một dashboard minh họa có thể bắt đầu bằng tab Tổng quan thị trường. Tab này hiển thị 4 KPI Card gồm tổng xe, xe mới, xe đã dùng và số hãng xe; hai Donut Chart cho tỷ lệ xuất xứ và tình trạng; Bar Chart cho Top 10 hãng xe; Line Chart cho xu hướng số lượng xe theo năm sản xuất; Treemap cho phân bố dòng xe; và slicer theo hãng, năm, xuất xứ, tình trạng.
+
+Khi người dùng chọn một hãng xe trong Bar Chart, các biểu đồ còn lại có thể tự động lọc hoặc highlight để cho biết hãng đó chủ yếu thuộc dòng xe nào, tập trung ở năm sản xuất nào, có tỷ lệ xe mới/xe đã dùng ra sao và có nguồn gốc trong nước hay nhập khẩu nhiều hơn. Đây là ví dụ điển hình cho giá trị của dashboard tương tác so với bảng dữ liệu tĩnh.
+
+\clearpage

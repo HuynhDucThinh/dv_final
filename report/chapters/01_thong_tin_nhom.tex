@@ -1,0 +1,97 @@
+\section{Thông tin nhóm}
+
+\subsection{Danh sách thành viên và phân công công việc}
+\vspace{-1.5em}
+
+\begin{xltabular}{\textwidth}{
+L{2.6cm}
+L{3.2cm}
+Y
+>{\centering\arraybackslash}p{3cm}
+}
+\caption{Danh sách thành viên và nhiệm vụ thực hiện} \\
+\textbf{MSSV} & \textbf{Họ và tên} & \textbf{Nhiệm vụ chính} & \textbf{Mức độ} \\ \hline
+\endfirsthead
+\multicolumn{4}{l}{\textit{(tiếp theo)}} \\
+\textbf{MSSV} & \textbf{Họ và tên} & \textbf{Nhiệm vụ chính} & \textbf{Mức độ} \\ \hline
+\endhead
+\multicolumn{4}{r}{\textit{(còn tiếp)}} \\
+\endfoot
+\endlastfoot
+
+23120087 &
+Phạm Ngọc Thanh &
+(1) Thiết kế nội dung Tab 02 trên PowerBI.\newline
+(2) Thiết kế layout tổng thể dashboard trên PowerBI. &
+100\%
+\\
+
+23120088 &
+Cao Tiến Thành &
+(1) Thiết kế nội dung Tab 01 trên PowerBI; \newline
+(2) Xây dựng web AI \& tích hợp PowerBI. &
+100\%
+\\
+
+23120195 &
+Lê Hà Thanh Chương &
+(1) Phân tích EDA;\newline
+(2) Thiết kế nội dung Tab 05 trên PowerBI;\newline &
+100\%
+\\
+
+23120198 &
+Nguyễn Nhựt Thanh &
+(1) Thực hiện tiền xử lí dữ liệu;\newline
+(2) Thiết kế nội dung Tab 04 trên PowerBI;\newline &
+100\%
+\\
+
+23120199 &
+Huỳnh Đức Thịnh &
+(1) Giới thiệu bộ dữ liệu và bối cảnh bài toán;\newline
+(2) Thiết kế nội dung Tab 03 trên PowerBI; \newline
+(3) Xây dựng web AI \& tích hợp Scraping Agent. &
+100\%
+\\
+\end{xltabular}
+
+
+\subsection{Giới thiệu đề tài}
+
+\textbf{Tên đề tài đề xuất:} Phân tích dữ liệu thị trường ô tô Việt Nam từ tập \texttt{car\_detail.csv} và thiết kế dashboard Power BI.
+
+\textbf{Phát biểu bài toán:} Đồ án hướng đến việc khai thác tập dữ liệu tin đăng xe trên \texttt{bonbanh.com} để mô tả bức tranh tổng quan của thị trường ô tô Việt Nam. Dữ liệu gồm 30.652 bản ghi và 21 cột, phản ánh cả xe mới và xe đã dùng trong giai đoạn năm sản xuất 1990--2023. Trọng tâm phân tích là phân bố nguồn gốc xe, tình trạng xe, dòng xe, hãng xe, nhiên liệu, hộp số, dẫn động, số chỗ, màu sắc, năm sản xuất và giá xe sau khi chuẩn hóa.
+
+\textbf{Phạm vi bài toán:}
+\begin{itemize}[leftmargin=1.5cm]
+    \item \textbf{Không gian:} Thị trường mua bán ô tô trực tuyến tại Việt Nam, dựa trên các tin đăng trong tập \texttt{car\_detail.csv}.
+    \item \textbf{Thời gian:} Năm sản xuất của xe nằm trong khoảng 1990--2025; báo cáo không giả định thời điểm đăng tin nếu dữ liệu không cung cấp rõ.
+    \item \textbf{Đối tượng phân tích:} Xe mới và xe đã dùng, bao gồm các dòng xe như: bán tải, SUV, Sedan, Hatchback, Convertible/Cabriolet, Crossover, Van/Minivan, Truck, Coupe và Wagon.
+    \item \textbf{Chỉ số sử dụng:} Số lượng xe, tỷ lệ cơ cấu, giá sau khi parse sang triệu VND, số km đã đi, năm sản xuất, hãng, grade/model, dòng xe, xuất xứ, tình trạng, nhiên liệu, dung tích động cơ, hộp số, dẫn động, số chỗ và màu sắc.
+\end{itemize}
+
+\subsection{Công cụ sử dụng}
+\vspace{-1.5em}
+\begin{xltabular}{\textwidth}{>{\raggedright\arraybackslash}p{3.1cm} >{\raggedright\arraybackslash}p{2.8cm} X}
+\caption{Công cụ và vai trò trong quy trình thực hiện} \\
+\textbf{Công cụ} & \textbf{Vai trò} & \textbf{Mô tả sử dụng trong dự án} \\ \hline
+\endfirsthead
+\multicolumn{3}{l}{\textit{(tiếp theo)}} \\
+\textbf{Công cụ} & \textbf{Vai trò} & \textbf{Mô tả sử dụng trong dự án} \\ \hline
+\endhead
+\multicolumn{3}{r}{\textit{(còn tiếp)}} \\
+\endfoot
+\endlastfoot
+Power BI Desktop & Trực quan hóa & Xây dựng dashboard 5 tab gồm tổng quan thị trường, phân tích giá, thông số kỹ thuật, xu hướng theo thời gian và AI Insights. \\
+Power Query & Tiền xử lý & Parse giá từ chuỗi văn bản sang số triệu VND, tách động cơ thành nhiên liệu và dung tích, chuẩn hóa số km, tiêu thụ nhiên liệu và xử lý giá trị thiếu. \\
+DAX & Tính toán chỉ số & Tạo các measure như tổng số xe, số xe mới, số xe đã dùng, số hãng xe, giá trung bình, tỷ lệ cơ cấu và các chỉ số phục vụ lọc tương tác. \\
+Python / Notebook & Phân tích bổ trợ & Kiểm tra dữ liệu, thống kê mô tả và thử nghiệm các hướng AI/ML như dự đoán giá, phân cụm phân khúc hoặc phát hiện giá bất thường nếu triển khai ngoài Power BI. \\
+\LaTeX & Báo cáo & Trình bày mục tiêu, dữ liệu, quy trình xử lý, thiết kế dashboard và định hướng ứng dụng AI/ML. \\
+\end{xltabular}
+
+\subsection{Định hướng thực hiện}
+
+Đồ án được triển khai theo hướng bảo toàn thông tin gốc của tập \texttt{car\_detail.csv}, chỉ biến đổi các trường cần thiết để trực quan hóa và phân tích. Nhóm tập trung vào năm hướng chính: tổng quan thị trường, phân tích giá xe, so sánh xe xăng với xe điện, hành vi của người mua và khai thác các góc khuất của thị trường xe ô tô, đồng thời tích hợp các tính năng AI/ML để hỗ trợ diễn giải insight. Các kết luận trong báo cáo chỉ dựa trên mô tả dữ liệu đã cung cấp, không suy diễn về toàn bộ thị trường ngoài phạm vi tập tin.
+
+\clearpage
