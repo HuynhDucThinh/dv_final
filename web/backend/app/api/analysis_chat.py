@@ -154,7 +154,7 @@ _TAB_PREWARMED_CACHE: dict[str, str] = {
 
 <suggestions>Xem Notebook 01_data_overview?|Xem Notebook 02_preprocessing?|Xem Notebook 03_eda?</suggestions>""",
 
-    "code_sample": """Dưới đây là đoạn mã Python mẫu hoàn chỉnh phân tích tập dữ liệu ô tô và vẽ biểu đồ. Đoạn code này ở trạng thái **CHỜ DUYỆT**, bạn có thể chỉnh sửa trực tiếp tham số hoặc nhấn nút **`▶ Thực thi`** ở góc trên khối code để chạy trực tiếp trên máy của bạn:
+    "code_sample": """Dưới đây là đoạn mã Python thực thi theo đúng yêu cầu của bạn. Đoạn code này ở trạng thái **CHỜ DUYỆT**, bạn có thể chỉnh sửa trực tiếp tham số hoặc nhấn nút **`▶ Thực thi`** ở góc trên khối code để chạy trực tiếp trên máy của bạn:
 
 ```python
 import pandas as pd
@@ -274,12 +274,17 @@ def _is_data_calculation_query(msg: str) -> bool:
     """
     m = msg.lower()
 
+    # 🔍 1. Yêu cầu tra cứu thông tin cột / schema bảng -> ƯU TIÊN HÀNG ĐẦU (kể cả khi câu chứa từ 'file')
+    schema_kw = ["bao nhiêu cột", "danh sách cột", "thông tin chi tiết của bảng", "thông tin bảng", "các cột", "tên cột", "cột dữ liệu", "kích thước bảng", "bao nhiêu dòng"]
+    if any(kw in m for kw in schema_kw):
+        return True
+
     # 🛑 NẾU LÀ YÊU CẦU QUẢN LÝ / CHỈNH SỬA FILE -> KHÔNG PHẢI TÍNH TOÁN CSV!
     file_action_kws = [
-        "file", ".py", ".txt", ".json", ".md",
+        ".py", ".txt", ".json", ".md",
         "dòng thứ", "dòng 1", "dòng 2", "dòng 3", "dòng 4", "dòng 5",
         "sửa file", "tạo file", "xóa file", "đổi tên", "di chuyển",
-        "trong file", "nội dung file", "lịch sử file", "backup",
+        "nội dung file", "lịch sử file", "backup",
         "hãy đổi", "thay thế dòng", "sửa dòng"
     ]
     if any(kw in m for kw in file_action_kws):
@@ -312,6 +317,22 @@ def _auto_generate_pandas_code(msg: str) -> str | None:
     Mã pandas sinh ra luôn tự động format trực tiếp ra bảng Markdown (100% chính xác).
     """
     m = msg.lower()
+
+    # ── Pattern 0: Thông tin cột / Schema / Danh sách cột / Số lượng cột ──────
+    if any(w in m for w in ["bao nhiêu cột", "danh sách cột", "thông tin chi tiết của bảng", "thông tin bảng", "các cột", "tên cột", "cột dữ liệu", "kích thước bảng", "bao nhiêu dòng"]):
+        return """
+import pandas as pd
+n_rows, n_cols = df.shape
+info_df = pd.DataFrame({
+    'STT': range(1, n_cols + 1),
+    'Tên cột': df.columns,
+    'Kiểu dữ liệu': [str(dt) for dt in df.dtypes],
+    'Số lượng Non-Null': [f"{df[col].notnull().sum():,} / {n_rows:,}" for col in df.columns],
+    'Tỷ lệ Null (%)': [f"{(df[col].isnull().sum() / n_rows * 100):.1f}%" for col in df.columns]
+})
+print(f"### 📊 Thông tin chi tiết bảng `car_detail_processed.csv` ({n_rows:,} dòng × {n_cols} cột):\\n")
+print(info_df.to_markdown(index=False))
+"""
 
     # ── Pattern 1: Trung bình / Trung vị Km theo năm sản xuất + loại nhiên liệu ──
     if any(w in m for w in ["km", "kilom", "số km"]) and any(w in m for w in ["dầu", "xăng", "nhiên liệu", "điện", "hybrid"]):
@@ -529,33 +550,39 @@ def _get_dashboard_data() -> dict:
             _DASHBOARD_CACHE = {}
     return _DASHBOARD_CACHE
 
-# ─── Cache DataFrame CSV (25MB, load 1 lần) ──────────────────────────────────
+# ─── Cache DataFrame CSV (25MB, load 1 lần, tự reload khi mtime thay đổi) ─────
 _DF_CACHE = None  # pandas DataFrame | None
 _DF_CACHE_PATH: str | None = None
+_DF_CACHE_MTIME: float = 0.0
 
 def _get_cached_df():
     """
     Load car_detail_processed.csv vào cache module-level.
-    Lần đầu: ~2-5s. Lần sau: ~0ms (đọc từ RAM).
+    Tự động kiểm tra mtime của file: nếu file bị chỉnh sửa/ghi đè trên đĩa,
+    tự động làm tươi (reload) cache để luôn có dữ liệu mới nhất.
     """
-    global _DF_CACHE, _DF_CACHE_PATH
-    if _DF_CACHE is not None:
-        return _DF_CACHE
+    global _DF_CACHE, _DF_CACHE_PATH, _DF_CACHE_MTIME
 
     data_path = get_data_file_path()
     if not data_path:
         logger.warning("[DataCache] ❌ get_data_file_path() trả None — kiểm tra .env DATA_PATH")
         print("[DataCache] ❌ Không tìm thấy đường dẫn CSV.")
         return None
+
     try:
+        current_mtime = os.path.getmtime(data_path)
+        if _DF_CACHE is not None and current_mtime == _DF_CACHE_MTIME:
+            return _DF_CACHE
+
         import pandas as pd
         import time as _time
-        print(f"[DataCache] ⏳ Đang load CSV vào RAM: {data_path}")
+        print(f"[DataCache] ⏳ Đang load/reload CSV vào RAM: {data_path}")
         t0 = _time.time()
         _DF_CACHE = pd.read_csv(
             data_path, low_memory=False, encoding="utf-8-sig", encoding_errors="replace"
         )
         _DF_CACHE_PATH = str(data_path)
+        _DF_CACHE_MTIME = current_mtime
         elapsed = _time.time() - t0
         shape = _DF_CACHE.shape
         mb = _DF_CACHE.memory_usage(deep=True).sum() / 1024 / 1024
@@ -568,12 +595,26 @@ def _get_cached_df():
         _DF_CACHE = None
     return _DF_CACHE
 
-# ─── Cache Notebook metadata (3 files, đọc 1 lần) ────────────────────────────
+# ─── Cache Notebook metadata (tự reload khi file .ipynb thay đổi) ─────────────
 _NOTEBOOK_META_CACHE: list | None = None
+_NOTEBOOK_META_CACHE_MTIMES: dict[str, float] = {}  # {str(path): mtime}
 
 def _get_notebook_metadata() -> list:
-    """Đọc metadata của 3 notebooks lúc startup. Không đọc toàn bộ nội dung."""
-    global _NOTEBOOK_META_CACHE
+    """Đọc metadata của 3 notebooks. Tự reload khi bất kỳ file .ipynb nào thay đổi (mtime check)."""
+    global _NOTEBOOK_META_CACHE, _NOTEBOOK_META_CACHE_MTIMES
+
+    notebook_dir = Path(__file__).resolve().parents[4] / "notebook"
+    # Kiểm tra mtime của tất cả file .ipynb — nếu có file mới/thay đổi thì reset cache
+    if _NOTEBOOK_META_CACHE is not None and notebook_dir.exists():
+        try:
+            current_mtimes = {str(p): p.stat().st_mtime for p in sorted(notebook_dir.glob("*.ipynb"))}
+            if current_mtimes != _NOTEBOOK_META_CACHE_MTIMES:
+                logger.warning("[NotebookCache] 🔄 Phát hiện thay đổi notebook — đang reload cache...")
+                print("[NotebookCache] 🔄 Notebook thay đổi — reload cache...")
+                _NOTEBOOK_META_CACHE = None
+        except Exception:
+            pass
+
     if _NOTEBOOK_META_CACHE is not None:
         return _NOTEBOOK_META_CACHE
 
@@ -605,6 +646,12 @@ def _get_notebook_metadata() -> list:
             except Exception as e:
                 logger.warning("[NotebookCache] ❌ Failed to index %s: %s", nb_file.name, e)
     _NOTEBOOK_META_CACHE = meta
+    # Lưu lại mtime snapshot sau khi đã index thành công
+    if notebook_dir.exists():
+        try:
+            _NOTEBOOK_META_CACHE_MTIMES = {str(p): p.stat().st_mtime for p in sorted(notebook_dir.glob("*.ipynb"))}
+        except Exception:
+            pass
     return _NOTEBOOK_META_CACHE
 
 # ─── Warm up tất cả caches khi module load ───────────────────────────────────
@@ -627,6 +674,13 @@ def _warmup_caches():
         _get_cached_df()
     except Exception as _e:
         print(f"[Cache Warmup] ❌ CSV cache lỗi: {_e}")
+    try:
+        # Khởi động PBIX Watcher — theo dõi file Power BI nếu có
+        from app.services import pbix_watcher as _pbix_watcher
+        _pbix_path = Path(__file__).resolve().parents[4] / "docs" / "report.pbix"
+        _pbix_watcher.start(_pbix_path)
+    except Exception as _e:
+        print(f"[Cache Warmup] ⚠️  PBIX Watcher bỏ qua: {_e}")
     print("[Cache Warmup] 🎉 Tất cả caches đã sẵn sàng!\n")
 
 _warmup_thread = _threading.Thread(target=_warmup_caches, daemon=True, name="cache-warmup")
@@ -689,14 +743,22 @@ hỗ trợ nhóm sinh viên thực hiện Đồ án cuối kỳ môn Trực Quan
 
 ## 2.1 QUY TẮC SINH CODE & GIẢI THÍCH (BẮT BUỘC THEO HƯỚNG DẪN TÍCH HỢP AI)
 
-- 📝 **BẮT BUỘC CÓ COMMENT GIẢI THÍCH BẰNG NGÔN NGỮ TỰ NHIÊN**: Mỗi khi sinh mã Python theo yêu cầu của người dùng, BẮT BUỘC phải đính kèm các dòng comment tiếng Việt giải thích rõ ràng ý nghĩa của từng khối lệnh ngay bên trong/trên đoạn code (Ví dụ: `# Đoạn code này sẽ xóa 15 dòng có giá trị NULL ở cột Doanh Thu, sử dụng hàm dropna() của Pandas.`).
-- 💡 **MÔ TẢ TỔNG QUAN**: Trước khi đưa ra khối code, ghi 1-2 câu tiếng Việt tóm tắt tác dụng và giải thích phương pháp phân tích/thuật toán được sử dụng để người dùng dễ theo dõi và phê duyệt.
+- 🔄 **QUY TẮC THỐNG NHẤT SỬ DỤNG DATAFRAME `df`**:
+  * Biến `df` ĐÃ ĐƯỢC LOAD SẴN TRONG RAM (33,848 dòng). Ưu tiên thao tác trực tiếp trên biến `df` (Ví dụ: `df['cột_mới'] = ...` hoặc `df = df.drop(...)`) mà KHÔNG CẦN gọi lệnh `pd.read_csv(...)` lại.
+  * Nếu cần lưu dữ liệu ra file đĩa sau khi sửa đổi, BẮT BUỘC sử dụng mã hóa UTF-8 BOM để Excel xem tiếng Việt chuẩn 100%: `df.to_csv('data/processed/car_detail_processed.csv', index=False, encoding='utf-8-sig')`.
+- 💡 **MÔ TẢ TỔNG QUAN BÁM SÁT YÊU CẦU**: Trước khi đưa ra khối code, ghi 1 câu tiếng Việt tóm tắt CHÍNH XÁC tác dụng theo đúng yêu cầu cụ thể của người dùng (Ví dụ: *"Dưới đây là đoạn mã Python để tạo cột Tiêu thụ nhiên liệu sạch 10..."*). KHÔNG ĐƯỢC tự ý dùng câu mẫu rập khuôn về "vẽ biểu đồ" nếu người dùng không yêu cầu vẽ biểu đồ.
+- 🚫 **TUYỆT ĐỐI KHÔNG ĐẶT GỢI Ý CÂU HỎI BÊN TRONG KHỐI CODE**: Khối code (fenced code block ```python ... ```) CHỈ ĐƯỢC CHỨA MÃ PYTHON HỢP LỆ VÀ COMMENT KỸ THUẬT. TUYỆT ĐỐI KHÔNG ĐƯỢC ĐẶT `# Gợi ý câu hỏi tiếp theo:` HOẶC THẺ `<suggestions>` BÊN TRONG KHỐI CODE ```python ... ```. Gợi ý câu hỏi hoặc thẻ `<suggestions>` BẮT BUỘC PHẢI ĐẶT Ở CUỐI CÙNG VÀ BÊN NGOÀI KHỐI CODE.
+- 📝 **BẮT BUỘC GIẢI THÍCH CODE SAU KHỐI CODE**: Sau mỗi khối code Python (```python ... ```), PHẢI có phần giải thích ngắn gọn bằng tiếng Việt theo cấu trúc:
+  1. Mô tả từng bước chính trong code làm gì (có thể dùng danh sách đánh số)
+  2. Giải thích các tham số quan trọng nếu người dùng có thể muốn chỉnh sửa
+  Phần giải thích này PHẢI nằm BÊN NGOÀI khối code, ngay phía dưới khối code.
+- 🚫 **TUYỆT ĐỐI KHÔNG SINH ĐOẠN MÔ TẢ TOOL CALL**: KHÔNG ĐƯỢC viết các đoạn kiểu: "Để chạy đoạn code này, bạn có thể dùng tool `run_python_code`..." hoặc sinh ra khối ```json { "tool": "..." }```. KHÔNG ĐƯỢC mô tả cách gọi tool cho người dùng bằng văn bản trong chat. Toàn bộ việc thực thi code được xử lý tự động bởi nút **▶ Thực thi** trên giao diện — AI không cần và TUYỆT ĐỐI KHÔNG được hướng dẫn user cách gọi tool thủ công.
 
 ## 3. ĐỊNH DẠNG CÂU TRẢ LỜI
 
 - Dùng **bảng Markdown** cho dữ liệu nhiều cột
 - Tô đậm `**số liệu quan trọng**`
-- Kết thúc bằng gợi ý câu hỏi tiếp theo:
+- Kết thúc bằng gợi ý câu hỏi tiếp theo BÊN NGOÀI KHỐI CODE (ở dòng cuối cùng của câu trả lời):
   `<suggestions>Câu hỏi 1?|Câu hỏi 2?|Câu hỏi 3?</suggestions>`
 
 ---
@@ -1198,6 +1260,14 @@ async def analysis_chat_stream(
                     f"```\n{content}\n```"
                 )
             else:
+                if file_path.lower().endswith(".csv"):
+                    from app.services.data_context import _get_csv_dynamic_info
+                    size_info = _get_csv_dynamic_info()
+                    return (
+                        f"📊 **File CSV dataset (`{file_path}`):**\n"
+                        f"- Kích thước: {size_info} (Đã được nạp sẵn vào RAM bộ nhớ backend)\n"
+                        f"- File dữ liệu CSV lớn không nên đọc trực tiếp dưới dạng văn bản thô. Bạn có thể hỏi trực tiếp AI về danh sách các cột, thông tin bảng hoặc yêu cầu tính toán/thống kê từ file CSV này!"
+                    )
                 return f"❌ **Lỗi đọc file:** {result['error']}"
 
         @tool
@@ -1651,12 +1721,8 @@ async def analysis_chat_stream(
                         output_file_param = out_match.group(1) if out_match else None
                         return ("scrape_car_data", {"url": extracted_url, "output_file": output_file_param})
 
-                # 🟢 0.1. YÊU CẦU VIẾT CODE NGAY TRÊN KHUNG CHAT (Interactive Code Block Stream)
-                if any(w in m for w in ["viết code ngay trên khung chat", "viết cho tôi đoạn code", "viết code ngay", "viết code python", "cho tôi đoạn code", "viết code mẫu", "viết code"]):
-                    if not any(w in m for w in ["tạo file", "sửa file", "xóa file", "đổi tên", "đọc file"]):
-                        if any(w in m for w in ["tròn", "pie"]):
-                            return ("prewarmed_cache", "code_sample_pie")
-                        return ("prewarmed_cache", "code_sample")
+                # 🟢 0.1. YÊU CẦU VIẾT CODE → để LLM sinh code chính xác theo yêu cầu người dùng
+                # (Đã xóa prewarmed shortcut cứng: LLM sẽ tự sinh code theo đúng nội dung thực tế)
 
                 # 🟢 1. ƯU TIÊN CAO: Thống kê / Tính toán / Phân tích CSV thực tế (TẦNG 3)
                 if _is_data_calculation_query(msg):
@@ -1787,12 +1853,19 @@ async def analysis_chat_stream(
                         yield f"data: {json.dumps({'type': 'done', 'content': full_text})}\n\n"
                         return  # Ngắt generator ngay lập tức!
 
-                    # 2. Cho LLM nhận xét 2-3 câu ngắn gọn bên dưới bảng (không được tự bịa số)
+                    # Nếu là câu hỏi tra cứu danh sách cột / schema -> Trả về bảng là kết thúc, không cần LLM nhận xét nhảm
+                    is_schema_query = any(w in user_content.lower() for w in ["bao nhiêu cột", "danh sách cột", "thông tin chi tiết của bảng", "thông tin bảng", "các cột", "tên cột", "cột dữ liệu", "kích thước bảng"])
+                    if is_schema_query:
+                        _set_response_cache(_cache_key, full_text)
+                        yield f"data: {json.dumps({'type': 'done', 'content': full_text})}\n\n"
+                        return
+
+                    # 2. Cho LLM nhận xét 1-2 câu ngắn gọn bên dưới bảng (nếu là câu hỏi tính toán)
                     synth_messages = [
                         SystemMessage(content=current_system_prompt),
                         HumanMessage(content=user_content),
                         AIMessage(content=str(tool_result)),
-                        HumanMessage(content="[YÊU CẦU BẮT BUỘC: Bảng dữ liệu ở trên ĐÃ ĐƯỢC HIỂN THỊ ĐẦY ĐỦ. KHÔNG LẶP LẠI BẢNG VÀ KHÔNG THAY ĐỔI BẤT KỲ CON SỐ NÀO. Viết 2-3 câu nhận xét ngắn gọn bằng Tiếng Việt về xu hướng nổi bật từ dữ liệu trên.]")
+                        HumanMessage(content="[YÊU CẦU BẮT BUỘC: Bảng dữ liệu ở trên ĐÃ ĐƯỢC HIỂN THỊ ĐẦY ĐỦ. KHÔNG LẶP LẠI BẢNG VÀ KHÔNG THAY ĐỔI BẤT KỲ CON SỐ NÀO. Viết 1-2 câu nhận xét ngắn gọn bằng Tiếng Việt trực tiếp về kết quả tính toán trên.]")
                     ]
                     _pr_buf = ""
                     async for chunk in llm.astream(synth_messages):
@@ -1865,12 +1938,19 @@ async def analysis_chat_stream(
                                     full_text += table_chunk
                                     yield f"data: {json.dumps({'type': 'token', 'content': table_chunk})}\n\n"
 
-                                    # 2. Cho LLM nhận xét 2-3 câu ngắn gọn bên dưới bảng (không được tự bịa số)
+                                    # Nếu là câu hỏi tra cứu danh sách cột / schema -> Trả về bảng là kết thúc, không cần LLM nhận xét nhảm
+                                    is_schema_query_ft = any(w in user_content.lower() for w in ["bao nhiêu cột", "danh sách cột", "thông tin chi tiết của bảng", "thông tin bảng", "các cột", "tên cột", "cột dữ liệu", "kích thước bảng"])
+                                    if is_schema_query_ft:
+                                        _set_response_cache(_cache_key, full_text)
+                                        yield f"data: {json.dumps({'type': 'done', 'content': full_text})}\n\n"
+                                        return
+
+                                    # 2. Cho LLM nhận xét 1-2 câu ngắn gọn bên dưới bảng (nếu là câu hỏi tính toán)
                                     synth_messages = [
                                         SystemMessage(content=current_system_prompt),
                                         HumanMessage(content=user_content),
                                         AIMessage(content=str(forced_result)),
-                                        HumanMessage(content="[YÊU CẦU BẮT BUỘC: Bảng dữ liệu ở trên ĐÃ ĐƯỢC HIỂN THỊ ĐẦY ĐỦ. KHÔNG LẶP LẠI BẢNG VÀ KHÔNG THAY ĐỔI BẤT KỲ CON SỐ NÀO. Viết 2-3 câu nhận xét ngắn gọn bằng Tiếng Việt về xu hướng nổi bật từ dữ liệu trên.]")
+                                        HumanMessage(content="[YÊU CẦU BẮT BUỘC: Bảng dữ liệu ở trên ĐÃ ĐƯỢC HIỂN THỊ ĐẦY ĐỦ. KHÔNG LẶP LẠI BẢNG VÀ KHÔNG THAY ĐỔI BẤT KỲ CON SỐ NÀO. Viết 1-2 câu nhận xét ngắn gọn bằng Tiếng Việt trực tiếp về kết quả tính toán trên.]")
                                     ]
                                     _synth_buf = ""
                                     async for chunk in llm.astream(synth_messages):
@@ -1962,9 +2042,25 @@ async def analysis_chat_stream(
                         await asyncio.sleep(DELAY)
                     _set_response_cache(_cache_key, final_content)
                 else:
-                    error_piece = "Xin lỗi, tôi không thể tạo câu trả lời lúc này. Vui lòng thử lại."
-                    full_text += error_piece
-                    yield f"data: {json.dumps({'type': 'token', 'content': error_piece})}\n\n"
+                    # Fallback stream bằng llm nếu ai_response.content từ bind_tools bị rỗng
+                    logger.info("[AgenticLoop] ai_response.content is empty from bind_tools, streaming via llm.astream...")
+                    _response_buf = ""
+                    try:
+                        async for chunk in llm.astream(lc_messages):
+                            token = getattr(chunk, "content", "") or ""
+                            if token:
+                                _response_buf += token
+                                full_text += token
+                                yield f"data: {json.dumps({'type': 'token', 'content': token})}\n\n"
+                    except Exception as _se:
+                        logger.warning("[AgenticLoop] Fallback stream failed: %s", _se)
+
+                    if _response_buf:
+                        _set_response_cache(_cache_key, _response_buf)
+                    else:
+                        error_piece = "Xin lỗi, tôi không thể tạo câu trả lời lúc này. Vui lòng thử lại."
+                        full_text += error_piece
+                        yield f"data: {json.dumps({'type': 'token', 'content': error_piece})}\n\n"
             else:
                 # Normal path với tool calls — dùng llm_with_tools.astream()
                 # Ollama cần tool schemas để xử lý và stream đúng tool_call messages

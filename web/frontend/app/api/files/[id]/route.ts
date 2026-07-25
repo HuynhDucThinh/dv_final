@@ -16,7 +16,17 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await auth.api.getSession({ headers: req.headers });
+    const sessionResult = await Promise.race([
+      auth.api.getSession({ headers: req.headers }),
+      new Promise<null>((_, reject) =>
+        setTimeout(() => reject(new Error('auth timeout')), 5000)
+      ),
+    ]);
+    const session = (
+      sessionResult &&
+      typeof sessionResult === 'object' &&
+      'user' in sessionResult
+    ) ? sessionResult : null;
     if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const { id } = await params;

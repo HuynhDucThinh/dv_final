@@ -41,6 +41,8 @@ from app.api.logs_analysis import router as logs_analysis_router
 from app.api.config import router as config_router
 # --- Router mới: File Operations & Approval Workflow (Phase 1 MVP - Agentic AI) ---
 from app.api.file_operations import router as file_operations_router
+# --- Router mới: Public API cho ứng dụng bên ngoài ---
+from app.api.public_api import router as public_api_router
 from app.services.pipeline import init_pipeline, preload_local_models
 from app.services.storage import initialize_storage
 from app.utils.logging import setup_logger
@@ -170,7 +172,7 @@ def _check_qdrant() -> dict:
 
 def create_app() -> FastAPI:
     """Application factory — tạo và cấu hình FastAPI app."""
-    application = FastAPI(title="vietcar RAG Backend")
+    application = FastAPI(title="vietcar Backend")
 
     # --- CORS Middleware ---
     application.add_middleware(
@@ -193,6 +195,8 @@ def create_app() -> FastAPI:
     application.include_router(config_router, prefix="/api/config", tags=["Config"])
     # --- Router mới: File Operations & Approval Workflow (Phase 1 MVP) ---
     application.include_router(file_operations_router)
+    # --- Router mới: Public API cho ứng dụng bên ngoài ---
+    application.include_router(public_api_router)
 
     @application.get("/health")
     async def health():

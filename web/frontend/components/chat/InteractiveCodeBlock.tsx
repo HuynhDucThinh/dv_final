@@ -32,6 +32,15 @@ interface ExecutionResultCache {
 // Giúp giữ lại kết quả (biểu đồ, stdout) ngay cả khi React component re-render
 const globalExecutionCache = new Map<string, ExecutionResultCache>();
 
+function cleanCodeString(rawCode: string): string {
+  if (!rawCode) return "";
+  return rawCode
+    .replace(/#\s*Gợi ý câu hỏi tiếp theo:[\s]*$/gi, "")
+    .replace(/#\s*Gợi ý câu hỏi tiếp theo:[\s\S]*$/gi, "")
+    .replace(/<suggestions>[\s\S]*?<\/suggestions>/gi, "")
+    .trimEnd();
+}
+
 export function InteractiveCodeBlock({
   initialCode,
   language = "python",
@@ -39,10 +48,11 @@ export function InteractiveCodeBlock({
   onSendResult,
 }: InteractiveCodeBlockProps) {
   const { t } = useTranslation();
-  const cacheKey = `${sessionId}::${initialCode.trim()}`;
+  const sanitizedInitialCode = cleanCodeString(initialCode);
+  const cacheKey = `${sessionId}::${sanitizedInitialCode.trim()}`;
   const cached = globalExecutionCache.get(cacheKey);
 
-  const [code, setCode] = useState(cached?.code ?? initialCode);
+  const [code, setCode] = useState(cached?.code ?? sanitizedInitialCode);
   const [status, setStatus] = useState<
     "pending" | "executing" | "success" | "error"
   >(cached?.status ?? "pending");

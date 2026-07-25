@@ -48,7 +48,17 @@ async function extractText(buffer: Buffer, mimeType: string, filename: string): 
 // POST /api/files — upload file
 export async function POST(req: NextRequest) {
   try {
-    const session = await auth.api.getSession({ headers: req.headers });
+    const sessionResult = await Promise.race([
+      auth.api.getSession({ headers: req.headers }),
+      new Promise<null>((_, reject) =>
+        setTimeout(() => reject(new Error('auth timeout')), 5000)
+      ),
+    ]);
+    const session = (
+      sessionResult &&
+      typeof sessionResult === 'object' &&
+      'user' in sessionResult
+    ) ? sessionResult : null;
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

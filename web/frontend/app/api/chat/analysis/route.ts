@@ -21,12 +21,22 @@ export async function POST(req: NextRequest) {
 
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
     try {
-      const session = await auth.api.getSession({ headers: req.headers });
-      if (session?.user?.id) {
-        headers['X-User-Id'] = session.user.id;
+      const sessionResult = await Promise.race([
+        auth.api.getSession({ headers: req.headers }),
+        new Promise<null>((_, reject) =>
+          setTimeout(() => reject(new Error('auth timeout')), 5000)
+        ),
+      ]);
+      if (
+        sessionResult &&
+        typeof sessionResult === 'object' &&
+        'user' in sessionResult &&
+        sessionResult.user?.id
+      ) {
+        headers['X-User-Id'] = sessionResult.user.id;
       }
     } catch {
-      // Guest mode — không có session
+      // Timeout hoặc guest mode — tiếp tục không có user ID
     }
 
     // Dùng AbortController độc lập (KHÔNG dùng req.signal trực tiếp)

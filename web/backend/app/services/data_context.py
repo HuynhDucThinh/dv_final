@@ -50,6 +50,42 @@ _CATEG_COLS = [
 
 _context_cache = None
 _context_cache_mtime = 0.0
+_dynamic_csv_info_cache: str | None = None
+_dynamic_csv_mtime: float = 0.0
+
+
+def _get_csv_dynamic_info() -> str:
+    """
+    Tự động kiểm tra thời gian sửa đổi (mtime) của file CSV trên đĩa.
+    Nếu file bị ghi đè/chỉnh sửa, tự động đọc lại kích thước thực tế (số dòng x số cột).
+    """
+    global _dynamic_csv_info_cache, _dynamic_csv_mtime
+    data_path_str = get_data_file_path() or str(PROCESSED_CSV)
+    data_path = Path(data_path_str)
+
+    default_str = "33,848 tin đăng × 30 cột"
+
+    if not data_path.exists():
+        return default_str
+
+    try:
+        current_mtime = os.path.getmtime(data_path)
+        if _dynamic_csv_info_cache is not None and current_mtime == _dynamic_csv_mtime:
+            return _dynamic_csv_info_cache
+
+        import pandas as pd
+        df_head = pd.read_csv(data_path, nrows=2, low_memory=False, encoding="utf-8-sig", on_bad_lines="skip")
+        with open(data_path, "r", encoding="utf-8-sig", errors="ignore") as f:
+            n_rows = max(0, sum(1 for _ in f) - 1)
+        n_cols = len(df_head.columns)
+
+        _dynamic_csv_info_cache = f"{n_rows:,} tin đăng × {n_cols} cột"
+        _dynamic_csv_mtime = current_mtime
+        return _dynamic_csv_info_cache
+    except Exception as e:
+        logger.warning(f"[DataContext] Không thể đọc mtime CSV động: {e}")
+        return default_str
+
 
 def build_data_context_card() -> str:
     """
@@ -58,9 +94,10 @@ def build_data_context_card() -> str:
     khi user hỏi về tab/dashboard (on-demand, từ cache).
     """
     data_path = get_data_file_path() or "D:/TU HOC/DV_Final/data/processed/car_detail_processed.csv"
-    return f"""## DỮ LIỆU CHỦ ĐẠO — car_detail_processed.csv
+    size_info = _get_csv_dynamic_info()
+    base_card = f"""## DỮ LIỆU CHỦ ĐẠO — car_detail_processed.csv
 - **File:** `{data_path}`
-- **Kích thước:** 33,848 tin đăng × 30 cột | Nguồn: bonbanh.com
+- **Kích thước:** {size_info} | Nguồn: bonbanh.com
 - Biến `df` đã được load sẵn trong RAM (cache) khi dùng tool `query_dataset_readonly`
 
 ### CÁC CỘT CHÍNH (tên chính xác — giữ nguyên dấu tiếng Việt khi viết code):
@@ -87,6 +124,15 @@ def build_data_context_card() -> str:
 `fact_car_listings.csv` · `dim_brand.csv` · `dim_body_type.csv` · `dim_fuel_type.csv`
 `dim_transmission.csv` · `dim_condition.csv` · `dim_origin.csv` · `dim_exterior_color.csv`
 """
+    # Append Power BI change log nếu có — không ảnh hưởng gì nếu watcher chưa chạy
+    try:
+        from app.services import pbix_watcher as _pw
+        pbix_summary = _pw.get_summary_for_context()
+        if pbix_summary:
+            base_card = base_card + "\n\n" + pbix_summary
+    except Exception:
+        pass
+    return base_card
 
 
 

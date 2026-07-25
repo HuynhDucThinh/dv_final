@@ -11,6 +11,7 @@ NGUYÊN TẮC:
 import base64
 import io
 import json
+import os
 import sys
 import traceback
 from datetime import datetime
@@ -68,17 +69,26 @@ def _get_or_create_namespace(session_id: str) -> dict[str, Any]:
         ns["pd"] = pd
         ns["np"] = np
         
-        # Tự động load df mặc định để tránh lỗi NameError nếu AI quên viết pd.read_csv()
-        from app.services.data_context import get_data_file_path
-        data_path = get_data_file_path()
+        # Tự động load df mặc định để tránh lỗi NameError nếu AI viết code biến df trực tiếp
+        from app.services.data_context import get_data_file_path, PROCESSED_CSV
+        data_path = get_data_file_path() or str(PROCESSED_CSV)
         if data_path:
             try:
-                ns["df"] = pd.read_csv(data_path, encoding="utf-8-sig", on_bad_lines="skip", engine="python")
+                from app.api.analysis_chat import _get_cached_df
+                cached_df = _get_cached_df()
+                if cached_df is not None:
+                    ns["df"] = cached_df.copy()
             except Exception:
+                pass
+
+            if "df" not in ns:
                 try:
-                    ns["df"] = pd.read_csv(data_path, encoding="utf-8", on_bad_lines="skip")
+                    ns["df"] = pd.read_csv(data_path, low_memory=False, encoding="utf-8-sig", encoding_errors="replace")
                 except Exception:
-                    pass
+                    try:
+                        ns["df"] = pd.read_csv(data_path, low_memory=False, encoding="utf-8", encoding_errors="replace")
+                    except Exception:
+                        pass
             
     except ImportError:
         pass
@@ -211,10 +221,24 @@ async def execute_code(req: ExecuteRequest) -> ExecuteResponse:
         err: str | None = None
 
         old_stdout, old_stderr = sys.stdout, sys.stderr
+        old_cwd = os.getcwd()
+        project_root = Path(__file__).resolve().parents[4]
+
         sys.stdout = stdout_b
         sys.stderr = stderr_b
 
+        # Tự động đảm bảo mọi lệnh to_csv() đều có encoding='utf-8-sig' để Excel không bị lỗi font tiếng Việt
+        import pandas as pd
+        _orig_to_csv = pd.DataFrame.to_csv
+        def _safe_to_csv(self, *args, **kwargs):
+            if "encoding" not in kwargs:
+                kwargs["encoding"] = "utf-8-sig"
+            return _orig_to_csv(self, *args, **kwargs)
+
+        pd.DataFrame.to_csv = _safe_to_csv
+
         try:
+            os.chdir(project_root)
             exec(req.code, namespace)  # noqa: S102
 
             # Thu thập tất cả figures đang mở
@@ -232,6 +256,8 @@ async def execute_code(req: ExecuteRequest) -> ExecuteResponse:
         except Exception:
             err = traceback.format_exc()
         finally:
+            pd.DataFrame.to_csv = _orig_to_csv
+            os.chdir(old_cwd)
             sys.stdout = old_stdout
             sys.stderr = old_stderr
 

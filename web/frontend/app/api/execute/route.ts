@@ -21,7 +21,17 @@ export async function POST(req: NextRequest) {
 
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
     try {
-      const session = await auth.api.getSession({ headers: req.headers });
+      const sessionResult = await Promise.race([
+        auth.api.getSession({ headers: req.headers }),
+        new Promise<null>((_, reject) =>
+          setTimeout(() => reject(new Error('auth timeout')), 5000)
+        ),
+      ]);
+      const session = (
+        sessionResult &&
+        typeof sessionResult === 'object' &&
+        'user' in sessionResult
+      ) ? sessionResult : null;
       if (session?.user?.id) {
         headers['X-User-Id'] = session.user.id;
       }

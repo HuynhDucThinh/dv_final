@@ -15,15 +15,21 @@ export async function GET(req: NextRequest) {
     const backendBase = getBackendUrl(req.url);
     const targetUrl = `${backendBase}/api/config/providers`;
 
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000); // 5s timeout
+
     const backendRes = await fetch(targetUrl, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
+      signal: controller.signal,
     });
+    clearTimeout(timeout);
 
     const data = await backendRes.json();
     return NextResponse.json(data, { status: backendRes.status });
   } catch {
-    // Trả về object rỗng khi backend chưa sẵn sàng — không crash UI
+    // Trả về object rỗng khi backend chưa sẵn sàng hoặc timeout — không crash UI
     return NextResponse.json({}, { status: 200 });
   }
 }
+
