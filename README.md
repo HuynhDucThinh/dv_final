@@ -29,15 +29,15 @@
 
 ## 1. Thông tin nhóm
 
-| STT | Họ và tên          | Nhiệm vụ chính                                                                                       |
-| :-: | :----------------- | :--------------------------------------------------------------------------------------------------- |
-|  1  | Cao Tiến Thành     | EDA & Thiết kế Tab 1 (Bức tranh thị trường)                                                         |
-|  2  | Phạm Ngọc Thanh    | Thiết kế Tab 2 (Giải mã giá xe)                                                                      |
-|  3  | Huỳnh Đức Thịnh    | Thu thập dữ liệu (Scraping Agent) & Thiết kế Tab 3 (Cuộc chiến Xăng vs Điện) & Xây dựng Web AI     |
-|  4  | Nguyễn Nhựt Thanh  | Tiền xử lý dữ liệu & Thiết kế Tab 4 (Chân dung người mua)                                          |
-|  5  | Lê Hà Thanh Chương | Thiết kế Tab 5 (Góc khuất thị trường)                                                               |
+| STT | Họ và tên          | Nhiệm vụ chính                                                                                 |
+| :-: | :----------------- | :--------------------------------------------------------------------------------------------- |
+|  1  | Cao Tiến Thành     | EDA & Thiết kế Tab 1 (Bức tranh thị trường)                                                    |
+|  2  | Phạm Ngọc Thanh    | Thiết kế Tab 2 (Giải mã giá xe)                                                                |
+|  3  | Huỳnh Đức Thịnh    | Thu thập dữ liệu (Scraping Agent) & Thiết kế Tab 3 (Cuộc chiến Xăng vs Điện) & Xây dựng Web AI |
+|  4  | Nguyễn Nhựt Thanh  | Tiền xử lý dữ liệu & Thiết kế Tab 4 (Chân dung người mua)                                      |
+|  5  | Lê Hà Thanh Chương | Thiết kế Tab 5 (Góc khuất thị trường)                                                          |
 
-> **Giảng viên hướng dẫn:** CN. Trần Huy Bân · CN. Võ Nhật Tân
+> **Giảng viên hướng dẫn:** TS. Bùi Tiến Lên
 
 ---
 
@@ -63,10 +63,10 @@ Sử dụng **33.848 tin đăng xe ô tô** thu thập từ Bonbanh.com (2015–
 
 **KPI tổng quan:** 33.848 tin đăng · 91 hãng xe · Giá trung vị 638 triệu VNĐ · Đời xe phổ biến nhất: 2023
 
-| Câu hỏi | Nội dung |
-| :------ | :------- |
-| CQ1 | Hãng xe nào chiếm tỷ trọng lớn nhất và cán cân thương hiệu Hàn–Nhật–Đức đang ở đâu? |
-| CQ2 | Phân khúc xe nào (SUV, Sedan, Crossover…) đang dẫn dắt thị trường thứ cấp? |
+| Câu hỏi | Nội dung                                                                            |
+| :------ | :---------------------------------------------------------------------------------- |
+| CQ1     | Hãng xe nào chiếm tỷ trọng lớn nhất và cán cân thương hiệu Hàn–Nhật–Đức đang ở đâu? |
+| CQ2     | Phân khúc xe nào (SUV, Sedan, Crossover…) đang dẫn dắt thị trường thứ cấp?          |
 
 **Phát hiện chính:** Toyota dẫn đầu với 5.861 tin (17,3%), SUV chiếm 36,3% — 2 dòng xe này cộng lại nắm giữ hơn một nửa thị phần. Xe cũ đã qua sử dụng chiếm 79,7%, xe lắp ráp trong nước chiếm 58%.
 
@@ -78,10 +78,10 @@ Sử dụng **33.848 tin đăng xe ô tô** thu thập từ Bonbanh.com (2015–
 
 **KPI tổng quan:** Giá trung vị 638 triệu · Giá trung bình 1.201 triệu · Rẻ nhất 18 triệu · Đắt nhất 54 tỷ
 
-| Câu hỏi | Nội dung |
-| :------ | :------- |
-| CQ3 | Giá xe phân bố như thế nào theo hãng và theo phân khúc giá? |
-| CQ4 | Độ khấu hao giá theo năm sản xuất và số km đã đi diễn ra theo quy luật nào? |
+| Câu hỏi | Nội dung                                                                    |
+| :------ | :-------------------------------------------------------------------------- |
+| CQ3     | Giá xe phân bố như thế nào theo hãng và theo phân khúc giá?                 |
+| CQ4     | Độ khấu hao giá theo năm sản xuất và số km đã đi diễn ra theo quy luật nào? |
 
 **Phát hiện chính:** Phân khúc 500 triệu–1 tỷ chiếm ~40% thị trường. Khoảng cách giữa giá trung vị (638 triệu) và trung bình (1.201 triệu) phản ánh ảnh hưởng mạnh của nhóm xe siêu sang đến thống kê.
 
@@ -93,12 +93,13 @@ Sử dụng **33.848 tin đăng xe ô tô** thu thập từ Bonbanh.com (2015–
 
 **KPI tổng quan:** 768 xe điện · Thị phần 2025: 19,79% · VinFast chiếm 89% xe điện
 
-| Câu hỏi | Nội dung |
-| :------ | :------- |
-| CQ5 | Xe điện chỉ chiếm 2,3% toàn bộ dữ liệu — tại sao gọi đây là "cuộc bứt phá", và điều gì đang âm thầm xảy ra song song? |
-| CQ6 | Quan niệm phổ biến rằng xe điện đắt hơn và được giữ dùng lâu dài — dữ liệu thực tế có xác nhận điều này không? |
+| Câu hỏi | Nội dung                                                                                                              |
+| :------ | :-------------------------------------------------------------------------------------------------------------------- |
+| CQ5     | Xe điện chỉ chiếm 2,3% toàn bộ dữ liệu — tại sao gọi đây là "cuộc bứt phá", và điều gì đang âm thầm xảy ra song song? |
+| CQ6     | Quan niệm phổ biến rằng xe điện đắt hơn và được giữ dùng lâu dài — dữ liệu thực tế có xác nhận điều này không?        |
 
 **Phát hiện chính:**
+
 - Xe điện tăng từ 5 xe (2020) lên 272 xe (2025) — thị phần từ 0,21% lên 19,79%.
 - Hybrid âm thầm tăng từ 1,7% lên 11,3% — làn sóng ít ai chú ý.
 - Xe điện **rẻ hơn** xe xăng cùng phân khúc từ 13–28% (Hatchback: 239 tr vs 329 tr).
@@ -112,10 +113,10 @@ Sử dụng **33.848 tin đăng xe ô tô** thu thập từ Bonbanh.com (2015–
 
 **KPI tổng quan:** Chọn màu trắng: 33,62% · Chọn số tự động: 82,05% · Chọn xe 5 chỗ: 68,82%
 
-| Câu hỏi | Nội dung |
-| :------ | :------- |
-| CQ7 | Thị trường ô tô ngày càng đa dạng nhưng người mua Việt lại ngày càng giống nhau trong lựa chọn — đâu là lý do đằng sau sự đồng nhất bất thường này? |
-| CQ8 | Điều gì xảy ra khi một thế hệ người mua đồng loạt chuyển sang số tự động và cũng đồng loạt bán xe sớm hơn? |
+| Câu hỏi | Nội dung                                                                                                                                            |
+| :------ | :-------------------------------------------------------------------------------------------------------------------------------------------------- |
+| CQ7     | Thị trường ô tô ngày càng đa dạng nhưng người mua Việt lại ngày càng giống nhau trong lựa chọn — đâu là lý do đằng sau sự đồng nhất bất thường này? |
+| CQ8     | Điều gì xảy ra khi một thế hệ người mua đồng loạt chuyển sang số tự động và cũng đồng loạt bán xe sớm hơn?                                          |
 
 **Phát hiện chính:** Màu trắng và đen chiếm hơn 55% — phản ánh tâm lý ưu tiên giá trị bán lại. Số tự động tăng liên tục từ 2016 đến 2023, số sàn gần như biến mất ở dòng xe mới. Xe điện cũ khi bán lại chỉ đi ~16.000 km, so với 30.000 km của xe xăng.
 
@@ -127,10 +128,10 @@ Sử dụng **33.848 tin đăng xe ô tô** thu thập từ Bonbanh.com (2015–
 
 **KPI tổng quan:** Xe chạy nhiều km nhất: 500.000 km · 33 hãng siêu hiếm · Chênh lệch giá Ferrari: 40,5 tỷ
 
-| Câu hỏi | Nội dung |
-| :------ | :------- |
-| CQ9 | Phân khúc siêu sang có đặc điểm giao dịch nào khác biệt so với xe phổ thông? |
-| CQ10 | Có những outlier dữ liệu nào có thể làm lệch kết quả phân tích nếu không xử lý đúng cách? |
+| Câu hỏi | Nội dung                                                                                  |
+| :------ | :---------------------------------------------------------------------------------------- |
+| CQ9     | Phân khúc siêu sang có đặc điểm giao dịch nào khác biệt so với xe phổ thông?              |
+| CQ10    | Có những outlier dữ liệu nào có thể làm lệch kết quả phân tích nếu không xử lý đúng cách? |
 
 ---
 
@@ -145,16 +146,19 @@ Sử dụng **33.848 tin đăng xe ô tô** thu thập từ Bonbanh.com (2015–
 ### Quy trình tiền xử lý (3 notebooks)
 
 **Notebook 01 — Khám phá dữ liệu thô (`01_data_overview.ipynb`) — Huỳnh Đức Thịnh**
+
 - Đọc 33.848 dòng × 30 cột, kiểm tra kiểu dữ liệu và tỷ lệ missing values.
 - Phát hiện các cột số bị lưu dưới dạng chuỗi (giá: "500 triệu", km: "50.000 km").
 
 **Notebook 02 — Tiền xử lý (`02_preprocessing.ipynb`) — Nguyễn Nhựt Thanh**
+
 - Ép kiểu và chuẩn hóa: Giá (triệu VNĐ), Số km, Năm sản xuất.
 - Lọc outlier: km ảo (> 999.999 km), giá bất hợp lý.
 - Chuẩn hóa 802 biến thể loại nhiên liệu về 4 nhóm: Xăng, Dầu, Điện, Hybrid.
 - Xuất `car_detail_processed.csv` (UTF-8 BOM, tương thích Power BI).
 
 **Notebook 03 — EDA (`03_eda.ipynb`) — Cao Tiến Thành**
+
 - Phân tích tương quan giữa Giá, Năm SX, Hãng và Loại nhiên liệu.
 - Xuất `Dashboard.json` — nguồn dữ liệu cho Web AI chatbot.
 
@@ -164,16 +168,16 @@ Sử dụng **33.848 tin đăng xe ô tô** thu thập từ Bonbanh.com (2015–
 
 Bảng trung tâm `fact_car_listings` (33.848 dòng, khóa chính `id_tin_đăng`) liên kết với 8 bảng chiều qua quan hệ một-nhiều, chuẩn hóa 3NF.
 
-| Bảng Dimension       | Mô tả                                           |
-| :------------------- | :---------------------------------------------- |
-| `dim_hang_xe`        | Hãng xe và nhóm thương hiệu                     |
-| `dim_dong_xe`        | Kiểu dáng thân xe (SUV, Sedan, Crossover…)      |
-| `dim_nhien_lieu`     | Loại nhiên liệu (Xăng, Dầu, Điện, Hybrid)      |
-| `dim_hop_so`         | Hộp số (Tự động / Số sàn)                       |
-| `dim_xuat_xu`        | Xuất xứ (Trong nước / Nhập khẩu)                |
-| `dim_tinh_trang`     | Tình trạng xe (Mới / Cũ)                        |
-| `dim_mau_sac`        | Màu ngoại thất                                  |
-| `dim_so_cho_ngoi`    | Số chỗ ngồi                                     |
+| Bảng Dimension    | Mô tả                                      |
+| :---------------- | :----------------------------------------- |
+| `dim_hang_xe`     | Hãng xe và nhóm thương hiệu                |
+| `dim_dong_xe`     | Kiểu dáng thân xe (SUV, Sedan, Crossover…) |
+| `dim_nhien_lieu`  | Loại nhiên liệu (Xăng, Dầu, Điện, Hybrid)  |
+| `dim_hop_so`      | Hộp số (Tự động / Số sàn)                  |
+| `dim_xuat_xu`     | Xuất xứ (Trong nước / Nhập khẩu)           |
+| `dim_tinh_trang`  | Tình trạng xe (Mới / Cũ)                   |
+| `dim_mau_sac`     | Màu ngoại thất                             |
+| `dim_so_cho_ngoi` | Số chỗ ngồi                                |
 
 ---
 
@@ -185,47 +189,52 @@ Bảng trung tâm `fact_car_listings` (33.848 dòng, khóa chính `id_tin_đăng
 
 Hệ thống định tuyến câu hỏi qua 3 tầng theo thứ tự ưu tiên:
 
-| Tầng | Tên | Tốc độ | Cơ chế | Loại câu hỏi |
-| :--: | :-- | :-----: | :----- | :----------- |
-| 1 | **Pre-warmed Cache** | ~0ms | Nội dung 5 tab được load sẵn vào RAM khi server khởi động | "Tab 3 cho thấy gì?" |
-| 2 | **Auto Pandas Query** | ~1–2s | Tự động sinh và chạy code pandas trên DataFrame 33.848 dòng | "Tỷ lệ nhiên liệu xăng dầu điện?" |
-| 3 | **Full LLM + Context** | ~5–10s | Gọi LLM (Groq/OpenAI/Google) với full system prompt + Dashboard.json + CSV schema | "Ngân sách 500 triệu mua xe điện nào?" |
+| Tầng | Tên                    | Tốc độ | Cơ chế                                                                            | Loại câu hỏi                           |
+| :--: | :--------------------- | :----: | :-------------------------------------------------------------------------------- | :------------------------------------- |
+|  1   | **Pre-warmed Cache**   |  ~0ms  | Nội dung 5 tab được load sẵn vào RAM khi server khởi động                         | "Tab 3 cho thấy gì?"                   |
+|  2   | **Auto Pandas Query**  | ~1–2s  | Tự động sinh và chạy code pandas trên DataFrame 33.848 dòng                       | "Tỷ lệ nhiên liệu xăng dầu điện?"      |
+|  3   | **Full LLM + Context** | ~5–10s | Gọi LLM (Groq/OpenAI/Google) với full system prompt + Dashboard.json + CSV schema | "Ngân sách 500 triệu mua xe điện nào?" |
 
 ### 6.2 Tính năng nổi bật
 
 #### Sinh & thực thi code Python (Code Sandbox)
+
 - AI tự động sinh code pandas/matplotlib phù hợp với câu hỏi phân tích.
 - Code hiển thị dạng block với nút **▶ Thực thi** — người dùng xem trước rồi mới chạy.
 - Kết quả trả về ngay trong cửa sổ chat: bảng Markdown + biểu đồ PNG (base64).
 - Namespace Python được giữ nguyên trong suốt phiên — không cần load lại `df` mỗi lần.
 
 #### Agent CRUD File với Approval Workflow (Human-in-the-Loop)
+
 AI có khả năng tạo, sửa, xóa, đổi tên file trong project — nhưng **không tự ý thực thi**. Mọi thao tác phải qua modal xác nhận:
 
-| Thao tác | Risk Level | Hành vi |
-| :------- | :--------: | :------ |
-| Đọc file | LOW | Tự động thực hiện |
-| Tạo file mới | MEDIUM | Hiện modal → user Approve |
-| Sửa file | HIGH | Hiện modal + diff trước/sau → user Approve |
-| Xóa file | CRITICAL | Hiện modal cảnh báo → user Approve |
-| Hoàn tác | — | Rollback về bản backup tự động |
+| Thao tác     | Risk Level | Hành vi                                    |
+| :----------- | :--------: | :----------------------------------------- |
+| Đọc file     |    LOW     | Tự động thực hiện                          |
+| Tạo file mới |   MEDIUM   | Hiện modal → user Approve                  |
+| Sửa file     |    HIGH    | Hiện modal + diff trước/sau → user Approve |
+| Xóa file     |  CRITICAL  | Hiện modal cảnh báo → user Approve         |
+| Hoàn tác     |     —      | Rollback về bản backup tự động             |
 
 **Thư mục được phép truy cập:** `data/`, `report/`, `ML/`, `docs/`, `notebook/`
 
 #### Multi-provider LLM
+
 Hỗ trợ chuyển đổi linh hoạt giữa các nhà cung cấp:
 
-| Provider | Model | Đặc điểm |
-| :------- | :---- | :-------- |
-| Groq | llama-3.3-70b-versatile | Nhanh, miễn phí tier |
-| OpenAI | gpt-4o-mini, gpt-4o | Chất lượng cao |
-| Google | gemini-2.0-flash-lite | Cân bằng tốc độ/chất lượng |
-| Ollama | llama3.2, qwen2.5 | Chạy local, không cần API key |
+| Provider | Model                   | Đặc điểm                      |
+| :------- | :---------------------- | :---------------------------- |
+| Groq     | llama-3.3-70b-versatile | Nhanh, miễn phí tier          |
+| OpenAI   | gpt-4o-mini, gpt-4o     | Chất lượng cao                |
+| Google   | gemini-2.0-flash-lite   | Cân bằng tốc độ/chất lượng    |
+| Ollama   | llama3.2, qwen2.5       | Chạy local, không cần API key |
 
 #### Scraping Agent tích hợp trong Chat
+
 - Gõ URL xe bất kỳ → AI gọi `scrape_car_data(url=...)` → trả về JSON thông tin xe ngay trong chat.
 
 #### Public API (cho ứng dụng bên ngoài)
+
 - Endpoint JSON đồng bộ — dễ tích hợp với Power BI, Excel, n8n, Python script.
 
 ### 6.3 Hướng dẫn sử dụng Web AI
@@ -247,12 +256,14 @@ Truy cập: **http://localhost:3000**
 #### Các câu hỏi mẫu theo từng tính năng
 
 **Tầng 1 — Xem Dashboard nhanh:**
+
 ```
 Tab 1 thị trường ô tô cho thấy gì?
 Tab 3 xe xăng và xe điện cho thấy gì?
 ```
 
 **Tầng 2 — Thống kê thực tế từ CSV:**
+
 ```
 Tỷ lệ phân bố các loại nhiên liệu xăng dầu điện?
 Top 10 hãng xe có nhiều tin đăng nhất?
@@ -260,18 +271,21 @@ Giá trung bình xe Toyota so với Hyundai?
 ```
 
 **Tầng 3 — Phân tích sâu, tư vấn:**
+
 ```
 Ngân sách 500 triệu muốn mua xe điện, nên chọn hãng nào?
 Tại sao xe điện lại rẻ hơn xe xăng trong khi nhiều người nghĩ ngược lại?
 ```
 
 **Sinh biểu đồ:**
+
 ```
 Vẽ biểu đồ so sánh giá xe điện và xe xăng theo dòng xe SUV, Crossover, Hatchback
 Vẽ pie chart phân bố loại nhiên liệu trên thị trường
 ```
 
 **CRUD File:**
+
 ```
 Tạo file report/ket_luan.md với nội dung tóm tắt Tab 3
 Sửa file report/ket_luan.md, thêm dòng kết luận về Hybrid
@@ -280,11 +294,13 @@ Hoàn tác thay đổi vừa rồi trong report/ket_luan.md
 ```
 
 **Scraping:**
+
 ```
 Thu thập thông tin xe tại https://bonbanh.com/xe-vinfast-vf8-...
 ```
 
 **Public API:**
+
 ```bash
 # Health check
 curl http://localhost:8000/api/public/health
@@ -303,10 +319,10 @@ curl -X POST http://localhost:8000/api/public/chat \
 
 Agent thu thập dữ liệu tự động từ các sàn ô tô trực tuyến, thiết kế 2 tầng:
 
-| Tầng | Phương pháp | Tốc độ | Áp dụng cho |
-| :--: | :---------- | :-----: | :---------- |
-| 1 | **Direct Scraper** (BeautifulSoup) | Rất nhanh | bonbanh.com, oto.com.vn |
-| 2 | **LLM Browser Agent** (browser-use) | Chậm hơn | Bất kỳ trang web nào |
+| Tầng | Phương pháp                         |  Tốc độ   | Áp dụng cho             |
+| :--: | :---------------------------------- | :-------: | :---------------------- |
+|  1   | **Direct Scraper** (BeautifulSoup)  | Rất nhanh | bonbanh.com, oto.com.vn |
+|  2   | **LLM Browser Agent** (browser-use) | Chậm hơn  | Bất kỳ trang web nào    |
 
 ### Sử dụng
 
